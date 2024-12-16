@@ -9,7 +9,7 @@ Invoicer je C# aplikace s webovım grafickım rozhraním navrená k automatizaci a 
 V programu si bude moct uivatel vybrat èíslování faktur podle své preference, zadávat jednotlivé odbìratele a poskytovatele jako ekonomické subjekty a vyhledávat je podle IÈA.
 
 ## Pouité technologie a postupy
-- **GUI:** Vue.js (nebo Blazor)
+- **GUI:** Blazor
 - **Backend:** ASP.net
 - **Práce s API (NPRG038 - síování):** API ARES ([ARES API Swagger UI](https://ares.gov.cz/swagger-ui/))
 - **Databáze (NPRG057 – ADO.net):** SQLite
