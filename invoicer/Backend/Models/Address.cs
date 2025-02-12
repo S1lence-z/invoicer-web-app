@@ -2,7 +2,7 @@
 
 namespace Backend.Models
 {
-	public class Address : ModelBase<Address>
+	public sealed class Address : ModelBase<Address>
 	{
 		[Key]
 		public int Id { get; private set; }

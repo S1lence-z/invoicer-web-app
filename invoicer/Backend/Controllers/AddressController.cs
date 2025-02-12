@@ -15,7 +15,7 @@ namespace Backend.Controllers
 			Address? address = context.Address.Find(id);
 			if (address == null)
 			{
-				return NotFound($"Addres with id {id} not found.");
+				return NotFound($"Addres with id {id} not found");
 			}
 			return Ok(address);
 		}
@@ -31,7 +31,7 @@ namespace Backend.Controllers
 		public IActionResult Post([FromBody] Address address)
 		{
 			if (address == null) {
-				return BadRequest("Address is null.");
+				return BadRequest("Address is null");
 			}
 			context.Address.Add(address);
 			context.SaveChanges();
@@ -43,12 +43,12 @@ namespace Backend.Controllers
 		{
 			if (address == null)
 			{
-				return BadRequest("New address is null.");
+				return BadRequest("New address is null");
 			}
 			Address? existingAddress = context.Address.Find(id);
 			if (existingAddress == null)
 			{
-				return NotFound($"Addres with id {id} not found.");
+				return NotFound($"Addres with id {id} not found");
 			}
 			existingAddress.Replace(address, context);
 			context.SaveChanges();
@@ -61,11 +61,11 @@ namespace Backend.Controllers
 			Address? address = context.Address.Find(id);
 			if (address == null)
 			{
-				return NotFound($"Addres with id {id} not found.");
+				return NotFound($"Addres with id {id} not found");
 			}
 			context.Address.Remove(address);
 			context.SaveChanges();
-			return Ok($"Address with id {id} deleted.");
+			return Ok($"Address with id {id} deleted");
 		}
 	}
 }
