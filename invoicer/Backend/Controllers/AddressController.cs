@@ -50,7 +50,7 @@ namespace Backend.Controllers
 			{
 				return NotFound($"Addres with id {id} not found.");
 			}
-			existingAddress.Replace(address);
+			existingAddress.Replace(address, context);
 			context.SaveChanges();
 			return Ok(existingAddress);
 		}

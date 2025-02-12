@@ -2,7 +2,7 @@
 
 namespace Backend.Models
 {
-	public class Address
+	public class Address : ModelBase<Address>
 	{
 		[Key]
 		public int Id { get; private set; }
@@ -18,14 +18,5 @@ namespace Backend.Models
 
 		[Required]
 		public required string Country { get; set; }
-
-		public Address Replace(Address newAddress)
-		{
-			Street = newAddress.Street;
-			City = newAddress.City;
-			ZipCode = newAddress.ZipCode;
-			Country = newAddress.Country;
-			return this;
-		}
 	}
 }
