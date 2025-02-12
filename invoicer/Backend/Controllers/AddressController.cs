@@ -1,33 +1,71 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Backend.Database;
+using Backend.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
 	[ApiController]
-	[Route("[controller]")]
-	public class AddressController : ControllerBase
+	[Route("api/[controller]")]
+	public class AddressController(ApplicationDbContext context) : ControllerBase
 	{
-		[HttpGet(Name = "GetAddress")]
-		public string Get()
+		[HttpGet("{id:int}", Name = "GetAddressById")]
+		public IActionResult GetById(int id)
 		{
-			return "Address";
+			Address? address = context.Address.Find(id);
+			if (address == null)
+			{
+				return NotFound($"Addres with id {id} not found.");
+			}
+			return Ok(address);
+		}
+
+		[HttpGet(Name = "GetAllAddresses")]
+		public IActionResult GetAll()
+		{
+			IList<Address> addressList = context.Address.ToList();
+			return Ok(addressList);
 		}
 
 		[HttpPost(Name = "PostAddress")]
-		public string Post()
+		public IActionResult Post([FromBody] Address address)
 		{
-			return "Address";
+			if (address == null) {
+				return BadRequest("Address is null.");
+			}
+			context.Address.Add(address);
+			context.SaveChanges();
+			return Ok(address);
 		}
 
-		[HttpPut(Name = "PutAddress")]
-		public string Put()
+		[HttpPut("{id:int}", Name = "PutAddress")]
+		public IActionResult Put(int id, [FromBody] Address address)
 		{
-			return "Address";
+			if (address == null)
+			{
+				return BadRequest("New address is null.");
+			}
+			Address? existingAddress = context.Address.Find(id);
+			if (existingAddress == null)
+			{
+				return NotFound($"Addres with id {id} not found.");
+			}
+			existingAddress.Replace(address);
+			context.SaveChanges();
+			return Ok(existingAddress);
 		}
 
-		[HttpDelete(Name = "DeleteAddress")]
-		public string Delete()
+		[HttpDelete("{id:int}", Name = "DeleteAddress")]
+		public IActionResult Delete(int id)
 		{
-			return "Address";
+			Address? address = context.Address.Find(id);
+			if (address == null)
+			{
+				return NotFound($"Addres with id {id} not found.");
+			}
+			context.Address.Remove(address);
+			context.SaveChanges();
+			return Ok($"Address with id {id} deleted.");
 		}
 	}
 }
