@@ -7,5 +7,6 @@ namespace Backend.Database
 	{
 		public DbSet<Address> Address { get; set; }
 		public DbSet<BankAccount> BankAccount { get; set; }
+		public DbSet<Entity> Entity { get; set; }
 	}
 }

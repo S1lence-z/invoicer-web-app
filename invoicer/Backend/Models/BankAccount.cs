@@ -18,6 +18,5 @@ namespace Backend.Models
 
 		[Required]
 		public string? IBAN { get; set; }
-
 	}
 }
