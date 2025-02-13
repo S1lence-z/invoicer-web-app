@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Models
 {
-	public abstract class ModelBase<TModel> where TModel : class
+	public abstract class ModelBase<TModel> where TModel : ModelBase<TModel>
 	{
 		private static HashSet<string> GetPrimaryKeyProperties(DbContext context)
 		{
@@ -15,7 +15,7 @@ namespace Backend.Models
 				.ToHashSet() ?? [];
 		}
 
-		public TModel Replace(TModel newModel, DbContext context)
+		public void Replace(TModel newModel, DbContext context)
 		{
 			HashSet<String> primaryKeyProperties = GetPrimaryKeyProperties(context);
 			foreach (var property in typeof(TModel).GetProperties())
@@ -27,7 +27,6 @@ namespace Backend.Models
 				var value = property.GetValue(newModel);
 				property.SetValue(this, value);
 			}
-			return newModel;
 		}
 	}
 }
