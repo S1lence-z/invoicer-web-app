@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
-using Backend.Database;
+﻿using Backend.Database;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
@@ -10,61 +10,61 @@ namespace Backend.Controllers
 	public class AddressController(ApplicationDbContext context) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetAddressById")]
-		public IActionResult GetById(int id)
+		public async Task<IActionResult> GetById(int id)
 		{
-			Address? address = context.Address.Find(id);
+			Address? address = await context.Address.FindAsync(id);
 			if (address == null)
 			{
-				return NotFound($"Addres with id {id} not found");
+				return NotFound($"Address with id {id} not found");
 			}
 			return Ok(address);
 		}
 
 		[HttpGet(Name = "GetAllAddresses")]
-		public IActionResult GetAll()
+		public async Task<IActionResult> GetAll()
 		{
-			IList<Address> addressList = context.Address.ToList();
+			IList<Address> addressList = await context.Address.ToListAsync();
 			return Ok(addressList);
 		}
 
 		[HttpPost(Name = "PostAddress")]
-		public IActionResult Post([FromBody] Address address)
+		public async Task<IActionResult> Post([FromBody] Address address)
 		{
 			if (address == null) {
 				return BadRequest("Address is null");
 			}
-			context.Address.Add(address);
-			context.SaveChanges();
-			return Ok(address);
+			await context.Address.AddAsync(address);
+			await context.SaveChangesAsync();
+			return CreatedAtRoute("GetAddressById", new { id = address.Id }, address);
 		}
 
 		[HttpPut("{id:int}", Name = "PutAddress")]
-		public IActionResult Put(int id, [FromBody] Address address)
+		public async Task<IActionResult> Put(int id, [FromBody] Address address)
 		{
 			if (address == null)
 			{
 				return BadRequest("New address is null");
 			}
-			Address? existingAddress = context.Address.Find(id);
+			Address? existingAddress = await context.Address.FindAsync(id);
 			if (existingAddress == null)
 			{
-				return NotFound($"Addres with id {id} not found");
+				return NotFound($"Address with id {id} not found");
 			}
 			existingAddress.Replace(address, context);
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 			return Ok(existingAddress);
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteAddress")]
-		public IActionResult Delete(int id)
+		public async Task<IActionResult> Delete(int id)
 		{
-			Address? address = context.Address.Find(id);
+			Address? address = await context.Address.FindAsync(id);
 			if (address == null)
 			{
-				return NotFound($"Addres with id {id} not found");
+				return NotFound($"Address with id {id} not found");
 			}
 			context.Address.Remove(address);
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 			return Ok($"Address with id {id} deleted");
 		}
 	}
