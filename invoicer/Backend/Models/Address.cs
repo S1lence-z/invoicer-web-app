@@ -5,7 +5,7 @@ namespace Backend.Models
 	public sealed class Address : ModelBase<Address>
 	{
 		[Key]
-		public int Id { get; private set; }
+		public int Id { get; set; }
 
 		[Required]
 		public required string Street { get; set; }
@@ -14,7 +14,7 @@ namespace Backend.Models
 		public required string City { get; set; }
 
 		[Required]
-		public required int ZipCode { get; set; }
+		public int ZipCode { get; set; }
 
 		[Required]
 		public required string Country { get; set; }

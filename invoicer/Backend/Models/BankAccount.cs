@@ -5,7 +5,7 @@ namespace Backend.Models
 	public sealed class BankAccount : ModelBase<BankAccount>
 	{
 		[Key]
-		public int Id { get; private set; }
+		public int Id { get; set; }
 
 		[Required]
 		public int AccountNumber { get; set; }

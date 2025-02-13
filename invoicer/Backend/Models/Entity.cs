@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Models
 {
@@ -8,7 +9,7 @@ namespace Backend.Models
 		public int Id { get; private set; }
 
 		[Required]
-		public required int Ico { get; set; }
+		public int Ico { get; set; }
 
 		[Required]
 		public required string Name { get; set; }
