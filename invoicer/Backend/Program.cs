@@ -1,4 +1,5 @@
 using Backend.Database;
+using Backend.Services.AresApiService;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend
@@ -14,6 +15,10 @@ namespace Backend
 				builder.Configuration.GetConnectionString("InvoicerDb"))
 			);
 
+			// Add custom services
+			builder.Services.AddScoped<AresApiService>();
+
+			// Add controllers after all the services
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
