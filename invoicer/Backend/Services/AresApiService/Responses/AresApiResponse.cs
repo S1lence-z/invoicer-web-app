@@ -1,6 +1,6 @@
-﻿namespace Backend.Services.AresApiService.Models
+﻿namespace Backend.Services.AresApiService.Responses
 {
-	public class SubjectInformation
+	public class SubjectInformation : IAresApiResponse
 	{
 		public string ico { get; set; }
 		public string obchodniJmeno { get; set; }

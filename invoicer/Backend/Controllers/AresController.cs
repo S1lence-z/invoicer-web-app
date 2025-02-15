@@ -1,5 +1,6 @@
 ﻿using Backend.Services.AresApiService;
 using Backend.Services.AresApiService.Models;
+using Backend.Services.AresApiService.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -11,12 +12,13 @@ namespace Backend.Controllers
 		[HttpGet("{ico}", Name = "GetEntityInformationByIco")]
 		public async Task<IActionResult> GetEntityInformationByIco(string ico)
 		{
-			SubjectInformation? subjectInformation = await aresApiService.GetEntityInformationByIcoAsync(ico);
-			if (subjectInformation == null)
+			IResult<IAresApiResponse> subjectInformation = await aresApiService.GetEntityInformationByIcoAsync(ico);
+
+			if (subjectInformation.IsSuccess)
 			{
-				return NotFound($"Entity with ICO {ico} not found");
+				return Ok(subjectInformation.Data);
 			}
-			return Ok(subjectInformation);
+			return StatusCode(subjectInformation.StatusCode, subjectInformation.ErrorMessage);
 		}
 	}
 }
