@@ -1,28 +1,28 @@
-# Generátor faktur – specifikace
+# GenerÃ¡tor faktur â€“ specifikace
 
-## Název programu
+## NÃ¡zev programu
 **Invoicer**
 
 ## Popis
-Invoicer je C# aplikace s webovım grafickım rozhraním navrená k automatizaci a zjednodušení procesu vytváøení faktur. Primárním uivatelem je mùj táta, kterı momentálnì vytváøí faktury ruènì. Tato aplikace mu vıznamnì usnadní práci tím, e automatizuje proces generování faktur.
+Invoicer je C# aplikace s webovÃ½m grafickÃ½m rozhranÃ­m navrÅ¾enÃ¡ k automatizaci a zjednoduÅ¡enÃ­ procesu vytvÃ¡Å™enÃ­ faktur. PrimÃ¡rnÃ­m uÅ¾ivatelem je mÅ¯j tÃ¡ta, kterÃ½ momentÃ¡lnÄ› vytvÃ¡Å™Ã­ faktury ruÄnÄ›. Tato aplikace mu vÃ½znamnÄ› usnadnÃ­ prÃ¡ci tÃ­m, Å¾e automatizuje proces generovÃ¡nÃ­ faktur.
 
-V programu si bude moct uivatel vybrat èíslování faktur podle své preference, zadávat jednotlivé odbìratele a poskytovatele jako ekonomické subjekty a vyhledávat je podle IÈA.
+V programu si bude moct uÅ¾ivatel vybrat ÄÃ­slovÃ¡nÃ­ faktur podle svÃ© preference, zadÃ¡vat jednotlivÃ© odbÄ›ratele a poskytovatele jako entity a vyhledÃ¡vat je podle IÄŒA.
 
-## Pouité technologie a postupy
+## PouÅ¾itÃ© technologie a postupy
 - **GUI:** Blazor
-- **Backend:** ASP.net
-- **Práce s API (NPRG038 - síování):** API ARES ([ARES API Swagger UI](https://ares.gov.cz/swagger-ui/))
-- **Databáze (NPRG057 – ADO.net):** SQLite
+- **Backend:** ASP.NET
+- **PrÃ¡ce s API (NPRG038 - sÃ­Å¥ovÃ¡nÃ­):** API ARES ([ARES API Swagger UI](https://ares.gov.cz/swagger-ui/))
+- **DatabÃ¡ze (NPRG057 â€“ ADO.net):** SQLite
 - **PDF:** QuestPDF knihovna pro export faktur do PDF
 
-## Hlavní funkcionalita
-### Generování faktur
-- Faktury budou obsahovat automaticky vyplnìné údaje po zadání IÈO pomocí API ARES.
-- Uivatel si bude moct pøidávat subjekty (adresy, bankovní úèty).
-- Uivatel uvidí, jaké faktury vygeneroval a spravuje.
+## HlavnÃ­ funkcionalita
+### GenerovÃ¡nÃ­ faktur
+- Faktury mohou bÃ½t pÅ™edvyplnÄ›nÃ© po zadÃ¡nÃ­ IÄŒA danÃ© entity pomocÃ­ ARES API.
+- UÅ¾ivatel si bude moct pÅ™idÃ¡vat subjekty (adresy, bankovnÃ­ ÃºÄty).
+- UÅ¾ivatel uvidÃ­, jakÃ© faktury vygeneroval a spravuje.
 
-### Uloení faktur
-- Faktury budou uloeny v lokální databázi SQLite.
+### UloÅ¾enÃ­ faktur
+- Faktury budou uloÅ¾eny v lokÃ¡lnÃ­ databÃ¡zi SQLite.
 
 ### Export faktur
-- Monost exportovat faktury do PDF pro tisk nebo pøeposlání.
+- MoÅ¾nost exportovat faktury do PDF pro tisk nebo pÅ™eposlÃ¡nÃ­.
