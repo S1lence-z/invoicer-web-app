@@ -34,8 +34,8 @@ namespace Backend.Controllers
 			if (address == null) {
 				return BadRequest("Address is null");
 			}
-			await addressService.CreateAsync(address);
-			return CreatedAtRoute("GetAddressById", new { id = address.Id }, address);
+			Address newAddres = await addressService.CreateAsync(address);
+			return CreatedAtRoute("GetAddressById", new { id = newAddres.Id }, newAddres);
 		}
 
 		[HttpPut("{id:int}", Name = "PutAddress")]
