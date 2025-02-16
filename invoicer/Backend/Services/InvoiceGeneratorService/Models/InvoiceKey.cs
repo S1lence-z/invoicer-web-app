@@ -1,4 +1,4 @@
-﻿using Backend.Models;
+﻿using Backend.Services.EntityService.Models;
 
 namespace Backend.Services.InvoiceGeneratorService.Models
 {

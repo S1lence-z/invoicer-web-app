@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Backend.Models;
 using Backend.Services.AddressService.Models;
 using Backend.Services.BankAccountService.Models;
 
-namespace Backend.Models
+namespace Backend.Services.EntityService.Models
 {
 	public class Entity : ModelBase<Entity>
 	{
