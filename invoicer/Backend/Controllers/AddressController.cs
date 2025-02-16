@@ -1,5 +1,6 @@
 ﻿using Backend.Database;
-using Backend.Models;
+using Backend.Services.AddressService;
+using Backend.Services.AddressService.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,12 +8,12 @@ namespace Backend.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
-	public class AddressController(ApplicationDbContext context) : ControllerBase
+	public class AddressController(IAddressService addressService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetAddressById")]
 		public async Task<IActionResult> GetById(int id)
 		{
-			Address? address = await context.Address.FindAsync(id);
+			Address? address = await addressService.GetByIdAsync(id);
 			if (address == null)
 			{
 				return NotFound($"Address with id {id} not found");
@@ -23,7 +24,7 @@ namespace Backend.Controllers
 		[HttpGet(Name = "GetAllAddresses")]
 		public async Task<IActionResult> GetAll()
 		{
-			IList<Address> addressList = await context.Address.ToListAsync();
+			IList<Address> addressList = await addressService.GetAllAsync();
 			return Ok(addressList);
 		}
 
@@ -33,8 +34,7 @@ namespace Backend.Controllers
 			if (address == null) {
 				return BadRequest("Address is null");
 			}
-			await context.Address.AddAsync(address);
-			await context.SaveChangesAsync();
+			await addressService.CreateAsync(address);
 			return CreatedAtRoute("GetAddressById", new { id = address.Id }, address);
 		}
 
@@ -45,26 +45,24 @@ namespace Backend.Controllers
 			{
 				return BadRequest("New address is null");
 			}
-			Address? existingAddress = await context.Address.FindAsync(id);
+			Address? existingAddress = await addressService.GetByIdAsync(id);
 			if (existingAddress == null)
 			{
 				return NotFound($"Address with id {id} not found");
 			}
-			existingAddress.Replace(address, context);
-			await context.SaveChangesAsync();
+			await addressService.UpdateAsync(id, address);
 			return Ok(existingAddress);
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteAddress")]
 		public async Task<IActionResult> Delete(int id)
 		{
-			Address? address = await context.Address.FindAsync(id);
+			Address? address = await addressService.GetByIdAsync(id);
 			if (address == null)
 			{
 				return NotFound($"Address with id {id} not found");
 			}
-			context.Address.Remove(address);
-			await context.SaveChangesAsync();
+			await addressService.DeleteAsync(id);
 			return Ok($"Address with id {id} deleted");
 		}
 	}
