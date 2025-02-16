@@ -1,11 +1,12 @@
-﻿using Backend.Services.InvoiceGeneratorService.Models;
+﻿using Backend.Services.InvoiceService;
+using Backend.Services.InvoiceService.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
-	public class InvoiceController : ControllerBase
+	public class InvoiceController(IInvoiceService invoiceService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetInvoiceById")]
 		public async Task<IActionResult> GetById(int id)

@@ -2,13 +2,12 @@
 using Backend.Models;
 using Backend.Services.EntityService.Models;
 
-namespace Backend.Services.InvoiceGeneratorService.Models
+namespace Backend.Services.InvoiceService.Models
 {
 	public class Invoice : ModelBase<Invoice>
 	{
-		// Composite key
 		[Key]
-		public InvoiceKey Id { get; set; }
+		public int Id { get; set; }
 
 		// Invoice properties
 		[Required]

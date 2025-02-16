@@ -1,4 +1,4 @@
-﻿namespace Backend.Services.InvoiceGeneratorService.Models
+﻿namespace Backend.Services.InvoiceService.Models
 {
 	public enum PaymentMethod
 	{

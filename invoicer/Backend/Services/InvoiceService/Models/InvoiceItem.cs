@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Backend.Models;
 
-namespace Backend.Services.InvoiceGeneratorService.Models
+namespace Backend.Services.InvoiceService.Models
 {
 	public class InvoiceItem : ModelBase<InvoiceItem>
 	{
-		// Composite key
 		[Key]
-		public InvoiceItemKey Id { get; set; }
+		public int Id { get; set; }
 
 		// InvoiceItem properties
 		[Required]
