@@ -1,5 +1,6 @@
 using Backend.Database;
 using Backend.Services.AresApiService;
+using Backend.Services.InvoiceGeneratorService;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend
@@ -17,6 +18,7 @@ namespace Backend
 
 			// Add custom services
 			builder.Services.AddScoped<AresApiService>();
+			builder.Services.AddScoped<InvoiceGeneratorService>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
