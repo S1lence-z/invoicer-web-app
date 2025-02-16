@@ -1,8 +1,6 @@
-﻿using Backend.Database;
-using Backend.Services.BankAccountService;
+﻿using Backend.Services.BankAccountService;
 using Backend.Services.BankAccountService.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
@@ -58,12 +56,11 @@ namespace Backend.Controllers
 		[HttpDelete("{id:int}", Name = "DeleteBankAccount")]
 		public async Task<IActionResult> Delete(int id)
 		{
-			BankAccount? bankAccount = await bankAccountService.GetByIdAsync(id);
-			if (bankAccount == null)
+			bool wasDeleted = await bankAccountService.DeleteAsync(id);
+			if (!wasDeleted)
 			{
 				return NotFound($"Bank account with id {id} not found");
 			}
-			await bankAccountService.DeleteAsync(id);
 			return Ok($"Bank account with id {id} deleted");
 		}
 	}

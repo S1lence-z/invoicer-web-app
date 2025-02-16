@@ -1,8 +1,6 @@
-﻿using Backend.Database;
-using Backend.Services.AddressService;
+﻿using Backend.Services.AddressService;
 using Backend.Services.AddressService.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
@@ -57,13 +55,12 @@ namespace Backend.Controllers
 		[HttpDelete("{id:int}", Name = "DeleteAddress")]
 		public async Task<IActionResult> Delete(int id)
 		{
-			Address? address = await addressService.GetByIdAsync(id);
-			if (address == null)
+			bool wasDeleted = await addressService.DeleteAsync(id);
+			if (!wasDeleted)
 			{
 				return NotFound($"Address with id {id} not found");
 			}
-			await addressService.DeleteAsync(id);
-			return Ok($"Address with id {id} deleted");
+			return Ok($"Address with id {id} was deleted");
 		}
 	}
 }
