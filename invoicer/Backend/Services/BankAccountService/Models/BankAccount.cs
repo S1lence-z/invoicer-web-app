@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Models;
 
-namespace Backend.Models
+namespace Backend.Services.BankAccountService.Models
 {
 	public sealed class BankAccount : ModelBase<BankAccount>
 	{

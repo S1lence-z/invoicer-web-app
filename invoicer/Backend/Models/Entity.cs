@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Backend.Services.AddressService.Models;
+using Backend.Services.BankAccountService.Models;
 
 namespace Backend.Models
 {

@@ -1,5 +1,6 @@
 ﻿using Backend.Database;
-using Backend.Models;
+using Backend.Services.BankAccountService;
+using Backend.Services.BankAccountService.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,12 +8,12 @@ namespace Backend.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
-	public class BankAccountController(ApplicationDbContext context) : ControllerBase
+	public class BankAccountController(IBankAccountService bankAccountService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetBankAccountById")]
 		public async Task<IActionResult> GetById(int id)
 		{
-			BankAccount? bankAccount = await context.BankAccount.FindAsync(id);
+			BankAccount? bankAccount = await bankAccountService.GetByIdAsync(id);
 			if (bankAccount == null)
 			{
 				return NotFound($"Bank account with id {id} not found");
@@ -23,7 +24,7 @@ namespace Backend.Controllers
 		[HttpGet(Name = "GetAllBankAccounts")]
 		public async Task<IActionResult> GetAll()
 		{
-			IList<BankAccount> bankAccountList = await context.BankAccount.ToListAsync();
+			IList<BankAccount> bankAccountList = await bankAccountService.GetAllAsync();
 			return Ok(bankAccountList);
 		}
 
@@ -34,9 +35,8 @@ namespace Backend.Controllers
 			{
 				return BadRequest("Bank account is null");
 			}
-			await context.BankAccount.AddAsync(bankAccount);
-			await context.SaveChangesAsync();
-			return CreatedAtRoute("GetBankAccountById", new { id = bankAccount.Id }, bankAccount);
+			BankAccount newBankAcc = await bankAccountService.CreateAsync(bankAccount);
+			return CreatedAtRoute("GetBankAccountById", new { id = newBankAcc.Id }, newBankAcc);
 		}
 
 		[HttpPut("{id:int}", Name = "PutBankAccount")]
@@ -46,26 +46,24 @@ namespace Backend.Controllers
 			{
 				return BadRequest("New bank account is null");
 			}
-			BankAccount? existingBankAccount = await context.BankAccount.FindAsync(id);
+			BankAccount? existingBankAccount = await bankAccountService.GetByIdAsync(id);
 			if (existingBankAccount == null)
 			{
 				return NotFound($"Bank account with id {id} not found");
 			}
-			existingBankAccount.Replace(bankAccount, context);
-			await context.SaveChangesAsync();
+			await bankAccountService.UpdateAsync(id, bankAccount);
 			return Ok(existingBankAccount);
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteBankAccount")]
 		public async Task<IActionResult> Delete(int id)
 		{
-			BankAccount? bankAccount = await context.BankAccount.FindAsync(id);
+			BankAccount? bankAccount = await bankAccountService.GetByIdAsync(id);
 			if (bankAccount == null)
 			{
 				return NotFound($"Bank account with id {id} not found");
 			}
-			context.BankAccount.Remove(bankAccount);
-			await context.SaveChangesAsync();
+			await bankAccountService.DeleteAsync(id);
 			return Ok($"Bank account with id {id} deleted");
 		}
 	}
