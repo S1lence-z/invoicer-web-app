@@ -9,7 +9,7 @@ namespace Backend.Controllers
 	[Route("api/[controller]")]
 	public class AresController(AresApiService aresApiService) : ControllerBase
 	{
-		[HttpGet("{ico}", Name = "GetEntityInformationByIco")]
+		[HttpGet("{ico:int}", Name = "GetEntityInformationByIco")]
 		public async Task<IActionResult> GetEntityInformationByIco(string ico)
 		{
 			IResult<IAresApiResponse> subjectInformation = await aresApiService.GetEntityInformationByIcoAsync(ico);
