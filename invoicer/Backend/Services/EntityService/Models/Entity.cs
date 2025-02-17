@@ -6,10 +6,10 @@ using Backend.Services.BankAccountService.Models;
 
 namespace Backend.Services.EntityService.Models
 {
-	public class Entity : ModelBase<Entity>
+	public class Entity : ModelBase<Entity>, IModel
 	{
 		[Key]
-		public int Id { get; private set; }
+		public int Id { get; set; }
 
 		[Required]
 		public int Ico { get; set; }
@@ -24,9 +24,15 @@ namespace Backend.Services.EntityService.Models
 		public string? PhoneNumber { get; set; }
 
 		[Required]
-		public required BankAccount BankAccount { get; set; }
+		public int BankAccountId { get; set; }
+
+		[ForeignKey(nameof(BankAccountId))]
+		public BankAccount? BankAccount { get; set; }
 
 		[Required]
-		public required Address Address { get; set; }
+		public int AddressId { get; set; }
+
+		[ForeignKey(nameof(AddressId))]
+		public Address? Address { get; set; }
 	}
 }

@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Backend.Database;
+using Backend.Services.AddressService.Models;
+using Backend.Services.BankAccountService.Models;
 using Backend.Services.EntityService.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +11,7 @@ namespace Backend.Services.EntityService
 	{
 		public async Task<Entity?> GetByIdAsync(int id)
 		{
+
 			return await context.Entity
 				.Include(e => e.BankAccount)
 				.Include(e => e.Address)
@@ -23,59 +26,47 @@ namespace Backend.Services.EntityService
 				.ToListAsync();
 		}
 
-		public async Task<Entity> CreateAsync(Entity obj)
+		public async Task<Entity> CreateAsync(Entity newEntity)
 		{
-			// Check if the bank account exists
-			if (obj.BankAccount != null)
-			{
-				var existingBankAccount = await context.BankAccount.FindAsync(obj.BankAccount.Id);
-				if (existingBankAccount == null)
-					throw new ArgumentException($"Bank account with id {obj.BankAccount.Id} not found.");
-				obj.BankAccount = existingBankAccount;
-			}
+			Address? address = await context.Address.FindAsync(newEntity.AddressId);
+			BankAccount? bankAccount = await context.BankAccount.FindAsync(newEntity.BankAccountId);
 
-			// Check if the address exists
-			if (obj.Address != null)
-			{
-				var existingAddress = await context.Address.FindAsync(obj.Address.Id);
-				if (existingAddress == null)
-					throw new ArgumentException($"Address with id {obj.Address.Id} not found.");
-				obj.Address = existingAddress;
-			}
+			if (address is null)
+				throw new ArgumentException($"Address with id {newEntity.AddressId} not found.");
 
-			await context.Entity.AddAsync(obj);
+			if (bankAccount is null)
+				throw new ArgumentException($"Bank account with id {newEntity.BankAccountId} not found.");
+
+			newEntity.Address = address;
+			newEntity.BankAccount = bankAccount;
+
+			context.Entity.Add(newEntity);
 			await context.SaveChangesAsync();
-			return obj;
+			return newEntity;
 		}
 
-		public async Task<Entity> UpdateAsync(int id, Entity obj)
+		public async Task<Entity> UpdateAsync(int id, Entity newEntityData)
 		{
-			Entity? existingEntity = await context.Entity
-				.Include(e => e.BankAccount)
-				.Include(e => e.Address)
-				.FirstOrDefaultAsync(e => e.Id == id);
-
-			if (existingEntity == null)
+			Entity? existingEntity = await context.Entity.FindAsync(id);
+			if (existingEntity is null)
 				throw new ArgumentException($"Entity with id {id} not found.");
-			existingEntity.Replace(obj, context);
+			
+			Address? possibleNewAddres = await context.Address.FindAsync(newEntityData.AddressId);
+			BankAccount? possibleNewBankAcc = await context.BankAccount.FindAsync(newEntityData.BankAccountId);
+			
+			if (possibleNewAddres is null)
+				throw new ArgumentException($"Updated address with id {newEntityData.AddressId} not found.");
+			if (possibleNewBankAcc is null)
+				throw new ArgumentException($"Updated bank account with id {newEntityData.BankAccountId} not found.");
 
-			// Check if the bank account exists
-			if (existingEntity.BankAccount != null)
-			{
-				var existingBankAccount = await context.BankAccount.FindAsync(existingEntity.BankAccount.Id);
-				if (existingBankAccount == null)
-					throw new ArgumentException($"Bank account with id {obj.BankAccount.Id} not found.");
-				existingEntity.BankAccount = existingBankAccount;
-			}
-
-			// Check if the address exists
-			if (obj.Address != null)
-			{
-				var existingAddress = await context.Address.FindAsync(obj.Address.Id);
-				if (existingAddress == null)
-					throw new ArgumentException($"Address with id {obj.Address.Id} not found.");
-				existingEntity.Address = existingAddress;
-			}
+			existingEntity.AddressId = newEntityData.AddressId;
+			existingEntity.BankAccountId = newEntityData.BankAccountId;
+			existingEntity.Address = possibleNewAddres;
+			existingEntity.BankAccount = possibleNewBankAcc;
+			existingEntity.Email = newEntityData.Email;
+			existingEntity.Ico = newEntityData.Ico;
+			existingEntity.Name = newEntityData.Name;
+			existingEntity.PhoneNumber = newEntityData.PhoneNumber;
 
 			await context.SaveChangesAsync();
 			return existingEntity;
@@ -84,7 +75,7 @@ namespace Backend.Services.EntityService
 		public async Task<bool> DeleteAsync(int id)
 		{
 			Entity? entity = await context.Entity.FindAsync(id);
-			if (entity == null)
+			if (entity is null)
 				return false;
 			context.Entity.Remove(entity);
 			await context.SaveChangesAsync();

@@ -14,7 +14,7 @@ namespace Backend.Controllers
 		public async Task<IActionResult> GetById(int id)
 		{
 			Entity? entity = await entityService.GetByIdAsync(id);
-			if (entity == null)
+			if (entity is null)
 			{
 				return NotFound($"Entity with id {id} not found");
 			}
@@ -31,7 +31,7 @@ namespace Backend.Controllers
 		[HttpPost(Name = "PostEntity")]
 		public async Task<IActionResult> Post([FromBody] Entity entity)
 		{
-			if (entity == null)
+			if (entity is null)
 			{
 				return BadRequest("Entity is null");
 			}
@@ -50,12 +50,12 @@ namespace Backend.Controllers
 		[HttpPut("{id:int}", Name = "PutEntity")]
 		public async Task<IActionResult> Put(int id, [FromBody] Entity entity)
 		{
-			if (entity == null)
+			if (entity is null)
 			{
 				return BadRequest("New entity is null");
 			}
 			Entity? existingEntity = await entityService.GetByIdAsync(id);	
-			if (existingEntity == null)
+			if (existingEntity is null)
 			{
 				return NotFound($"Entity with id {id} not found");
 			}
