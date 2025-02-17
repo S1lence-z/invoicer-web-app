@@ -16,20 +16,25 @@ namespace Backend.Services.BankAccountService
 			return await context.BankAccount.ToListAsync();
 		}
 
-		public async Task<BankAccount> CreateAsync(BankAccount obj)
+		public async Task<BankAccount> CreateAsync(BankAccount newBankAcc)
 		{
 			// TODO: Add db exception handling
-			await context.BankAccount.AddAsync(obj);
+			await context.BankAccount.AddAsync(newBankAcc);
 			await context.SaveChangesAsync();
-			return obj;
+			return newBankAcc;
 		}
 
-		public async Task<BankAccount> UpdateAsync(int id, BankAccount obj)
+		public async Task<BankAccount> UpdateAsync(int id, BankAccount updatedBankAcc)
 		{
 			BankAccount? bankAcc = await context.BankAccount.FindAsync(id);
-			if (bankAcc == null)
+			if (bankAcc is null)
 				throw new KeyNotFoundException($"Bank account with id {id} not found");
-			bankAcc.Replace(obj, context);
+
+			bankAcc.BankName = updatedBankAcc.BankName;
+			bankAcc.AccountNumber = updatedBankAcc.AccountNumber;
+			bankAcc.BankCode = updatedBankAcc.BankCode;
+			bankAcc.IBAN = updatedBankAcc.IBAN;
+
 			await context.SaveChangesAsync();
 			return bankAcc;
 		}
@@ -37,7 +42,7 @@ namespace Backend.Services.BankAccountService
 		public async Task<bool> DeleteAsync(int id)
 		{
 			BankAccount? bankAcc = await context.BankAccount.FindAsync(id);
-			if (bankAcc == null)
+			if (bankAcc is null)
 				return false;
 			context.BankAccount.Remove(bankAcc);
 			await context.SaveChangesAsync();

@@ -3,7 +3,7 @@ using Backend.Models;
 
 namespace Backend.Services.AddressService.Models
 {
-	public sealed class Address : ModelBase<Address>
+	public sealed class Address : ModelBase<Address>, IModel
 	{
 		[Key]
 		public int Id { get; set; }

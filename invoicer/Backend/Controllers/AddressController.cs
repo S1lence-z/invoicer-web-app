@@ -12,7 +12,7 @@ namespace Backend.Controllers
 		public async Task<IActionResult> GetById(int id)
 		{
 			Address? address = await addressService.GetByIdAsync(id);
-			if (address == null)
+			if (address is null)
 			{
 				return NotFound($"Address with id {id} not found");
 			}
@@ -29,7 +29,7 @@ namespace Backend.Controllers
 		[HttpPost(Name = "PostAddress")]
 		public async Task<IActionResult> Post([FromBody] Address address)
 		{
-			if (address == null) {
+			if (address is null) {
 				return BadRequest("Address is null");
 			}
 			Address newAddres = await addressService.CreateAsync(address);
@@ -39,12 +39,12 @@ namespace Backend.Controllers
 		[HttpPut("{id:int}", Name = "PutAddress")]
 		public async Task<IActionResult> Put(int id, [FromBody] Address address)
 		{
-			if (address == null)
+			if (address is null)
 			{
 				return BadRequest("New address is null");
 			}
 			Address? existingAddress = await addressService.GetByIdAsync(id);
-			if (existingAddress == null)
+			if (existingAddress is null)
 			{
 				return NotFound($"Address with id {id} not found");
 			}

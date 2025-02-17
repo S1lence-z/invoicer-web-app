@@ -12,7 +12,7 @@ namespace Backend.Controllers
 		public async Task<IActionResult> GetById(int id)
 		{
 			BankAccount? bankAccount = await bankAccountService.GetByIdAsync(id);
-			if (bankAccount == null)
+			if (bankAccount is null)
 			{
 				return NotFound($"Bank account with id {id} not found");
 			}
@@ -29,7 +29,7 @@ namespace Backend.Controllers
 		[HttpPost(Name = "PostBankAccount")]
 		public async Task<IActionResult> Post([FromBody] BankAccount bankAccount)
 		{
-			if (bankAccount == null)
+			if (bankAccount is null)
 			{
 				return BadRequest("Bank account is null");
 			}
@@ -40,12 +40,12 @@ namespace Backend.Controllers
 		[HttpPut("{id:int}", Name = "PutBankAccount")]
 		public async Task<IActionResult> Put(int id, [FromBody] BankAccount bankAccount)
 		{
-			if (bankAccount == null)
+			if (bankAccount is null)
 			{
 				return BadRequest("New bank account is null");
 			}
 			BankAccount? existingBankAccount = await bankAccountService.GetByIdAsync(id);
-			if (existingBankAccount == null)
+			if (existingBankAccount is null)
 			{
 				return NotFound($"Bank account with id {id} not found");
 			}

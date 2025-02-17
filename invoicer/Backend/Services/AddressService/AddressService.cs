@@ -17,20 +17,25 @@ namespace Backend.Services.AddressService
 			return await context.Address.ToListAsync();
 		}
 
-		public async Task<Address> CreateAsync(Address obj)
+		public async Task<Address> CreateAsync(Address newAddress)
 		{
 			// TODO: Add db exception handling
-			await context.Address.AddAsync(obj);
+			await context.Address.AddAsync(newAddress);
 			await context.SaveChangesAsync();
-			return obj;
+			return newAddress;
 		}
 
-		public async Task<Address> UpdateAsync(int id, Address obj)
+		public async Task<Address> UpdateAsync(int id, Address updatedAddress)
 		{
 			Address? existingAddress = await context.Address.FindAsync(id);
-			if (existingAddress == null)
+			if (existingAddress is null)
 				throw new KeyNotFoundException($"Address with id {id} not found");
-			existingAddress.Replace(obj, context);
+
+			existingAddress.Street = updatedAddress.Street;
+			existingAddress.City = updatedAddress.City;
+			existingAddress.Country = updatedAddress.Country;
+			existingAddress.ZipCode = updatedAddress.ZipCode;
+
 			await context.SaveChangesAsync();
 			return existingAddress;
 		}
@@ -38,7 +43,7 @@ namespace Backend.Services.AddressService
 		public async Task<bool> DeleteAsync(int id)
 		{
 			Address? address = await context.Address.FindAsync(id);
-			if (address == null)
+			if (address is null)
 				return false;
 			context.Address.Remove(address);
 			await context.SaveChangesAsync();
