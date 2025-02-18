@@ -11,31 +11,56 @@ namespace Backend.Controllers
 		[HttpGet("{id:int}", Name = "GetInvoiceById")]
 		public async Task<IActionResult> GetById(int id)
 		{
-			return Ok();
+			Invoice? invoice = await invoiceService.GetByIdAsync(id);
+			if (invoice is null)
+				return NotFound($"Entity with id {id} not found");
+			return Ok(invoice);
 		}
 
 		[HttpGet(Name = "GetAllInvoices")]
 		public async Task<IActionResult> GetAll()
 		{
-			return Ok();
+			IList<Invoice> invoices = await invoiceService.GetAllAsync();
+			return Ok(invoices);
 		}
 
 		[HttpPost(Name = "PostInvoice")]
 		public async Task<IActionResult> Post([FromBody] Invoice invoice)
 		{
-			return Created();
+			Invoice createdInvoice;
+			try
+			{
+				createdInvoice = await invoiceService.CreateAsync(invoice);
+			}
+			catch (ArgumentException e)
+			{
+				return BadRequest(e.Message);
+			}
+			return CreatedAtRoute("GetInvoiceById", new { id = createdInvoice.Id }, createdInvoice);
 		}
 
 		[HttpPut("{id:int}", Name = "PutInvoice")]
 		public async Task<IActionResult> Put(int id, [FromBody] Invoice invoice)
 		{
-			return Ok();
+			Invoice updatedInvoice;
+			try
+			{
+				updatedInvoice = await invoiceService.UpdateAsync(id, invoice);
+			}
+			catch (ArgumentException e)
+			{
+				return NotFound(e.Message);
+			}
+			return Ok(updatedInvoice);
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteInvoice")]
 		public async Task<IActionResult> Delete(int id)
 		{
-			return Ok();
+			bool wasDeleted = await invoiceService.DeleteAsync(id);
+			if (!wasDeleted)
+				return NotFound($"Invoice with id {id} not found");
+			return Ok($"Invoice with id {id} deleted");
 		}
 	}
 }

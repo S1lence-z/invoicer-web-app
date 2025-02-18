@@ -1,33 +1,108 @@
 ﻿using Backend.Database;
+using Backend.Services.EntityService.Models;
 using Backend.Services.InvoiceService.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.InvoiceService
 {
 	public class InvoiceService(ApplicationDbContext context) : IInvoiceService
 	{
-		public Task<Invoice> CreateAsync(Invoice obj)
+		public async Task<Invoice?> GetByIdAsync(int id)
 		{
-			throw new NotImplementedException();
+			return await context.Invoice
+				.Include(i => i.Seller)
+					.ThenInclude(s => s.Address)
+				.Include(i => i.Seller)
+					.ThenInclude(s => s.BankAccount)
+				.Include(i => i.Buyer)
+					.ThenInclude(b => b.Address)
+				.Include(i => i.Buyer)
+					.ThenInclude(b => b.BankAccount)
+				.Include(i => i.Items)
+				.FirstOrDefaultAsync(i => i.Id == id);
 		}
 
-		public Task<bool> DeleteAsync(int id)
+		public async Task<IList<Invoice>> GetAllAsync()
 		{
-			throw new NotImplementedException();
+			return await context.Invoice
+				.Include(i => i.Seller)
+					.ThenInclude(s => s.Address)
+				.Include(i => i.Seller)
+					.ThenInclude(s => s.BankAccount)
+				.Include(i => i.Buyer)
+					.ThenInclude(b => b.Address)
+				.Include(i => i.Buyer)
+					.ThenInclude(b => b.BankAccount)
+				.Include(i => i.Items)
+				.ToListAsync();
 		}
 
-		public Task<IList<Invoice>> GetAllAsync()
+		public async Task<Invoice> CreateAsync(Invoice newInvoice)
 		{
-			throw new NotImplementedException();
+			Entity? seller = await context.Entity
+				.Include(e => e.BankAccount)
+				.Include(e => e.Address)
+				.FirstOrDefaultAsync(e => e.Id == newInvoice.SellerId);
+			Entity? buyer = await context.Entity
+				.Include(e => e.BankAccount)
+				.Include(e => e.Address)
+				.FirstOrDefaultAsync(e => e.Id == newInvoice.BuyerId);
+
+			if (seller is null)
+				throw new ArgumentException($"Seller entity with id {newInvoice.SellerId} not found");
+			if (buyer is null)
+				throw new ArgumentException($"Buyer entity with id {newInvoice.BuyerId} not found");
+
+			newInvoice.Seller = seller;
+			newInvoice.Buyer = buyer;
+
+			context.Invoice.Add(newInvoice);
+			await context.SaveChangesAsync();
+			return newInvoice;
 		}
 
-		public Task<Invoice?> GetByIdAsync(int id)
+		public async Task<Invoice> UpdateAsync(int id, Invoice updatedInvoice)
 		{
-			throw new NotImplementedException();
+			Invoice? existingInvoice = await context.Invoice.FindAsync(id);
+			if (existingInvoice == null)
+				throw new ArgumentException($"Invoice with id {id} not found");
+			Entity? seller = await context.Entity
+				.Include(e => e.BankAccount)
+				.Include(e => e.Address)
+				.FirstOrDefaultAsync(e => e.Id == updatedInvoice.SellerId);
+			Entity? buyer = await context.Entity
+				.Include(e => e.BankAccount)
+				.Include(e => e.Address)
+				.FirstOrDefaultAsync(e => e.Id == updatedInvoice.BuyerId);
+			if (seller is null)
+				throw new ArgumentException($"Seller entity with id {updatedInvoice.SellerId} not found");
+			if (buyer is null)
+				throw new ArgumentException($"Buyer entity with id {updatedInvoice.BuyerId} not found");
+
+			existingInvoice.SellerId = updatedInvoice.SellerId;
+			existingInvoice.BuyerId = updatedInvoice.BuyerId;
+			existingInvoice.Seller = seller;
+			existingInvoice.Buyer = buyer;
+			existingInvoice.InvoiceNumber = updatedInvoice.InvoiceNumber;
+			existingInvoice.IssueDate = updatedInvoice.IssueDate;
+			existingInvoice.DueDate = updatedInvoice.DueDate;
+			existingInvoice.Currency = updatedInvoice.Currency;
+			existingInvoice.PaymentMethod = updatedInvoice.PaymentMethod;
+			existingInvoice.DeliveryMethod = updatedInvoice.DeliveryMethod;
+			existingInvoice.Items = updatedInvoice.Items;
+
+			await context.SaveChangesAsync();
+			return existingInvoice;
 		}
 
-		public Task<Invoice> UpdateAsync(int id, Invoice obj)
+		public async Task<bool> DeleteAsync(int id)
 		{
-			throw new NotImplementedException();
+			Invoice? existingInvoice = await context.Invoice.FindAsync(id);
+			if (existingInvoice == null)
+				return false;
+			context.Invoice.Remove(existingInvoice);
+			await context.SaveChangesAsync();
+			return true;
 		}
 	}
 }

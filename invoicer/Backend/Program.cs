@@ -23,6 +23,7 @@ namespace Backend
 			builder.Services.AddScoped<IAddressService, AddressService>();
 			builder.Services.AddScoped<IBankAccountService, BankAccountService>();
 			builder.Services.AddScoped<IEntityService, EntityService>();
+			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 			builder.Services.AddScoped<AresApiService>();
 			builder.Services.AddScoped<InvoiceService>();
 

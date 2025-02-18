@@ -1,12 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.InvoiceService.Models
 {
-	public class InvoiceItem : ModelBase<InvoiceItem>
+	public class InvoiceItem : ModelBase<InvoiceItem>, IModel
 	{
 		[Key]
 		public int Id { get; set; }
+
+		// Invoice properties
+		[Required]
+		public required int InvoiceId { get; set; }
+
+		[ForeignKey(nameof(InvoiceId))]
+		public Invoice? Invoice { get; set; }
 
 		// InvoiceItem properties
 		[Required]
