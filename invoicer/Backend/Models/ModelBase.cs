@@ -1,32 +1,24 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Models
 {
 	public abstract class ModelBase<TModel> where TModel : ModelBase<TModel>
 	{
-		private static HashSet<string> GetPrimaryKeyProperties(DbContext context)
+		public static void ConfigureEntity(ModelBuilder modelBuilder)
 		{
-			return context.Model?
-				.FindEntityType(typeof(TModel))?
-				.FindPrimaryKey()?
-				.Properties
-				.Select(prop => prop.Name)
-				.ToHashSet() ?? [];
+			modelBuilder.Entity<TModel>(entity =>
+			{
+				TModel instance = (TModel)Activator.CreateInstance(typeof(TModel));
+				instance!.SetUp(modelBuilder);
+			});
 		}
 
-		public void Replace(TModel newModel, DbContext context)
+		protected virtual void SetUp(ModelBuilder modelBuilder)
 		{
-			HashSet<String> primaryKeyProperties = GetPrimaryKeyProperties(context);
-			foreach (var property in typeof(TModel).GetProperties())
-			{
-				if (primaryKeyProperties.Contains(property.Name))
-				{
-					continue;
-				}
-				var value = property.GetValue(newModel);
-				property.SetValue(this, value);
-			}
+			throw new NotImplementedException("SetUp method not implemented");
 		}
 	}
 }

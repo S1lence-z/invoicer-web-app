@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Models;
 
-namespace Backend.Models
+namespace Backend.Services.BankAccountService.Models
 {
-	public sealed class BankAccount : ModelBase<BankAccount>
+	public sealed class BankAccount : ModelBase<BankAccount>, IModel
 	{
 		[Key]
 		public int Id { get; set; }
@@ -16,7 +17,6 @@ namespace Backend.Models
 		[Required]
 		public required string BankName { get; set; }
 
-		[Required]
-		public string? IBAN { get; set; }
+		public string IBAN { get; set; } = string.Empty;
 	}
 }

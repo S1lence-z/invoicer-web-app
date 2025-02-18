@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Models;
 
-namespace Backend.Models
+namespace Backend.Services.AddressService.Models
 {
-	public sealed class Address : ModelBase<Address>
+	public sealed class Address : ModelBase<Address>, IModel
 	{
 		[Key]
 		public int Id { get; set; }
 
 		[Required]
 		public required string Street { get; set; }
-		
+
 		[Required]
 		public required string City { get; set; }
 

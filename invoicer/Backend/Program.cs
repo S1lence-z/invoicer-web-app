@@ -1,5 +1,9 @@
 using Backend.Database;
+using Backend.Services.AddressService;
 using Backend.Services.AresApiService;
+using Backend.Services.BankAccountService;
+using Backend.Services.EntityService;
+using Backend.Services.InvoiceService;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend
@@ -16,7 +20,12 @@ namespace Backend
 			);
 
 			// Add custom services
+			builder.Services.AddScoped<IAddressService, AddressService>();
+			builder.Services.AddScoped<IBankAccountService, BankAccountService>();
+			builder.Services.AddScoped<IEntityService, EntityService>();
+			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 			builder.Services.AddScoped<AresApiService>();
+			builder.Services.AddScoped<InvoiceService>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
