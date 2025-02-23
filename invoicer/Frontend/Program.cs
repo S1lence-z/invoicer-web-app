@@ -1,3 +1,5 @@
+using System.Net.Http.Json;
+using Frontend.Models;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -11,8 +13,18 @@ namespace Frontend
 			builder.RootComponents.Add<App>("#app");
 			builder.RootComponents.Add<HeadOutlet>("head::after");
 
-			builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+			// Create a new http client
+			var httpClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
 
+			// Load environment config
+			var envConfig = await httpClient.GetFromJsonAsync<EnvironmentConfig>("env.json");
+
+			// Register services
+			builder.Services.AddScoped(sp => httpClient);
+			if (envConfig is not null)
+				builder.Services.AddSingleton(envConfig);
+
+			// Build and run the app
 			await builder.Build().RunAsync();
 		}
 	}
