@@ -72,8 +72,8 @@ namespace Backend.Database
 				invoice.Property(i => i.IssueDate).IsRequired();
 				invoice.Property(i => i.DueDate).IsRequired();
 				invoice.Property(i => i.Currency).IsRequired().HasConversion<string>().HasDefaultValue(Currency.CZK);
-				invoice.Property(i => i.PaymentMethod).HasConversion<string>().HasDefaultValue(null);
-				invoice.Property(i => i.DeliveryMethod).HasConversion<string>().HasDefaultValue(null);
+				invoice.Property(i => i.PaymentMethod).HasConversion<string>().HasDefaultValue(PaymentMethod.BankTransfer);
+				invoice.Property(i => i.DeliveryMethod).HasConversion<string>().HasDefaultValue(DeliveryMethod.PersonalPickUp);
 				invoice.HasMany(i => i.Items).WithOne().HasForeignKey(i => i.InvoiceId);
 			});
 		}
