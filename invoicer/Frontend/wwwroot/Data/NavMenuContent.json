@@ -1,0 +1,12 @@
+[
+	{
+		"Label": "Home",
+		"UrlPath": "/",
+		"IconClass": "bi bi-house-door-fill-nav-menu"
+	},
+	{
+		"Label": "Entities",
+		"UrlPath": "/entities",
+		"IconClass": "bi bi-plus-square-fill-nav-menu"
+	}
+]

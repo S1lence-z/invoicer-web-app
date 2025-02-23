@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Frontend.Utils
+@inject NavMenuItemsProvider NavMenuContentProvider
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Invoicer</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -9,11 +12,14 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+        @foreach (var item in @NavMenuContentProvider.Items) {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@item.UrlPath" Match="NavLinkMatch.All">
+                    <span class="@item.IconClass"></span>
+                    @item.Label
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
 
