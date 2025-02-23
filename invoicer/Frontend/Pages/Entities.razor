@@ -1,0 +1,53 @@
+﻿@page "/entities"
+
+@* PAGE CONTAINER *@
+<div class="d-flex flex-column border rounded-3">
+    @* HEADER *@
+    <div class="d-flex flex-row justify-content-between align-content-center px-4 pt-4">
+        <h3>Economic Entites</h3>
+        <button class="btn btn-primary" @onclick="AddNewEntity">
+            Add New Entity
+        </button>
+    </div>
+    <hr/>
+    @* CONTENT *@
+    <div class="d-flex flex-row px-4 pb-4">
+        @* ENTITIES LIST *@
+        <div class="d-flex flex-col justify-content-between">
+            <div class="d-flex flex-column">
+                <h5>Entity 1</h5>
+                <p>Entity 1 description</p>
+            </div>
+            <div class="d-flex flex-row gap-4">
+                <button class="btn btn-primary" @onclick="EditEntity">
+                    Edit
+                </button>
+                <button class="btn btn-danger" @onclick="DeleteEntity">
+                    Delete
+                </button>
+            </div>
+        </div>
+        @* DETAILS OF THE SELECTED ENTITY *@
+        <div class="d-flex flex-column mt-4">
+            <h5>Entity 1</h5>
+            <p>Entity 1 description</p>
+         </div>
+    </div>
+</div>
+
+@code {
+    private void AddNewEntity()
+    {
+        Console.WriteLine("Adding new entity");
+    }
+
+    private void EditEntity()
+    {
+        Console.WriteLine("Editing entity");
+    }
+
+    private void DeleteEntity()
+    {
+        Console.WriteLine("Deleting entity");
+    }
+}
