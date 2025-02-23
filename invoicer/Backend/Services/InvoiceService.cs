@@ -1,9 +1,9 @@
 ﻿using Backend.Database;
-using Backend.Services.EntityService.Models;
-using Backend.Services.InvoiceService.Models;
+using Domain.ServiceInterfaces;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Services.InvoiceService
+namespace Backend.Services
 {
 	public class InvoiceService(ApplicationDbContext context) : IInvoiceService
 	{

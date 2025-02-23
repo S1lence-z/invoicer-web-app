@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using Backend.Database;
-using Backend.Services.AddressService.Models;
+﻿using Backend.Database;
+using Domain.Models;
+using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Services.AddressService
+namespace Backend.Services
 {
 	public class AddressService(ApplicationDbContext context) : IAddressService
 	{

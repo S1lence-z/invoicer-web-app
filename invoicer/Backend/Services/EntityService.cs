@@ -1,11 +1,9 @@
-﻿using System.Runtime.InteropServices;
-using Backend.Database;
-using Backend.Services.AddressService.Models;
-using Backend.Services.BankAccountService.Models;
-using Backend.Services.EntityService.Models;
+﻿using Backend.Database;
+using Domain.Models;
+using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Services.EntityService
+namespace Backend.Services
 {
 	public class EntityService(ApplicationDbContext context) : IEntityService
 	{

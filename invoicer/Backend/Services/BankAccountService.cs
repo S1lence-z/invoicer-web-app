@@ -1,8 +1,9 @@
 ﻿using Backend.Database;
-using Backend.Services.BankAccountService.Models;
+using Domain.Models;
+using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Services.BankAccountService
+namespace Backend.Services
 {
 	public class BankAccountService(ApplicationDbContext context) : IBankAccountService
 	{

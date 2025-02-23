@@ -1,4 +1,4 @@
-﻿namespace Backend.Services.InvoiceService.Models
+﻿namespace Domain.Enums
 {
 	public enum DeliveryMethod
 	{

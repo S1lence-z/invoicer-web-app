@@ -1,5 +1,5 @@
-﻿using Backend.Services.AddressService;
-using Backend.Services.AddressService.Models;
+﻿using Domain.Models;
+using Domain.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers

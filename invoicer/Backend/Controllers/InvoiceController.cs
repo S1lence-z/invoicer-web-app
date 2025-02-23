@@ -1,5 +1,5 @@
-﻿using Backend.Services.InvoiceService;
-using Backend.Services.InvoiceService.Models;
+﻿using Domain.ServiceInterfaces;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
