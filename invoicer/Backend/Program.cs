@@ -32,16 +32,30 @@ namespace Backend
 
 			var app = builder.Build();
 
+			// Enable Swagger UI
 			app.UseSwagger();
 			app.UseSwaggerUI();
 
 			//app.UseHttpsRedirection();
+
+			// Enable CORS
+			EnableCors(app);
 
 			app.UseAuthorization();
 
 			app.MapControllers();
 
 			app.Run();
+		}
+
+		private static void EnableCors(IApplicationBuilder app)
+		{
+			app.UseCors(builder =>
+			{
+				builder.AllowAnyOrigin();
+				builder.AllowAnyMethod();
+				builder.AllowAnyHeader();
+			});
 		}
 	}
 }
