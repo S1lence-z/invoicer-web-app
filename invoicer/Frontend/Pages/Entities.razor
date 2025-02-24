@@ -1,4 +1,7 @@
-﻿@page "/entities"
+﻿@page "/entities";
+@using Domain.Models
+@using Domain.ServiceInterfaces
+@inject IAddressService addressService;
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3">
@@ -19,10 +22,10 @@
                 <p>Entity 1 description</p>
             </div>
             <div class="d-flex flex-row gap-4">
-                <button class="btn btn-primary" @onclick="EditEntity">
+                <button class="btn btn-primary">
                     Edit
                 </button>
-                <button class="btn btn-danger" @onclick="DeleteEntity">
+                <button class="btn btn-danger">
                     Delete
                 </button>
             </div>
@@ -31,23 +34,21 @@
         <div class="d-flex flex-column mt-4">
             <h5>Entity 1</h5>
             <p>Entity 1 description</p>
-         </div>
+        </div>
     </div>
 </div>
 
 @code {
-    private void AddNewEntity()
+    private async void AddNewEntity()
     {
-        Console.WriteLine("Adding new entity");
-    }
-
-    private void EditEntity()
-    {
-        Console.WriteLine("Editing entity");
-    }
-
-    private void DeleteEntity()
-    {
-        Console.WriteLine("Deleting entity");
+        var newEntity = new Address
+        {
+            City = "New City",
+            Country = "New Country",
+            Street = "New Street",
+            ZipCode = 73737
+        };
+        var res = await addressService.CreateAsync(newEntity);
+        Console.WriteLine(res);
     }
 }
