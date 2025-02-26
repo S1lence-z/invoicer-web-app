@@ -1,0 +1,35 @@
+﻿@using Domain.Models
+
+<div class="d-flex flex-column p-4">
+    @*Entity*@
+    <h4>@SelectedEntity.Name</h4>
+    <div class="d-flex flex-row gap-5">
+        <p><strong>ICO: </strong>@SelectedEntity.Ico</p>
+        <p><strong>Email: </strong>@SelectedEntity.Email</p>
+        <p><strong>Phone: </strong>@SelectedEntity.PhoneNumber</p>
+    </div>
+    @* Address and Bank Account*@
+    <div class="d-flex flex-row gap-5">
+        <div class="d-flex flex-column border border-black p-3 rounded flex-grow-1"
+            <h5 class="text-primary">Bank Account</h5>
+            <p><strong>Bank Name: </strong>@SelectedEntity.BankAccount!.BankName</p>
+            <p>
+                <strong>Account Number: </strong>
+                @SelectedEntity.BankAccount.AccountNumber
+            </p>
+            <p><strong>Bank Code: </strong>@SelectedEntity.BankAccount.BankCode</p>
+            <p><strong>IBAN: </strong>@SelectedEntity.BankAccount.IBAN</p>
+        </div>
+        <div class="d-flex flex-column border border-black p-3 rounded flex-grow-1">
+            <h5 class="text-primary">Address</h5>
+            <p><strong>Street: </strong>@SelectedEntity.Address!.Street</p>
+            <p><strong>City: </strong>@SelectedEntity.Address!.City</p>
+            <p><strong>Zip Code: </strong>@SelectedEntity.Address!.ZipCode</p>
+            <p><strong>Country: </strong>@SelectedEntity.Address!.Country</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Entity SelectedEntity { get; set; } = null!;
+}

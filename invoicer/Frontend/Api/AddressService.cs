@@ -1,7 +1,6 @@
 ﻿using Domain.Models;
 using Domain.ServiceInterfaces;
 using Frontend.Models;
-using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 
 namespace Frontend.Api
@@ -9,6 +8,7 @@ namespace Frontend.Api
 	public class AddressService : IAddressService
 	{
 		private readonly HttpClient _httpClient;
+		private readonly string _urlPath = "api/Address";
 
 		public AddressService(EnvironmentConfig config)
 		{
@@ -17,30 +17,29 @@ namespace Frontend.Api
 
 		public async Task<Address> CreateAsync(Address obj)
 		{
-			Console.WriteLine(_httpClient.BaseAddress + "api/Address");
-			var response = await _httpClient.PostAsJsonAsync("api/Address", obj);
+			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
 			return await response.Content.ReadFromJsonAsync<Address>();
 		}
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			var response = await _httpClient.DeleteAsync($"api/Address/{id}");
+			var response = await _httpClient.DeleteAsync($"{_urlPath}/{id}");
 			return response.IsSuccessStatusCode;
 		}
 
 		public async Task<IList<Address>> GetAllAsync()
 		{
-			return await _httpClient.GetFromJsonAsync<IList<Address>>("api/Address");
+			return await _httpClient.GetFromJsonAsync<IList<Address>>(_urlPath);
 		}
 
 		public async Task<Address?> GetByIdAsync(int id)
 		{
-			return await _httpClient.GetFromJsonAsync<Address>($"api/Address/{id}");
+			return await _httpClient.GetFromJsonAsync<Address>($"{_urlPath}/{id}");
 		}
 
 		public async Task<Address> UpdateAsync(int id, Address obj)
 		{
-			var response = await _httpClient.PutAsJsonAsync($"api/Address/{id}", obj);
+			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			return await response.Content.ReadFromJsonAsync<Address>();
 		}
 	}

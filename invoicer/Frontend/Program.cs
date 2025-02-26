@@ -31,8 +31,8 @@ namespace Frontend
 				builder.Services.AddSingleton(new NavMenuItemsProvider(navMenuItemsList));
 
 			// Register api services
-			
 			builder.Services.AddScoped<IAddressService, AddressService>();
+			builder.Services.AddScoped<IEntityService, EntityService>();
 
 			// Build and run the app
 			await builder.Build().RunAsync();
