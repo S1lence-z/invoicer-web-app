@@ -11,13 +11,13 @@ namespace Backend.Services
 		{
 			return await context.Invoice
 				.Include(i => i.Seller)
-					.ThenInclude(s => s.Address)
+					.ThenInclude(s => s!.Address)
 				.Include(i => i.Seller)
-					.ThenInclude(s => s.BankAccount)
+					.ThenInclude(s => s!.BankAccount)
 				.Include(i => i.Buyer)
-					.ThenInclude(b => b.Address)
+					.ThenInclude(b => b!.Address)
 				.Include(i => i.Buyer)
-					.ThenInclude(b => b.BankAccount)
+					.ThenInclude(b => b!.BankAccount)
 				.Include(i => i.Items)
 				.FirstOrDefaultAsync(i => i.Id == id);
 		}
@@ -26,13 +26,13 @@ namespace Backend.Services
 		{
 			return await context.Invoice
 				.Include(i => i.Seller)
-					.ThenInclude(s => s.Address)
+					.ThenInclude(s => s!.Address)
 				.Include(i => i.Seller)
-					.ThenInclude(s => s.BankAccount)
+					.ThenInclude(s => s!.BankAccount)
 				.Include(i => i.Buyer)
-					.ThenInclude(b => b.Address)
+					.ThenInclude(b => b!.Address)
 				.Include(i => i.Buyer)
-					.ThenInclude(b => b.BankAccount)
+					.ThenInclude(b => b!.BankAccount)
 				.Include(i => i.Items)
 				.ToListAsync();
 		}
