@@ -9,7 +9,7 @@
     @* HEADER *@
     <div class="d-flex flex-row justify-content-between align-content-center px-4 pt-4">
         <h3>Economic Entites</h3>
-        <button class="btn btn-primary">
+        <button class="btn btn-primary" @onclick="() => AddNewEntity()">
             Add New Entity
         </button>
     </div>
@@ -47,10 +47,18 @@
         </div>
     </div>
 </div>
+@* ADD NEW ENTITY MODAL *@
+<Modal Title="Add New Entity" IsVisible="isAddingNewEntity" OnClose="() => isAddingNewEntity = false">
+
+
+
+</Modal>
+
 
 @code {
     private IList<Entity> allEntities = new List<Entity>();
     private Entity? selectedEntity = null;
+    private bool isAddingNewEntity = false;
 
     protected override async Task OnInitializedAsync() {
         await LoadEntities();
@@ -91,5 +99,10 @@
     private void EditEntity(Entity entityToEdit)
     {
         Console.WriteLine($"Editing entity with id {entityToEdit.Id}");
+    }
+
+    private void AddNewEntity()
+    {
+        isAddingNewEntity = true;
     }
 }

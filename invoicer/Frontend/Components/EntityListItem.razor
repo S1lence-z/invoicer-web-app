@@ -20,8 +20,15 @@
 </div>
 
 @code {
-    [Parameter, EditorRequired] public Entity Entity { get; set; } = null!;
-    [Parameter] public EventCallback<Entity> OnSelectEntity { get; set; }
-    [Parameter] public EventCallback<Entity> OnDeleteEntity { get; set; }
-    [Parameter] public EventCallback<Entity> OnEditEntity { get; set; } 
+    [Parameter, EditorRequired] 
+    public Entity Entity { get; set; } = null!;
+    
+    [Parameter] 
+    public EventCallback<Entity> OnSelectEntity { get; set; }
+    
+    [Parameter] 
+    public EventCallback<Entity> OnDeleteEntity { get; set; }
+    
+    [Parameter] 
+    public EventCallback<Entity> OnEditEntity { get; set; } 
 }
