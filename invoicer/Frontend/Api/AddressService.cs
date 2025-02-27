@@ -15,7 +15,7 @@ namespace Frontend.Api
 			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
 		}
 
-		public async Task<Address> CreateAsync(Address obj)
+		public async Task<Address?> CreateAsync(Address obj)
 		{
 			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
 			return await response.Content.ReadFromJsonAsync<Address>();

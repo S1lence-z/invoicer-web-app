@@ -1,16 +1,19 @@
 ﻿@using Domain.Interfaces;
 @using Domain.AresApiModels;
+@using Domain.Models
 @using Domain.ServiceInterfaces;
 @inject IAresApiService aresApiService;
+@inject IAddressService addressService;
+@inject IEntityService entityService;
 
 @* TODO: make the ares api window as an independent component *@
 
-<div class="">
+<div>
     @* ARES API WINDOW *@
     <div class="border border-primary rounded bg-gradient p-2 mb-4 d-flex justify-content-center">
         <div class="d-flex flex-column gap-4 text-center align-items-center">
             <h4 class="text-primary m-auto">Enter the ICO of the Entity</h4>
-            <input type="number" class="form-control" placeholder="Enter ICO..." @bind="userInputIco" />
+            <input type="text" class="form-control" placeholder="Enter ICO..." @bind="userInputIco" />
             <button class="btn btn-success w-50" @onclick="FillInAresData">Fill In</button>
             @if (!string.IsNullOrEmpty(aresApiErrorMessage)) 
             {
@@ -19,7 +22,7 @@
         </div>
     </div>
     @* ENTITY FORM *@
-    <form>
+    <EditForm Model="@this" OnValidSubmit="SubmitForm">
         <div class="row mb-4">
             <div class="col">
                 <label for="entity-name" class="font-weight-bold">Name</label>
@@ -63,8 +66,10 @@
             </div>
         </div>
         @* BANK ACCOUNT FORM*@
-        <button type="submit" class="btn btn-primary float-end">Submit</button>
-    </form>
+        <label for="bank-acc-id" class="font-weight-bold">Bank Account Id</label>
+        <input type="text" class="form-control" id="bank-acc-id" placeholder="Bank Account Id" @bind="entityBankAccountId" />
+        <button type="submit" class="btn btn-primary float-end mt-4">Submit</button>
+    </EditForm>
 </div>
 
 @code {
@@ -81,17 +86,18 @@
     private int? entityAddressZipCode { get; set; } = null;
     private string entityAddressCity { get; set; } = string.Empty;
     private string entityAddressCountry { get; set; } = string.Empty;
+    private int entityBankAccountId { get; set; } = 2;
 
     private async void FillInAresData()
     {
         try 
         {
-            if (string.IsNullOrWhiteSpace(userInputIco))
+            if (string.IsNullOrEmpty(userInputIco))
             {
                 aresApiErrorMessage = "No Ico Provided";
                 return;
             }
-            var response = await aresApiService.GetEntityInformationByIcoAsync(userInputIco);
+            var response = await aresApiService.GetEntityInformationByIcoAsync(userInputIco.ToString()!);
             switch (response.IsSuccess)
             {
                 case true:
@@ -125,5 +131,62 @@
         entityAddressZipCode = newData.sidlo.psc;
         entityAddressCity = newData.sidlo.nazevObce!;
         entityAddressCountry = newData.sidlo.nazevStatu!;
+    }
+
+    private async Task SubmitForm() {
+        try 
+        {
+            var newAddress = new Address
+                {
+                    Street = entityAddressStreet,
+                    ZipCode = entityAddressZipCode ?? 0,
+                    City = entityAddressCity,
+                    Country = entityAddressCountry
+                };
+
+            // Create the address
+            Address? newAddressResponse = await addressService.CreateAsync(newAddress);
+            if (newAddressResponse is null) {
+                aresApiErrorMessage = "Address creation failed";
+                return;
+            }
+            // Create the entity
+            var newEntity = new Entity
+                {
+                    Ico = entityIco,
+                    Name = entityName,
+                    Email = entityEmail,
+                    PhoneNumber = entityPhone,
+                    AddressId = newAddressResponse.Id,
+                    BankAccountId = entityBankAccountId
+                };
+            Entity? newEntityResponse = await entityService.CreateAsync(newEntity);
+            if (newEntityResponse is null)
+            {
+                aresApiErrorMessage = "Entity creation failed";
+                return;
+            }
+            ClearForm();
+        }
+        catch (Exception e)
+        {
+            aresApiErrorMessage = e.Message;
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void ClearForm() {
+        entityIco = string.Empty;
+        entityName = string.Empty;
+        entityEmail = string.Empty;
+        entityPhone = string.Empty;
+        entityAddressStreet = string.Empty;
+        entityAddressZipCode = null;
+        entityAddressCity = string.Empty;
+        entityAddressCountry = string.Empty;
+        entityBankAccountId = 2;
     }
 }
