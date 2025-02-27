@@ -1,0 +1,9 @@
+﻿using Domain.Interfaces;
+
+namespace Domain.ServiceInterfaces
+{
+	public interface IAresApiService
+	{
+		public Task<IResult<IAresApiResponse>> GetEntityInformationByIcoAsync(string ico);
+	}
+}

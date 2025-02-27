@@ -1,4 +1,6 @@
-﻿namespace Backend.Services.AresApiService.Responses
+﻿using Domain.Interfaces;
+
+namespace Domain.AresApiModels
 {
 	public class SubjectInformation : IAresApiResponse
 	{
@@ -11,7 +13,7 @@
 		public string? datumAktualizace { get; set; }
 		public string? dic { get; set; }
 		public string? icoId { get; set; }
-		public AdresaDorucovaci?	 adresaDorucovaci { get; set; }
+		public AdresaDorucovaci? adresaDorucovaci { get; set; }
 		public SeznamRegistraci? seznamRegistraci { get; set; }
 		public string? primarniZdroj { get; set; }
 		public IReadOnlyList<DalsiUdaje>? dalsiUdaje { get; set; }
@@ -88,7 +90,7 @@
 		public string? kodStatu { get; set; }
 		public string? nazevStatu { get; set; }
 		public int kodKraje { get; set; }
-		public string?	 nazevKraje { get; set; }
+		public string? nazevKraje { get; set; }
 		public int kodOkresu { get; set; }
 		public int kodObce { get; set; }
 		public string? nazevObce { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace Backend.Services.AresApiService.Responses
+﻿using Domain.Interfaces;
+
+namespace Domain.AresApiModels
 {
 	public class AresApiErrorResponse : IAresApiResponse
 	{
