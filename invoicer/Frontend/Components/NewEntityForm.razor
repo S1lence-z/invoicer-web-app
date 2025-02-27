@@ -1,0 +1,87 @@
+﻿@using Domain.Interfaces;
+@using Domain.AresApiModels;
+@using Domain.ServiceInterfaces;
+@inject IAresApiService aresApiService;
+
+<div class="">
+    @* ARES API WINDOW *@
+    <div class="border border-primary rounded bg-gradient p-4 mb-4 d-flex justify-content-center">
+        <div class="text-center">
+            <h4 class="text-primary mb-3">Enter the ICO of the Entity</h4>
+            <input type="number" class="form-control mb-3" placeholder="Enter ICO..." @bind="userInputIco" />
+            <button class="btn btn-success w-50" @onclick="FillInAresData">Fill In</button>
+        </div>
+    </div>
+    <hr />
+    @* ENTITY FORM *@
+    <form>
+        <div class="row mb-4">
+            <div class="col">
+                <label for="entity-name" class="font-weight-bold">Name</label>
+                <input type="text" class="form-control" id="entity-name" placeholder="Enter Name" @bind="entityName" />
+            </div>
+            <div class="col">
+                <label for="entity-ico" class="font-weight-bold">ICO</label>
+                <input type="number" class="form-control" id="entity-ico" placeholder="Enter ICO" @bind="entityIco" />
+            </div>
+        </div>
+        <div class="form-group mb-4">
+            <div class="row">
+                <div class="col">
+                    <label for="entity-email" class="font-weight-bold">Email Address</label>
+                    <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" />
+                </div>
+                <div class="col">
+                    <label for="entity-phone" class="font-weight-bold">Phone Number</label>
+                    <input type="tel" class="form-control" id="entity-phone" placeholder="Enter Phone Number" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-4">
+            <label for="entity-email" class="font-weight-bold">Email Address</label>
+            <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" />
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="font-weight-bold">Address</label>
+            <input type="text" class="form-control" placeholder="Enter Address"/>
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="font-weight-bold">Bank Account</label>
+            <input type="text" class="form-control" placeholder="Enter Bank Account" />
+        </div>
+        <button type="submit" class="btn btn-primary float-end">Submit</button>
+    </form>
+</div>
+
+@code {
+    // For ARES API call
+    private string userInputIco { get; set; } = string.Empty;
+
+    // Fields for the form
+    private string entityIco { get; set; } = string.Empty;
+    private string entityName { get; set; } = string.Empty;
+
+    private async void FillInAresData()
+    {
+        if (string.IsNullOrWhiteSpace(userInputIco))
+        {
+            Console.WriteLine("No input");
+            return;
+        }
+
+        var response = await aresApiService.GetEntityInformationByIcoAsync(userInputIco);
+        if (response.IsSuccess) 
+        {
+            SubjectInformation data = (SubjectInformation)response.Data;
+            entityIco = data.ico;
+            entityName = data.obchodniJmeno;
+            StateHasChanged();
+            return;
+        }
+        // Handle the error
+        Console.WriteLine(response.ErrorMessage);
+    }
+}
