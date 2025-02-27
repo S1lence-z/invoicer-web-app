@@ -18,7 +18,7 @@ namespace Domain.AresApiModels
 		}
 
 		public static AresApiResult<TData> Success(TData data) => new(data, true, null, 200);
-		public static AresApiResult<TData> Failure(string errorMessage, int statusCode) => new(default, false, errorMessage, statusCode);
+		public static AresApiResult<TData> Failure(TData? errorData, string errorMessage, int statusCode) => new(errorData, false, errorMessage, statusCode);
 	}
 
 }
