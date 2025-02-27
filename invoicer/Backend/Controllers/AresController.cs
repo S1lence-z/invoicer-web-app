@@ -11,13 +11,13 @@ namespace Backend.Controllers
 		[HttpGet("{ico:int}", Name = "GetEntityInformationByIco")]
 		public async Task<IActionResult> GetEntityInformationByIco(string ico)
 		{
-			IResult<IAresApiResponse> subjectInformation = await aresApiService.GetEntityInformationByIcoAsync(ico);
+			IResult<IAresApiResponse> responseData = await aresApiService.GetEntityInformationByIcoAsync(ico);
 
-			if (subjectInformation.IsSuccess)
+			if (responseData.IsSuccess)
 			{
-				return Ok(subjectInformation.Data);
+				return Ok(responseData.Data);
 			}
-			return StatusCode(subjectInformation.StatusCode, subjectInformation.ErrorMessage);
+			return StatusCode(responseData.StatusCode, responseData);
 		}
 	}
 }
