@@ -10,7 +10,7 @@ namespace Frontend.Api
 	{
 		private readonly HttpClient _httpClient;
 		private readonly string _urlPath = "api/ares";
-		private static readonly JsonSerializerOptions jsonSerializeOptions = new() { PropertyNameCaseInsensitive = true };
+		private static readonly JsonSerializerOptions jsonSerializeOptions = new() { PropertyNameCaseInsensitive = true, IncludeFields = true };
 
 		public AresApiService(EnvironmentConfig config)
 		{
@@ -23,12 +23,12 @@ namespace Frontend.Api
 			if (response.IsSuccessStatusCode)
 			{
 				var content = await response.Content.ReadAsStringAsync();
-				var data = JsonSerializer.Deserialize<SubjectInformation>(content, jsonSerializeOptions);
+				SubjectInformation? data = JsonSerializer.Deserialize<SubjectInformation>(content, jsonSerializeOptions);
 				return AresApiResult<SubjectInformation>.Success(data!);
 			}
 			var errorContent = await response.Content.ReadAsStringAsync();
-			var errorData = JsonSerializer.Deserialize<AresApiErrorResponse>(errorContent, jsonSerializeOptions);
-			return AresApiResult<AresApiErrorResponse>.Failure(errorData, errorData?.Popis ?? "Unknown Error", (int)response.StatusCode);
+			AresApiResult<AresApiErrorResponse>? errorData = JsonSerializer.Deserialize<AresApiResult<AresApiErrorResponse>>(errorContent, jsonSerializeOptions);
+			return AresApiResult<AresApiErrorResponse>.Failure(errorData?.Data, "Unknown Error", (int)response.StatusCode);
 		}
 	}
 }

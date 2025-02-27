@@ -9,12 +9,12 @@ namespace Domain.AresApiModels
 		public string? ErrorMessage { get; }
 		public int StatusCode { get; }
 
-		private AresApiResult(TData? data, bool isSuccess, string? errorMessage, int errorCode)
+		public AresApiResult(TData? data, bool isSuccess, string? errorMessage, int statusCode)
 		{
 			Data = data;
 			IsSuccess = isSuccess;
 			ErrorMessage = errorMessage;
-			StatusCode = errorCode;
+			StatusCode = statusCode;
 		}
 
 		public static AresApiResult<TData> Success(TData data) => new(data, true, null, 200);

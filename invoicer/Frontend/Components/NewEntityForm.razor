@@ -5,14 +5,17 @@
 
 <div class="">
     @* ARES API WINDOW *@
-    <div class="border border-primary rounded bg-gradient p-4 mb-4 d-flex justify-content-center">
-        <div class="text-center">
-            <h4 class="text-primary mb-3">Enter the ICO of the Entity</h4>
-            <input type="number" class="form-control mb-3" placeholder="Enter ICO..." @bind="userInputIco" />
+    <div class="border border-primary rounded bg-gradient p-2 mb-4 d-flex justify-content-center">
+        <div class="d-flex flex-column gap-4 text-center align-items-center">
+            <h4 class="text-primary m-auto">Enter the ICO of the Entity</h4>
+            <input type="number" class="form-control" placeholder="Enter ICO..." @bind="userInputIco" />
             <button class="btn btn-success w-50" @onclick="FillInAresData">Fill In</button>
+            @if (!string.IsNullOrEmpty(aresApiErrorMessage)) 
+            {
+                <p class="text-danger m-auto">@aresApiErrorMessage</p>
+            }
         </div>
     </div>
-    <hr />
     @* ENTITY FORM *@
     <form>
         <div class="row mb-4">
@@ -43,6 +46,7 @@
             <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" />
         </div>
 
+        @* Address Form *@
         <div class="form-group mb-4">
             <label class="font-weight-bold">Address</label>
             <input type="text" class="form-control" placeholder="Enter Address"/>
@@ -59,6 +63,7 @@
 @code {
     // For ARES API call
     private string userInputIco { get; set; } = string.Empty;
+    private string aresApiErrorMessage { get; set; } = string.Empty;
 
     // Fields for the form
     private string entityIco { get; set; } = string.Empty;
@@ -68,7 +73,7 @@
     {
         if (string.IsNullOrWhiteSpace(userInputIco))
         {
-            Console.WriteLine("No Ico Provided");
+            aresApiErrorMessage = "No Ico Provided";
             return;
         }
 
@@ -77,14 +82,22 @@
         {
             case true:
                 SubjectInformation data = (SubjectInformation)response.Data!;
-                entityIco = data.ico!;
-                entityName = data.obchodniJmeno!;
-                StateHasChanged();
+                FillInForm(data);
                 break;
             case false:
                 AresApiErrorResponse errorData = (AresApiErrorResponse)response.Data!;
-                Console.WriteLine(errorData.Popis);
+                aresApiErrorMessage = errorData.Popis;
                 break;
         }
+        StateHasChanged();
+    }
+
+    private void FillInForm(SubjectInformation newData)
+    {
+        // Clear the error message
+        aresApiErrorMessage = string.Empty;
+        // Populate the form
+        entityIco = newData.ico!;
+        entityName = newData.obchodniJmeno!;
     }
 }
