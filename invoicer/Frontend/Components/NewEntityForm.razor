@@ -3,6 +3,8 @@
 @using Domain.ServiceInterfaces;
 @inject IAresApiService aresApiService;
 
+@* TODO: make the ares api window as an independent component *@
+
 <div class="">
     @* ARES API WINDOW *@
     <div class="border border-primary rounded bg-gradient p-2 mb-4 d-flex justify-content-center">
@@ -28,34 +30,39 @@
                 <input type="number" class="form-control" id="entity-ico" placeholder="Enter ICO" @bind="entityIco" />
             </div>
         </div>
-        <div class="form-group mb-4">
-            <div class="row">
-                <div class="col">
-                    <label for="entity-email" class="font-weight-bold">Email Address</label>
-                    <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" />
-                </div>
-                <div class="col">
-                    <label for="entity-phone" class="font-weight-bold">Phone Number</label>
-                    <input type="tel" class="form-control" id="entity-phone" placeholder="Enter Phone Number" />
-                </div>
+        <div class="row">
+            <div class="col">
+                <label for="entity-email" class="font-weight-bold">Email Address</label>
+                <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" @bind="entityEmail" />
+            </div>
+            <div class="col">
+                <label for="entity-phone" class="font-weight-bold">Phone Number</label>
+                <input type="tel" class="form-control" id="entity-phone" placeholder="Enter Phone Number" @bind="entityPhone" />
             </div>
         </div>
-
-        <div class="form-group mb-4">
-            <label for="entity-email" class="font-weight-bold">Email Address</label>
-            <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" />
+        <hr/>
+        @* ADDRESS FORM *@
+        <div class="row mb-4">
+            <div class="col">
+                <label for="address-street" class="font-weight-bold">Street And Number</label>
+                <input type="text" class="form-control" id="address-street" placeholder="Street And Number" @bind="entityAddressStreet" />
+            </div>
+            <div class="col">
+                <label for="address-zipcode" class="font-weight-bold">Zip Code</label>
+                <input type="number" class="form-control" id="address-zipcode" placeholder="Zip Code" @bind="entityAddressZipCode" />
+            </div>
         </div>
-
-        @* Address Form *@
-        <div class="form-group mb-4">
-            <label class="font-weight-bold">Address</label>
-            <input type="text" class="form-control" placeholder="Enter Address"/>
+        <div class="row mb-4">
+            <div class="col">
+                <label for="address-city" class="font-weight-bold">City</label>
+                <input type="text" class="form-control" id="address-city" placeholder="City" @bind="entityAddressCity" />
+            </div>
+            <div class="col">
+                <label for="address-country" class="font-weight-bold">Country</label>
+                <input type="text" class="form-control" id="address-country" placeholder="Country" @bind="entityAddressCountry" />
+            </div>
         </div>
-
-        <div class="form-group mb-4">
-            <label class="font-weight-bold">Bank Account</label>
-            <input type="text" class="form-control" placeholder="Enter Bank Account" />
-        </div>
+        @* BANK ACCOUNT FORM*@
         <button type="submit" class="btn btn-primary float-end">Submit</button>
     </form>
 </div>
@@ -68,28 +75,43 @@
     // Fields for the form
     private string entityIco { get; set; } = string.Empty;
     private string entityName { get; set; } = string.Empty;
+    private string entityEmail { get; set; } = string.Empty;
+    private string entityPhone { get; set; } = string.Empty;
+    private string entityAddressStreet { get; set; } = string.Empty;
+    private int? entityAddressZipCode { get; set; } = null;
+    private string entityAddressCity { get; set; } = string.Empty;
+    private string entityAddressCountry { get; set; } = string.Empty;
 
     private async void FillInAresData()
     {
-        if (string.IsNullOrWhiteSpace(userInputIco))
+        try 
         {
-            aresApiErrorMessage = "No Ico Provided";
-            return;
+            if (string.IsNullOrWhiteSpace(userInputIco))
+            {
+                aresApiErrorMessage = "No Ico Provided";
+                return;
+            }
+            var response = await aresApiService.GetEntityInformationByIcoAsync(userInputIco);
+            switch (response.IsSuccess)
+            {
+                case true:
+                    SubjectInformation data = (SubjectInformation)response.Data!;
+                    FillInForm(data);
+                    break;
+                case false:
+                    AresApiErrorResponse errorData = (AresApiErrorResponse)response.Data!;
+                    aresApiErrorMessage = errorData.Popis;
+                    break;
+            }
         }
-
-        var response = await aresApiService.GetEntityInformationByIcoAsync(userInputIco);
-        switch (response.IsSuccess)
+        catch (Exception e)
         {
-            case true:
-                SubjectInformation data = (SubjectInformation)response.Data!;
-                FillInForm(data);
-                break;
-            case false:
-                AresApiErrorResponse errorData = (AresApiErrorResponse)response.Data!;
-                aresApiErrorMessage = errorData.Popis;
-                break;
+            aresApiErrorMessage = e.Message;
+        } 
+        finally 
+        {
+            StateHasChanged();
         }
-        StateHasChanged();
     }
 
     private void FillInForm(SubjectInformation newData)
@@ -99,5 +121,9 @@
         // Populate the form
         entityIco = newData.ico!;
         entityName = newData.obchodniJmeno!;
+        entityAddressStreet = newData.sidlo!.nazevUlice + newData.sidlo.cisloDomovni;
+        entityAddressZipCode = newData.sidlo.psc;
+        entityAddressCity = newData.sidlo.nazevObce!;
+        entityAddressCountry = newData.sidlo.nazevStatu!;
     }
 }
