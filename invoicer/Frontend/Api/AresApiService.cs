@@ -28,7 +28,7 @@ namespace Frontend.Api
 			}
 			var errorContent = await response.Content.ReadAsStringAsync();
 			var errorData = JsonSerializer.Deserialize<AresApiErrorResponse>(errorContent, jsonSerializeOptions);
-			return AresApiResult<AresApiErrorResponse>.Failure(errorData?.Popis ?? "Unknown Error", (int)response.StatusCode);
+			return AresApiResult<AresApiErrorResponse>.Failure(errorData, errorData?.Popis ?? "Unknown Error", (int)response.StatusCode);
 		}
 	}
 }

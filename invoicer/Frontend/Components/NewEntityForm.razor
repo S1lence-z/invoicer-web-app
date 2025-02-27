@@ -68,20 +68,23 @@
     {
         if (string.IsNullOrWhiteSpace(userInputIco))
         {
-            Console.WriteLine("No input");
+            Console.WriteLine("No Ico Provided");
             return;
         }
 
         var response = await aresApiService.GetEntityInformationByIcoAsync(userInputIco);
-        if (response.IsSuccess) 
+        switch (response.IsSuccess)
         {
-            SubjectInformation data = (SubjectInformation)response.Data;
-            entityIco = data.ico;
-            entityName = data.obchodniJmeno;
-            StateHasChanged();
-            return;
+            case true:
+                SubjectInformation data = (SubjectInformation)response.Data!;
+                entityIco = data.ico!;
+                entityName = data.obchodniJmeno!;
+                StateHasChanged();
+                break;
+            case false:
+                AresApiErrorResponse errorData = (AresApiErrorResponse)response.Data!;
+                Console.WriteLine(errorData.Popis);
+                break;
         }
-        // Handle the error
-        Console.WriteLine(response.ErrorMessage);
     }
 }
