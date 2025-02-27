@@ -34,14 +34,14 @@ namespace Backend.Services.AresApiService
 			}
 			catch (Exception ex)
 			{
-				return AresApiResult<IAresApiResponse>.Failure($"Unexpected error: {ex.Message}", 500);
+				return AresApiResult<IAresApiResponse>.Failure(null, $"Unexpected error: {ex.Message}", 500);
 			}
 		}
 
 		private static IResult<IAresApiResponse> HandleErrorResponse(HttpStatusCode statusCode, AresApiErrorResponse errorResponse)
 		{
 			string message = $"{(int)statusCode}: {errorResponse?.Popis ?? "Unknown Error"}";
-			return AresApiResult<AresApiErrorResponse>.Failure(message, (int)statusCode);
+			return AresApiResult<AresApiErrorResponse>.Failure(errorResponse, message, (int)statusCode);
 		}
 	}
 }
