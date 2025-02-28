@@ -73,6 +73,9 @@
 </div>
 
 @code {
+    // Parameters
+    [Parameter] public EventCallback SubmitCallback { get; set; }
+
     // For ARES API call
     private string userInputIco { get; set; } = string.Empty;
     private string aresApiErrorMessage { get; set; } = string.Empty;
@@ -166,7 +169,6 @@
                 aresApiErrorMessage = "Entity creation failed";
                 return;
             }
-            ClearForm();
         }
         catch (Exception e)
         {
@@ -174,11 +176,14 @@
         }
         finally
         {
+            await SubmitCallback.InvokeAsync();
+            ClearForm();
             StateHasChanged();
         }
     }
 
     private void ClearForm() {
+        userInputIco = string.Empty;
         entityIco = string.Empty;
         entityName = string.Empty;
         entityEmail = string.Empty;

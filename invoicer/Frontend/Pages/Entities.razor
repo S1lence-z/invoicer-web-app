@@ -30,7 +30,7 @@
             <div class="d-flex flex-column pe-2 overflow-auto" style="max-height: 600px">
                 @foreach (var entity in allEntities)
                 {
-                    <EntityListItem Entity="entity" OnSelectEntity="SelectEntity" OnDeleteEntity="DeleteEntity" OnEditEntity="EditEntity" />
+                    <EntityListItem Entity="entity" OnSelectEntity="SelectEntity" OnDeleteEntity="DeleteEntity" OnEditEntity="EditEntity" IsSelected="IsEntitySelected(entity)" />
                 }
             </div>
         }
@@ -48,9 +48,8 @@
     </div>
 </div>
 @* ADD NEW ENTITY MODAL *@
-<Modal Title="Add New Entity" IsVisible="isAddingNewEntity" OnClose="() => isAddingNewEntity = false">
-    <NewEntityForm/>
-    <AddressForm/>
+<Modal Title="Add New Entity" IsVisible="isAddingNewEntity" OnClose="() => ShowNewEntityModal()">
+    <NewEntityForm SubmitCallback="ShowNewEntityModal"/>
 </Modal>
 
 
@@ -61,6 +60,10 @@
 
     protected override async Task OnInitializedAsync() {
         await LoadEntities();
+    }
+
+    private bool IsEntitySelected(Entity entity) {
+        return selectedEntity != null && selectedEntity.Id == entity.Id;
     }
 
     private async Task LoadEntities() {
@@ -100,8 +103,10 @@
         Console.WriteLine($"Editing entity with id {entityToEdit.Id}");
     }
 
-    private void ShowNewEntityModal()
+    private async Task ShowNewEntityModal()
     {
-        isAddingNewEntity = true;
+        isAddingNewEntity = !isAddingNewEntity;
+        await LoadEntities();
+        StateHasChanged();
     }
 }
