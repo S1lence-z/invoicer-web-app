@@ -9,7 +9,7 @@
     @* HEADER *@
     <div class="d-flex flex-row justify-content-between align-content-center px-4 pt-4">
         <h3>Economic Entites</h3>
-        <button class="btn btn-primary" @onclick="() => ShowNewEntityModal()">
+        <button class="btn btn-primary" @onclick="ShowNewEntityModal">
             Add New Entity
         </button>
     </div>
@@ -48,15 +48,21 @@
     </div>
 </div>
 @* ADD NEW ENTITY MODAL *@
-<Modal Title="Add New Entity" IsVisible="isAddingNewEntity" OnClose="() => ShowNewEntityModal()">
-    <NewEntityForm SubmitCallback="ShowNewEntityModal"/>
+<Modal Title="Add New Entity" IsVisible="isAddingNewEntity" OnClose="ShowNewEntityModal">
+    <EntityForm SubmitCallback="ShowNewEntityModal"/>
+</Modal>
+@* EDIT ENTITY MODAL *@
+<Modal Title="Edit Entity" IsVisible="isEditingEntity" OnClose="ShowEditEntityModal">
+    <EntityForm SubmitCallback="ShowEditEntityModal" EntityInstance="entityToEdit" />
 </Modal>
 
 
 @code {
     private IList<Entity> allEntities = new List<Entity>();
     private Entity? selectedEntity = null;
+    private Entity? entityToEdit = null;
     private bool isAddingNewEntity = false;
+    private bool isEditingEntity = false;
 
     protected override async Task OnInitializedAsync() {
         await LoadEntities();
@@ -98,14 +104,21 @@
         }
     }
 
-    private void EditEntity(Entity entityToEdit)
+    private async void EditEntity(Entity entityToEdit)
     {
-        Console.WriteLine($"Editing entity with id {entityToEdit.Id}");
+        this.entityToEdit = entityToEdit;
+        await ShowEditEntityModal();
     }
 
     private async Task ShowNewEntityModal()
     {
         isAddingNewEntity = !isAddingNewEntity;
+        await LoadEntities();
+        StateHasChanged();
+    }
+
+    private async Task ShowEditEntityModal() {
+        isEditingEntity = !isEditingEntity;
         await LoadEntities();
         StateHasChanged();
     }
