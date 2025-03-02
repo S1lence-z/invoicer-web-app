@@ -84,7 +84,6 @@ namespace Backend.Database
 			{
 				invoiceItem.HasKey(ii => ii.Id);
 				invoiceItem.Property(ii => ii.InvoiceId).IsRequired();
-				invoiceItem.HasOne(ii => ii.Invoice).WithMany(i => i.Items).HasForeignKey(ii => ii.InvoiceId);
 				invoiceItem.Property(ii => ii.Unit).IsRequired();
 				invoiceItem.Property(ii => ii.Quantity).IsRequired();
 				invoiceItem.Property(ii => ii.Description).IsRequired();
