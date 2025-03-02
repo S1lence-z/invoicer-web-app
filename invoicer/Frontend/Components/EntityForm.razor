@@ -6,21 +6,14 @@
 @inject IAddressService addressService;
 @inject IEntityService entityService;
 
-@* TODO: make the ares api window as an independent component *@
-
 <div>
     @* ARES API WINDOW *@
-    <div class="border border-primary rounded bg-gradient p-2 mb-4 d-flex justify-content-center">
-        <div class="d-flex flex-column gap-4 text-center align-items-center">
-            <h4 class="text-primary m-auto">Enter the ICO of the Entity</h4>
-            <input type="text" class="form-control" placeholder="Enter ICO..." @bind="userInputIco" />
-            <button class="btn btn-success w-50" @onclick="FillInAresData">Fill In</button>
-            @if (!string.IsNullOrEmpty(aresApiErrorMessage)) 
-            {
-                <p class="text-danger m-auto">@aresApiErrorMessage</p>
-            }
-        </div>
-    </div>
+    <AresApiLookup 
+    UserInputIco="@userInputIco"
+    UserInputIcoChanged="@((string ico) => userInputIco = ico)"
+    AresApiService="aresApiService" 
+    AresApiErrorMessage="@aresApiErrorMessage" 
+    OnFillInAresData="FillInAresData" />
     @* ENTITY FORM *@
     <EditForm Model="@this" OnValidSubmit="SubmitForm">
         <div class="row mb-4">
@@ -76,6 +69,7 @@
     // Parameters
     [Parameter] public EventCallback SubmitCallback { get; set; }
     [Parameter] public Entity? EntityInstance { get; set; } = null;
+    [Parameter, EditorRequired] public bool isActive { get; set; }
 
     // For ARES API call
     private string userInputIco { get; set; } = string.Empty;
@@ -107,9 +101,11 @@
             entityBankAccountId = EntityInstance.BankAccountId;
             return;
         }
+        if (!isActive)
+            ClearForm();
     }
 
-    private async void FillInAresData()
+    private async Task FillInAresData()
     {
         try 
         {
@@ -152,6 +148,20 @@
         entityAddressZipCode = newData.sidlo.psc;
         entityAddressCity = newData.sidlo.nazevObce!;
         entityAddressCountry = newData.sidlo.nazevStatu!;
+    }
+
+    private void ClearForm()
+    {
+        userInputIco = string.Empty;
+        entityIco = string.Empty;
+        entityName = string.Empty;
+        entityEmail = string.Empty;
+        entityPhone = string.Empty;
+        entityAddressStreet = string.Empty;
+        entityAddressZipCode = null;
+        entityAddressCity = string.Empty;
+        entityAddressCountry = string.Empty;
+        entityBankAccountId = 2;
     }
 
     private async Task SubmitForm() {
@@ -250,18 +260,5 @@
             aresApiErrorMessage = "Entity update failed";
             return;
         }
-    }
-
-    private void ClearForm() {
-        userInputIco = string.Empty;
-        entityIco = string.Empty;
-        entityName = string.Empty;
-        entityEmail = string.Empty;
-        entityPhone = string.Empty;
-        entityAddressStreet = string.Empty;
-        entityAddressZipCode = null;
-        entityAddressCity = string.Empty;
-        entityAddressCountry = string.Empty;
-        entityBankAccountId = 2;
     }
 }

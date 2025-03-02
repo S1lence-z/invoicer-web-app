@@ -1,0 +1,28 @@
+﻿@using Domain.ServiceInterfaces
+
+@* ARES API WINDOW *@
+<div class="border border-primary rounded bg-gradient p-2 mb-4 d-flex justify-content-center">
+    <div class="d-flex flex-column gap-4 text-center align-items-center">
+        <h4 class="text-primary m-auto">Enter the ICO of the Entity</h4>
+        <input type="text" class="form-control" placeholder="Enter ICO..." value="@UserInputIco" @oninput="HandleUserInputChange" />
+        <button class="btn btn-success w-50" @onclick="OnFillInAresData.InvokeAsync">Fill In</button>
+        @if (!string.IsNullOrEmpty(AresApiErrorMessage))
+        {
+            <p class="text-danger m-auto">@AresApiErrorMessage</p>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IAresApiService AresApiService { get; set; } = null!;
+    [Parameter, EditorRequired] public string? UserInputIco { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public EventCallback<string> UserInputIcoChanged { get; set; }
+    [Parameter, EditorRequired] public EventCallback<bool> OnFillInAresData { get; set; }
+    [Parameter, EditorRequired] public string AresApiErrorMessage { get; set; } = string.Empty;
+
+    private async Task HandleUserInputChange(ChangeEventArgs e)
+    {
+        UserInputIco = e.Value?.ToString();
+        await UserInputIcoChanged.InvokeAsync(UserInputIco);
+    }
+}

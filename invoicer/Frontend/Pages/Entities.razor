@@ -49,11 +49,11 @@
 </div>
 @* ADD NEW ENTITY MODAL *@
 <Modal Title="Add New Entity" IsVisible="isAddingNewEntity" OnClose="ShowNewEntityModal">
-    <EntityForm SubmitCallback="ShowNewEntityModal"/>
+    <EntityForm SubmitCallback="ShowNewEntityModal" isActive="isAddingNewEntity"/>
 </Modal>
 @* EDIT ENTITY MODAL *@
 <Modal Title="Edit Entity" IsVisible="isEditingEntity" OnClose="ShowEditEntityModal">
-    <EntityForm SubmitCallback="ShowEditEntityModal" EntityInstance="entityToEdit" />
+    <EntityForm SubmitCallback="ShowEditEntityModal" EntityInstance="entityToEdit" isActive="isEditingEntity" />
 </Modal>
 
 
@@ -97,17 +97,17 @@
     {
         var status = await entityService.DeleteAsync(entityToDelete.Id);
         if (status) {
-            allEntities.Remove(entityToDelete);
             selectedEntity = null;
+            await LoadEntities();
             StateHasChanged();
-            Console.WriteLine($"Entity with id {entityToDelete.Id} was deleted");
         }
     }
 
-    private async void EditEntity(Entity entityToEdit)
+    private async Task EditEntity(Entity entityToEdit)
     {
         this.entityToEdit = entityToEdit;
         await ShowEditEntityModal();
+        StateHasChanged();
     }
 
     private async Task ShowNewEntityModal()
