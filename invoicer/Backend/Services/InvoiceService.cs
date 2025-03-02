@@ -2,6 +2,7 @@
 using Domain.ServiceInterfaces;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.Services
 {
@@ -37,7 +38,7 @@ namespace Backend.Services
 				.ToListAsync();
 		}
 
-		public async Task<Invoice> CreateAsync(Invoice newInvoice)
+		public async Task<Invoice?> CreateAsync(Invoice newInvoice)
 		{
 			Entity? seller = await context.Entity
 				.Include(e => e.BankAccount)
@@ -64,8 +65,9 @@ namespace Backend.Services
 		public async Task<Invoice> UpdateAsync(int id, Invoice updatedInvoice)
 		{
 			Invoice? existingInvoice = await context.Invoice.FindAsync(id);
-			if (existingInvoice == null)
+			if (existingInvoice is null)
 				throw new ArgumentException($"Invoice with id {id} not found");
+
 			Entity? seller = await context.Entity
 				.Include(e => e.BankAccount)
 				.Include(e => e.Address)
@@ -98,7 +100,7 @@ namespace Backend.Services
 		public async Task<bool> DeleteAsync(int id)
 		{
 			Invoice? existingInvoice = await context.Invoice.FindAsync(id);
-			if (existingInvoice == null)
+			if (existingInvoice is null)
 				return false;
 			context.Invoice.Remove(existingInvoice);
 			await context.SaveChangesAsync();
