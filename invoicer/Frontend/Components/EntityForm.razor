@@ -5,6 +5,7 @@
 @inject IAresApiService aresApiService;
 @inject IAddressService addressService;
 @inject IEntityService entityService;
+@inject IBankAccountService bankAccountService;
 
 <div>
     @* ARES API WINDOW *@
@@ -58,9 +59,28 @@
                 <input type="text" class="form-control" id="address-country" placeholder="Country" @bind="entityAddressCountry" />
             </div>
         </div>
+        <hr />
         @* BANK ACCOUNT FORM*@
-        <label for="bank-acc-id" class="font-weight-bold">Bank Account Id</label>
-        <input type="text" class="form-control" id="bank-acc-id" placeholder="Bank Account Id" @bind="entityBankAccountId" />
+        <div class="row mb-4">
+            <div class="col">
+                <label for="bank-acc-accNumber" class="font-weight-bold">Account Number</label>
+                <input type="number" class="form-control" id="bank-acc-accNumber" placeholder="Account Number" @bind="entityBankAccountNumber" />
+            </div>
+            <div class="col">
+                <label for="bank-acc-accCode" class="font-weight-bold">Bank Code</label>
+                <input type="number" class="form-control" id="bank-acc-accCode" placeholder="Bank Code" @bind="entityBankAccountCode" />
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <label for="bank-acc-name" class="font-weight-bold">Bank Name</label>
+                <input type="text" class="form-control" id="bank-acc-name" placeholder="Bank Name" @bind="entityBankAccountName" />
+            </div>
+            <div class="col">
+                <label for="bank-acc-iban" class="font-weight-bold">IBAN</label>
+                <input type="number" class="form-control" id="bank-acc-iban" placeholder="IBAN" @bind="entityBankAccountIban" />
+            </div>
+        </div>
         <button type="submit" class="btn btn-primary float-end mt-4">Submit</button>
     </EditForm>
 </div>
@@ -76,15 +96,21 @@
     private string aresApiErrorMessage { get; set; } = string.Empty;
 
     // Fields for the form
+    // Entity
     private string entityIco { get; set; } = string.Empty;
     private string entityName { get; set; } = string.Empty;
     private string entityEmail { get; set; } = string.Empty;
     private string entityPhone { get; set; } = string.Empty;
+    // Address
     private string entityAddressStreet { get; set; } = string.Empty;
     private int? entityAddressZipCode { get; set; } = null;
     private string entityAddressCity { get; set; } = string.Empty;
     private string entityAddressCountry { get; set; } = string.Empty;
-    private int entityBankAccountId { get; set; } = 2;
+    // Bank Account
+    private string entityBankAccountNumber { get; set; } = string.Empty;
+    private string entityBankAccountCode { get; set; } = string.Empty;
+    private string entityBankAccountName { get; set; } = string.Empty;
+    private string entityBankAccountIban { get; set; } = string.Empty;
 
     protected override void OnParametersSet()
     {
@@ -98,7 +124,10 @@
             entityAddressZipCode = EntityInstance.Address.ZipCode;
             entityAddressCity = EntityInstance.Address.City;
             entityAddressCountry = EntityInstance.Address.Country;
-            entityBankAccountId = EntityInstance.BankAccountId;
+            entityBankAccountNumber = EntityInstance.BankAccount!.AccountNumber;
+            entityBankAccountCode = EntityInstance.BankAccount.BankCode;
+            entityBankAccountName = EntityInstance.BankAccount.BankName;
+            entityBankAccountIban = EntityInstance.BankAccount.IBAN;
             return;
         }
         if (!isActive)
@@ -161,7 +190,10 @@
         entityAddressZipCode = null;
         entityAddressCity = string.Empty;
         entityAddressCountry = string.Empty;
-        entityBankAccountId = 2;
+        entityBankAccountNumber = string.Empty;
+        entityBankAccountCode = string.Empty;
+        entityBankAccountName = string.Empty;
+        entityBankAccountIban = string.Empty;
     }
 
     private async Task SubmitForm() {
@@ -202,6 +234,20 @@
             aresApiErrorMessage = "Address creation failed";
             return;
         }
+        // Create the bank account
+        var newBankAccount = new BankAccount
+            {
+                AccountNumber = entityBankAccountNumber,
+                BankCode = entityBankAccountCode,
+                BankName = entityBankAccountName,
+                IBAN = entityBankAccountIban
+            };
+        BankAccount? newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
+        if (newBankAccountResponse is null)
+        {
+            aresApiErrorMessage = "Bank account creation failed";
+            return;
+        }
         // Create the entity
         var newEntity = new Entity
             {
@@ -210,7 +256,7 @@
                 Email = entityEmail,
                 PhoneNumber = entityPhone,
                 AddressId = newAddressResponse.Id,
-                BankAccountId = entityBankAccountId
+                BankAccountId = newBankAccountResponse.Id
             };
         Entity? newEntityResponse = await entityService.CreateAsync(newEntity);
         if (newEntityResponse is null)
@@ -243,6 +289,22 @@
             aresApiErrorMessage = "Address update failed";
             return;
         }
+        // Edit the bank account
+        int bankAccountId = EntityInstance.BankAccountId;
+        var editedBankAccount = new BankAccount
+            {
+                Id = bankAccountId,
+                AccountNumber = entityBankAccountNumber,
+                BankCode = entityBankAccountCode,
+                BankName = entityBankAccountName,
+                IBAN = entityBankAccountIban
+            };
+        BankAccount? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, editedBankAccount);
+        if (editedBankAccountResponse is null)
+        {
+            aresApiErrorMessage = "Bank account update failed";
+            return;
+        }
         // Edit the entity
         var editedEntity = new Entity
             {
@@ -252,7 +314,7 @@
                 Email = entityEmail,
                 PhoneNumber = entityPhone,
                 AddressId = EntityInstance.AddressId,
-                BankAccountId = entityBankAccountId
+                BankAccountId = EntityInstance.BankAccountId
             };
         Entity? editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
         if (editedEntityResponse is null)
