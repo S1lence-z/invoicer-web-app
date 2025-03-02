@@ -2,7 +2,7 @@
 using Domain.ServiceInterfaces;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Backend.Utils;
 
 namespace Backend.Services
 {
@@ -105,6 +105,14 @@ namespace Backend.Services
 			context.Invoice.Remove(existingInvoice);
 			await context.SaveChangesAsync();
 			return true;
+		}
+
+		public async Task<byte[]> ExportInvoicePdf(int id)
+		{
+			Invoice? invoiceToExport = await context.Invoice.FindAsync(id);
+			if (invoiceToExport is null)
+				throw new ArgumentException($"Invoice with id {id} not found");
+			return await InvoicePdfGenerator.ExportInvoicePdf(invoiceToExport);
 		}
 	}
 }

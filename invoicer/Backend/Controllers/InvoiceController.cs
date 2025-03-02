@@ -1,6 +1,7 @@
 ﻿using Domain.ServiceInterfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Utils;
 
 namespace Backend.Controllers
 {
@@ -71,6 +72,24 @@ namespace Backend.Controllers
 			if (!wasDeleted)
 				return NotFound($"Invoice with id {id} not found");
 			return Ok($"Invoice with id {id} deleted");
+		}
+
+		[HttpGet("{id:int}/export-pdf", Name = "ExportInvoicePdf")]
+		public async Task<IActionResult> ExportPdf(int id)
+		{
+			try
+			{
+				byte[] invoicePdf = await invoiceService.ExportInvoicePdf(id);
+				return File(invoicePdf, "application/pdf", $"invoice_{id}.pdf");
+			}
+			catch (ArgumentException e)
+			{
+				return NotFound(e.Message);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 	}
 }
