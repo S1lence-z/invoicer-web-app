@@ -1,6 +1,7 @@
-﻿using Backend.Services.InvoiceService;
-using Backend.Services.InvoiceService.Models;
+﻿using Domain.ServiceInterfaces;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Utils;
 
 namespace Backend.Controllers
 {
@@ -27,7 +28,12 @@ namespace Backend.Controllers
 		[HttpPost(Name = "PostInvoice")]
 		public async Task<IActionResult> Post([FromBody] Invoice invoice)
 		{
-			Invoice createdInvoice;
+			if (invoice.Items is null || invoice.Items.Count == 0)
+			{
+				return BadRequest("Invoice must have at least one item");
+			}
+
+			Invoice? createdInvoice;
 			try
 			{
 				createdInvoice = await invoiceService.CreateAsync(invoice);
@@ -36,12 +42,17 @@ namespace Backend.Controllers
 			{
 				return BadRequest(e.Message);
 			}
-			return CreatedAtRoute("GetInvoiceById", new { id = createdInvoice.Id }, createdInvoice);
+			return CreatedAtRoute("GetInvoiceById", new { id = createdInvoice!.Id }, createdInvoice);
 		}
 
 		[HttpPut("{id:int}", Name = "PutInvoice")]
 		public async Task<IActionResult> Put(int id, [FromBody] Invoice invoice)
 		{
+			if (invoice.Items is null || invoice.Items.Count == 0)
+			{
+				return BadRequest("Invoice must have at least one item");
+			}
+
 			Invoice updatedInvoice;
 			try
 			{
@@ -49,7 +60,7 @@ namespace Backend.Controllers
 			}
 			catch (ArgumentException e)
 			{
-				return NotFound(e.Message);
+				return BadRequest(e.Message);
 			}
 			return Ok(updatedInvoice);
 		}
@@ -61,6 +72,24 @@ namespace Backend.Controllers
 			if (!wasDeleted)
 				return NotFound($"Invoice with id {id} not found");
 			return Ok($"Invoice with id {id} deleted");
+		}
+
+		[HttpGet("{id:int}/export-pdf", Name = "ExportInvoicePdf")]
+		public async Task<IActionResult> ExportPdf(int id)
+		{
+			try
+			{
+				byte[] invoicePdf = await invoiceService.ExportInvoicePdf(id);
+				return File(invoicePdf, "application/pdf", $"invoice_{id}.pdf");
+			}
+			catch (ArgumentException e)
+			{
+				return NotFound(e.Message);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 	}
 }

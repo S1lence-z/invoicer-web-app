@@ -1,0 +1,326 @@
+﻿@using Domain.Interfaces;
+@using Domain.AresApiModels;
+@using Domain.Models
+@using Domain.ServiceInterfaces;
+@inject IAresApiService aresApiService;
+@inject IAddressService addressService;
+@inject IEntityService entityService;
+@inject IBankAccountService bankAccountService;
+
+<div>
+    @* ARES API WINDOW *@
+    <AresApiLookup 
+    UserInputIco="@userInputIco"
+    UserInputIcoChanged="@((string ico) => userInputIco = ico)"
+    AresApiService="aresApiService" 
+    AresApiErrorMessage="@aresApiErrorMessage" 
+    OnFillInAresData="FillInAresData" />
+    @* ENTITY FORM *@
+    <EditForm Model="@this" OnValidSubmit="SubmitForm">
+        <div class="row mb-4">
+            <div class="col">
+                <label for="entity-name" class="font-weight-bold">Name</label>
+                <input type="text" class="form-control" id="entity-name" placeholder="Enter Name" @bind="entityName" />
+            </div>
+            <div class="col">
+                <label for="entity-ico" class="font-weight-bold">ICO</label>
+                <input type="number" class="form-control" id="entity-ico" placeholder="Enter ICO" @bind="entityIco" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="entity-email" class="font-weight-bold">Email Address</label>
+                <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" @bind="entityEmail" />
+            </div>
+            <div class="col">
+                <label for="entity-phone" class="font-weight-bold">Phone Number</label>
+                <input type="tel" class="form-control" id="entity-phone" placeholder="Enter Phone Number" @bind="entityPhone" />
+            </div>
+        </div>
+        <hr/>
+        @* ADDRESS FORM *@
+        <div class="row mb-4">
+            <div class="col">
+                <label for="address-street" class="font-weight-bold">Street And Number</label>
+                <input type="text" class="form-control" id="address-street" placeholder="Street And Number" @bind="entityAddressStreet" />
+            </div>
+            <div class="col">
+                <label for="address-zipcode" class="font-weight-bold">Zip Code</label>
+                <input type="number" class="form-control" id="address-zipcode" placeholder="Zip Code" @bind="entityAddressZipCode" />
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <label for="address-city" class="font-weight-bold">City</label>
+                <input type="text" class="form-control" id="address-city" placeholder="City" @bind="entityAddressCity" />
+            </div>
+            <div class="col">
+                <label for="address-country" class="font-weight-bold">Country</label>
+                <input type="text" class="form-control" id="address-country" placeholder="Country" @bind="entityAddressCountry" />
+            </div>
+        </div>
+        <hr />
+        @* BANK ACCOUNT FORM*@
+        <div class="row mb-4">
+            <div class="col">
+                <label for="bank-acc-accNumber" class="font-weight-bold">Account Number</label>
+                <input type="number" class="form-control" id="bank-acc-accNumber" placeholder="Account Number" @bind="entityBankAccountNumber" />
+            </div>
+            <div class="col">
+                <label for="bank-acc-accCode" class="font-weight-bold">Bank Code</label>
+                <input type="number" class="form-control" id="bank-acc-accCode" placeholder="Bank Code" @bind="entityBankAccountCode" />
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <label for="bank-acc-name" class="font-weight-bold">Bank Name</label>
+                <input type="text" class="form-control" id="bank-acc-name" placeholder="Bank Name" @bind="entityBankAccountName" />
+            </div>
+            <div class="col">
+                <label for="bank-acc-iban" class="font-weight-bold">IBAN</label>
+                <input type="number" class="form-control" id="bank-acc-iban" placeholder="IBAN" @bind="entityBankAccountIban" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary float-end mt-4">Submit</button>
+    </EditForm>
+</div>
+
+@code {
+    // Parameters
+    [Parameter] public EventCallback SubmitCallback { get; set; }
+    [Parameter] public Entity? EntityInstance { get; set; } = null;
+    [Parameter, EditorRequired] public bool isActive { get; set; }
+
+    // For ARES API call
+    private string userInputIco { get; set; } = string.Empty;
+    private string aresApiErrorMessage { get; set; } = string.Empty;
+
+    // Fields for the form
+    // Entity
+    private string entityIco { get; set; } = string.Empty;
+    private string entityName { get; set; } = string.Empty;
+    private string entityEmail { get; set; } = string.Empty;
+    private string entityPhone { get; set; } = string.Empty;
+    // Address
+    private string entityAddressStreet { get; set; } = string.Empty;
+    private int? entityAddressZipCode { get; set; } = null;
+    private string entityAddressCity { get; set; } = string.Empty;
+    private string entityAddressCountry { get; set; } = string.Empty;
+    // Bank Account
+    private string entityBankAccountNumber { get; set; } = string.Empty;
+    private string entityBankAccountCode { get; set; } = string.Empty;
+    private string entityBankAccountName { get; set; } = string.Empty;
+    private string entityBankAccountIban { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (EntityInstance is not null)
+        {
+            entityIco = EntityInstance.Ico;
+            entityName = EntityInstance.Name;
+            entityEmail = EntityInstance.Email;
+            entityPhone = EntityInstance.PhoneNumber;
+            entityAddressStreet = EntityInstance.Address!.Street;
+            entityAddressZipCode = EntityInstance.Address.ZipCode;
+            entityAddressCity = EntityInstance.Address.City;
+            entityAddressCountry = EntityInstance.Address.Country;
+            entityBankAccountNumber = EntityInstance.BankAccount!.AccountNumber;
+            entityBankAccountCode = EntityInstance.BankAccount.BankCode;
+            entityBankAccountName = EntityInstance.BankAccount.BankName;
+            entityBankAccountIban = EntityInstance.BankAccount.IBAN;
+            return;
+        }
+        if (!isActive)
+            ClearForm();
+    }
+
+    private async Task FillInAresData()
+    {
+        try 
+        {
+            if (string.IsNullOrEmpty(userInputIco))
+            {
+                aresApiErrorMessage = "No Ico Provided";
+                return;
+            }
+            var response = await aresApiService.GetEntityInformationByIcoAsync(userInputIco.ToString()!);
+            switch (response.IsSuccess)
+            {
+                case true:
+                    SubjectInformation data = (SubjectInformation)response.Data!;
+                    FillInForm(data);
+                    break;
+                case false:
+                    AresApiErrorResponse errorData = (AresApiErrorResponse)response.Data!;
+                    aresApiErrorMessage = errorData.Popis;
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            aresApiErrorMessage = e.Message;
+        } 
+        finally 
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void FillInForm(SubjectInformation newData)
+    {
+        // Clear the error message
+        aresApiErrorMessage = string.Empty;
+        // Populate the form
+        entityIco = newData.ico!;
+        entityName = newData.obchodniJmeno!;
+        entityAddressStreet = newData.sidlo!.nazevUlice + newData.sidlo.cisloDomovni;
+        entityAddressZipCode = newData.sidlo.psc;
+        entityAddressCity = newData.sidlo.nazevObce!;
+        entityAddressCountry = newData.sidlo.nazevStatu!;
+    }
+
+    private void ClearForm()
+    {
+        userInputIco = string.Empty;
+        entityIco = string.Empty;
+        entityName = string.Empty;
+        entityEmail = string.Empty;
+        entityPhone = string.Empty;
+        entityAddressStreet = string.Empty;
+        entityAddressZipCode = null;
+        entityAddressCity = string.Empty;
+        entityAddressCountry = string.Empty;
+        entityBankAccountNumber = string.Empty;
+        entityBankAccountCode = string.Empty;
+        entityBankAccountName = string.Empty;
+        entityBankAccountIban = string.Empty;
+    }
+
+    private async Task SubmitForm() {
+        try 
+        {
+            if (EntityInstance is null)
+            {
+                await SubmitNewEntity();
+                return;
+            }
+            await SubmitEditEntity();
+        }
+        catch (Exception e)
+        {
+            aresApiErrorMessage = e.Message;
+        }
+        finally
+        {
+            await SubmitCallback.InvokeAsync();
+            ClearForm();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitNewEntity() {
+        var newAddress = new Address
+            {
+                Street = entityAddressStreet,
+                ZipCode = entityAddressZipCode ?? 0,
+                City = entityAddressCity,
+                Country = entityAddressCountry
+            };
+
+        // Create the address
+        Address? newAddressResponse = await addressService.CreateAsync(newAddress);
+        if (newAddressResponse is null)
+        {
+            aresApiErrorMessage = "Address creation failed";
+            return;
+        }
+        // Create the bank account
+        var newBankAccount = new BankAccount
+            {
+                AccountNumber = entityBankAccountNumber,
+                BankCode = entityBankAccountCode,
+                BankName = entityBankAccountName,
+                IBAN = entityBankAccountIban
+            };
+        BankAccount? newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
+        if (newBankAccountResponse is null)
+        {
+            aresApiErrorMessage = "Bank account creation failed";
+            return;
+        }
+        // Create the entity
+        var newEntity = new Entity
+            {
+                Ico = entityIco,
+                Name = entityName,
+                Email = entityEmail,
+                PhoneNumber = entityPhone,
+                AddressId = newAddressResponse.Id,
+                BankAccountId = newBankAccountResponse.Id
+            };
+        Entity? newEntityResponse = await entityService.CreateAsync(newEntity);
+        if (newEntityResponse is null)
+        {
+            aresApiErrorMessage = "Entity creation failed";
+            return;
+        }
+    }
+
+    private async Task SubmitEditEntity() 
+    {
+        if (EntityInstance is null)
+        {
+            aresApiErrorMessage = "Entity instance is null";
+            return;
+        }
+        // Edit the address
+        int addressId = EntityInstance.AddressId;
+        var editedAddress = new Address
+            {
+                Id = addressId,
+                Street = entityAddressStreet,
+                ZipCode = entityAddressZipCode ?? 0,
+                City = entityAddressCity,
+                Country = entityAddressCountry
+            };
+        Address? editedAddressResponse = await addressService.UpdateAsync(addressId, editedAddress);
+        if (editedAddressResponse is null)
+        {
+            aresApiErrorMessage = "Address update failed";
+            return;
+        }
+        // Edit the bank account
+        int bankAccountId = EntityInstance.BankAccountId;
+        var editedBankAccount = new BankAccount
+            {
+                Id = bankAccountId,
+                AccountNumber = entityBankAccountNumber,
+                BankCode = entityBankAccountCode,
+                BankName = entityBankAccountName,
+                IBAN = entityBankAccountIban
+            };
+        BankAccount? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, editedBankAccount);
+        if (editedBankAccountResponse is null)
+        {
+            aresApiErrorMessage = "Bank account update failed";
+            return;
+        }
+        // Edit the entity
+        var editedEntity = new Entity
+            {
+                Id = EntityInstance.Id,
+                Ico = entityIco,
+                Name = entityName,
+                Email = entityEmail,
+                PhoneNumber = entityPhone,
+                AddressId = EntityInstance.AddressId,
+                BankAccountId = EntityInstance.BankAccountId
+            };
+        Entity? editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
+        if (editedEntityResponse is null)
+        {
+            aresApiErrorMessage = "Entity update failed";
+            return;
+        }
+    }
+}

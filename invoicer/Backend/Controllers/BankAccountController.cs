@@ -1,5 +1,5 @@
-﻿using Backend.Services.BankAccountService;
-using Backend.Services.BankAccountService.Models;
+﻿using Domain.Models;
+using Domain.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers

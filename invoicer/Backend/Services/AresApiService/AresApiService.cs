@@ -1,18 +1,19 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Backend.Services.AresApiService.Models;
-using Backend.Services.AresApiService.Responses;
+using Domain.AresApiModels;
+using Domain.Interfaces;
+using Domain.ServiceInterfaces;
 using Refit;
 
 namespace Backend.Services.AresApiService
 {
-	public class AresApiService
+	public class AresApiService : IAresApiService
 	{
 		private readonly IAresApi _aresApi;
 		private const string baseUrl = "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest";
 		private static readonly JsonSerializerOptions jsonSerializeOptions = new() { PropertyNameCaseInsensitive = true };
 
-	public AresApiService()
+		public AresApiService()
 		{
 			_aresApi = RestService.For<IAresApi>(baseUrl);
 		}
@@ -26,21 +27,21 @@ namespace Backend.Services.AresApiService
 				if (response.IsSuccessStatusCode)
 				{
 					SubjectInformation? data = JsonSerializer.Deserialize<SubjectInformation>(content, jsonSerializeOptions);
-					return Result<SubjectInformation>.Success(data!);
+					return AresApiResult<SubjectInformation>.Success(data!);
 				}
 				AresApiErrorResponse? errorData = JsonSerializer.Deserialize<AresApiErrorResponse>(content, jsonSerializeOptions);
 				return HandleErrorResponse(response.StatusCode, errorData!);
 			}
 			catch (Exception ex)
 			{
-				return Result<IAresApiResponse>.Failure($"Unexpected error: {ex.Message}", 500);
+				return AresApiResult<IAresApiResponse>.Failure(null, $"Unexpected error: {ex.Message}", 500);
 			}
 		}
 
 		private static IResult<IAresApiResponse> HandleErrorResponse(HttpStatusCode statusCode, AresApiErrorResponse errorResponse)
 		{
 			string message = $"{(int)statusCode}: {errorResponse?.Popis ?? "Unknown Error"}";
-			return Result<AresApiErrorResponse>.Failure(message, (int)statusCode);
+			return AresApiResult<AresApiErrorResponse>.Failure(errorResponse, message, (int)statusCode);
 		}
 	}
 }

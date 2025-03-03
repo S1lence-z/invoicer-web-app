@@ -1,9 +1,9 @@
 using Backend.Database;
-using Backend.Services.AddressService;
+using Backend.Services;
 using Backend.Services.AresApiService;
-using Backend.Services.BankAccountService;
-using Backend.Services.EntityService;
-using Backend.Services.InvoiceService;
+using Backend.Utils;
+using Domain.Interfaces;
+using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend
@@ -24,8 +24,7 @@ namespace Backend
 			builder.Services.AddScoped<IBankAccountService, BankAccountService>();
 			builder.Services.AddScoped<IEntityService, EntityService>();
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
-			builder.Services.AddScoped<AresApiService>();
-			builder.Services.AddScoped<InvoiceService>();
+			builder.Services.AddScoped<IAresApiService, AresApiService>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
@@ -35,20 +34,30 @@ namespace Backend
 
 			var app = builder.Build();
 
-			// Configure the HTTP request pipeline.
-			if (app.Environment.IsDevelopment())
-			{
-				app.UseSwagger();
-				app.UseSwaggerUI();
-			}
+			// Enable Swagger UI
+			app.UseSwagger();
+			app.UseSwaggerUI();
 
-			app.UseHttpsRedirection();
+			//app.UseHttpsRedirection();
+
+			// Enable CORS
+			EnableCors(app);
 
 			app.UseAuthorization();
 
 			app.MapControllers();
 
 			app.Run();
+		}
+
+		private static void EnableCors(IApplicationBuilder app)
+		{
+			app.UseCors(builder =>
+			{
+				builder.AllowAnyOrigin();
+				builder.AllowAnyMethod();
+				builder.AllowAnyHeader();
+			});
 		}
 	}
 }

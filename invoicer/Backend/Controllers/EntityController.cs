@@ -1,8 +1,6 @@
-﻿using Backend.Database;
-using Backend.Services.EntityService;
-using Backend.Services.EntityService.Models;
+﻿using Domain.Models;
+using Domain.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {

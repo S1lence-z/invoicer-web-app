@@ -1,0 +1,28 @@
+﻿<div class="modal" tabindex="-1" role="dialog" style="display:@(IsVisible ? "block" : "none"); background: rgba(0, 0, 0, 0.5);">
+    <div class="modal-lg" role="document" style="margin: auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button class="btn btn-close" aria-label="Close" @onclick="() => OnClose.InvokeAsync(false)">
+                </button>
+            </div>
+            <div class="modal-body">
+                @ChildContent
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

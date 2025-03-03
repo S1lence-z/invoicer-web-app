@@ -1,0 +1,20 @@
+﻿using Domain.Enums;
+
+namespace Domain.Models
+{
+    public class Invoice
+    {
+		public int Id { get; set; }
+		public int SellerId { get; set; }
+		public Entity? Seller { get; set; }
+		public int BuyerId { get; set; }
+		public Entity? Buyer { get; set; }
+		public string InvoiceNumber { get; set; } = string.Empty;
+		public DateTime IssueDate { get; set; } = DateTime.Now;
+		public DateTime DueDate { get; set; }
+		public Currency Currency { get; set; }
+		public PaymentMethod PaymentMethod { get; set; }
+		public DeliveryMethod DeliveryMethod { get; set; }
+		public ICollection<InvoiceItem> Items { get; set; } = new List<InvoiceItem>();
+	}
+}
