@@ -8,5 +8,10 @@
 		"Label": "Entities",
 		"UrlPath": "/entities",
 		"IconClass": "bi bi-plus-square-fill-nav-menu"
+	},
+	{
+		"Label": "Invoices",
+		"UrlPath": "/invoices",
+		"IconClass": "bi bi-plus-square-fill-nav-menu"
 	}
 ]
