@@ -8,7 +8,7 @@ namespace Backend.Utils.InvoicePdfGenerator
 {
 	public class InvoicePdfGenerator : IInvoicePdfGenerator
 	{
-		public static async Task<byte[]?> ExportInvoicePdf(Invoice invoice)
+		public static async Task<IPdfGenerationResult> ExportInvoicePdf(Invoice invoice)
 		{
 			return await Task.Run(() =>
 			{
@@ -17,11 +17,11 @@ namespace Backend.Utils.InvoicePdfGenerator
 					QuestPDF.Settings.License = LicenseType.Community;
 					InvoicePdfDocument newDoc = new(invoice);
 					byte[] pdfFile = newDoc.GeneratePdf();
-					return pdfFile;
+					return PdfGenerationResult.Success(pdfFile);
 				} 
 				catch (Exception e)
 				{
-					return null;
+					return PdfGenerationResult.Failure(e.Message);
 				}
 			});
 		}

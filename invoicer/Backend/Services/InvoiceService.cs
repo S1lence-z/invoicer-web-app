@@ -3,6 +3,7 @@ using Domain.ServiceInterfaces;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Backend.Utils.InvoicePdfGenerator;
+using Domain.Interfaces;
 
 namespace Backend.Services
 {
@@ -107,14 +108,15 @@ namespace Backend.Services
 			return true;
 		}
 
-		public async Task<byte[]> ExportInvoicePdf(int id)
+		public async Task<IPdfGenerationResult> ExportInvoicePdf(int id)
 		{
 			Invoice? invoiceToExport = await GetByIdAsync(id);
+
 			if (invoiceToExport is null)
 				throw new ArgumentException($"Invoice with id {id} not found");
-			byte[]? pdfFile = await InvoicePdfGenerator.ExportInvoicePdf(invoiceToExport);
-			if (pdfFile is null)
-				throw new Exception("Failed to generate PDF");
+
+			IPdfGenerationResult pdfFile = await InvoicePdfGenerator.ExportInvoicePdf(invoiceToExport);
+
 			return pdfFile;
 		}
 	}

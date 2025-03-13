@@ -5,6 +5,6 @@ namespace Domain.ServiceInterfaces
 {
 	public interface IInvoiceService : IService<int, Invoice> 
 	{
-		public Task<byte[]> ExportInvoicePdf(int id);
+		public Task<IPdfGenerationResult> ExportInvoicePdf(int id);
 	}
 }
