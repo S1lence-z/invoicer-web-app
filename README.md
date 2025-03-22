@@ -18,7 +18,7 @@ docker build -f ./Backend/Dockerfile.custom -t invoicer-backend .
 ```
  2. Run the backend container
 ```bash
-docker run -p 8080:8080 -p 8081:8081 --name invoicer-backend invoicer-backend
+docker run -d -p 8080:8080 -p 8081:8081 --name invoicer-backend invoicer-backend
 ```
 
 #### Frontend
