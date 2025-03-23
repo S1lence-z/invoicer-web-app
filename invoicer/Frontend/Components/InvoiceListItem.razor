@@ -1,0 +1,28 @@
+﻿@using Domain.Models;
+
+<div class="d-flex flex-row border rounded p-2 align-items-center">
+    <div class="d-flex flex-row gap-4 align-items-center" style="cursor: pointer;">
+        <p class="align-content-center text-center">@Invoice.InvoiceNumber</p>
+        <p class="text-center">Buyer: @Invoice.Buyer!.Name</p>
+        <p class="text-center">Seller: @Invoice.Seller!.Name</p>
+        <p class="text-center">@Invoice.DueDate.ToString("d")</p>
+        <div class="d-flex flex-row gap-1">
+            <p class="text-center">@CalculateInvoiceSum(Invoice)</p>
+            <p class="text-center">@Invoice.Currency</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Invoice Invoice { get; set; } = null!;
+
+    private decimal CalculateInvoiceSum(Invoice invoice) {
+        decimal total = 0;
+        foreach (var item in invoice.Items) {
+            decimal itemTotal = item.Quantity * item.UnitPrice;
+            total += itemTotal;
+        }
+        return total;
+    }
+}
