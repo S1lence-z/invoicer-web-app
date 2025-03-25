@@ -1,16 +1,17 @@
 ﻿@using Domain.Models;
 
 <div class="card border-1 shadow-sm">
-    <div class="card-body d-flex justify-content-between" style="cursor: pointer;">
+    <div class="card-body d-flex justify-content-between align-content-center" style="cursor: pointer;">
         <span class="fw-bold">@Invoice.InvoiceNumber</span>
-
-        <span class="text-muted">@Invoice.Buyer!.Name</span>
-
         <span class="text-muted">@Invoice.Seller!.Name</span>
-
+        <span class="text-muted">@Invoice.Buyer!.Name</span>
         <span class="text-muted">@Invoice.DueDate.ToString("d")</span>
         <span class="fw-bold">
             @CalculateInvoiceSum(Invoice) @Invoice.Currency
+        </span>
+        <span>
+            <button class="btn btn-outline-primary btn-sm" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">Edit</button>
+            <button class="btn btn-outline-danger btn-sm" @onclick ="() => OnDeleteInvoice.InvokeAsync(Invoice)">Delete</button>
         </span>
     </div>
 </div>
@@ -29,4 +30,10 @@
         }
         return total;
     }
+
+    [Parameter]
+    public EventCallback<Invoice> OnDeleteInvoice { get; set; }
+
+    [Parameter]
+    public EventCallback<Invoice> OnEditInvoice { get; set; }
 }
