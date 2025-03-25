@@ -10,6 +10,7 @@
             @CalculateInvoiceSum(Invoice) @Invoice.Currency
         </span>
         <span>
+            <button class="btn btn-outline-success btn-sm" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">Export</button>
             <button class="btn btn-outline-primary btn-sm" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">Edit</button>
             <button class="btn btn-outline-danger btn-sm" @onclick ="() => OnDeleteInvoice.InvokeAsync(Invoice)">Delete</button>
         </span>
@@ -36,4 +37,7 @@
 
     [Parameter]
     public EventCallback<Invoice> OnEditInvoice { get; set; }
+
+    [Parameter]
+    public EventCallback<Invoice> OnExportInvoice { get; set; }
 }

@@ -1,9 +1,11 @@
 ﻿@page "/invoices";
+@using Domain.Interfaces
 @using Domain.Models
 @using Domain.ServiceInterfaces
 @using Frontend.Components;
 @using System.Collections.ObjectModel
 @inject IInvoiceService invoiceService;
+@inject IJSRuntime jsRuntime;
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3">
@@ -58,7 +60,7 @@
             {
                 @foreach (var invoice in shownInvoices)
                 {
-                    <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" />
+                    <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" OnExportInvoice="ExportInvoice" />
                 }
             }
         </div>
@@ -152,6 +154,30 @@
             await LoadInvoices();
             StateHasChanged();
         }
+    }
+
+    private async Task ExportInvoice(Invoice invToExport) {
+        IPdfGenerationResult response = await invoiceService.ExportInvoicePdf(invToExport.Id);
+        if (!response.IsSuccess)
+        {
+            Console.WriteLine(response.ErrorMessage);
+        }
+
+        string defaultFileName = $"Invoice_{invToExport.InvoiceNumber}.pdf";
+        string? userFileName = await jsRuntime.InvokeAsync<string>("promptFilename", defaultFileName);
+
+        if (string.IsNullOrWhiteSpace(userFileName))
+        {
+            Console.WriteLine("Download canceled.");
+            return;
+        }
+
+        if (!userFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            userFileName += ".pdf";
+        }
+
+        await jsRuntime.InvokeVoidAsync("downloadPdf", userFileName, response.Data);
     }
 
     private async Task ShowAddInvoiceModal()

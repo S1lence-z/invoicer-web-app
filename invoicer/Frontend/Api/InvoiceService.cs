@@ -28,9 +28,18 @@ namespace Frontend.Api
 			return response.IsSuccessStatusCode;
 		}
 
-		public Task<IPdfGenerationResult> ExportInvoicePdf(int id)
+		public async Task<IPdfGenerationResult> ExportInvoicePdf(int id)
 		{
-			throw new NotImplementedException();
+			HttpResponseMessage response = await _httpClient.GetAsync($"{_urlPath}/{id}/export-pdf");
+
+			if (!response.IsSuccessStatusCode)
+			{
+				return PdfGenerationResult.Failure("Failed to generate PDF", (int)response.StatusCode);
+			}
+
+			byte[] pdfFile = await response.Content.ReadAsByteArrayAsync();
+
+			return PdfGenerationResult.Success(pdfFile);
 		}
 
 		public async Task<IList<Invoice>> GetAllAsync()
