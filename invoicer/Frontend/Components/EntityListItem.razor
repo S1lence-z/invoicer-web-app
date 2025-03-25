@@ -1,21 +1,23 @@
 ﻿@using Domain.Models;
 
-<div class="d-flex flex-column border rounded p-3 mb-2 @(IsSelected ? "bg-dark text-white" : "bg-white")">
-    <div class="d-flex flex-column" style="cursor: pointer;" @onclick="() => OnSelectEntity.InvokeAsync(Entity)">
-        <h5>@Entity.Name</h5>
-        <p>
-            <strong>Bank:</strong>
-            @Entity.BankAccount!.BankName
-            (@Entity.BankAccount.AccountNumber/@Entity.BankAccount.BankCode)
+<div class="card border-1 shadow-sm @(IsSelected ? "border border-primary" : "")">
+    <div class="card-body" style="cursor: pointer;" @onclick="() => OnSelectEntity.InvokeAsync(Entity)">
+        <h5 class="card-title mb-2">@Entity.Name</h5>
+        
+        <p class="mb-1">
+            <span class="fw-bold">Bank:</span> 
+            <span class="text-muted">@Entity.BankAccount!.BankName (@Entity.BankAccount.AccountNumber/@Entity.BankAccount.BankCode)</span>
         </p>
-        <p>
-            <strong>Address:</strong>
-            @Entity.Address!.Street, @Entity.Address.City
+        
+        <p class="mb-0">
+            <span class="fw-bold">Address:</span> 
+            <span class="text-muted">@Entity.Address!.Street, @Entity.Address.City</span>
         </p>
     </div>
-    <div class="d-flex flex-row gap-2 mt-2">
-        <button class="btn btn-primary" @onclick="() => OnEditEntity.InvokeAsync(this.Entity)">Edit</button>
-        <button class="btn btn-danger" @onclick="() => OnDeleteEntity.InvokeAsync(this.Entity)">Delete</button>
+
+    <div class="card-footer bg-white border-0 d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" @onclick="() => OnEditEntity.InvokeAsync(Entity)">Edit</button>
+        <button class="btn btn-outline-danger btn-sm" @onclick="() => OnDeleteEntity.InvokeAsync(Entity)">Delete</button>
     </div>
 </div>
 

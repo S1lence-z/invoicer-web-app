@@ -27,7 +27,7 @@
         else 
         {
             @* ENTITIES LIST *@
-            <div class="d-flex flex-column pe-2 overflow-auto" style="max-height: 600px">
+            <div class="d-flex flex-column pe-2 overflow-auto gap-2" style="max-height: 600px">
                 @foreach (var entity in allEntities)
                 {
                     <EntityListItem Entity="entity" OnSelectEntity="SelectEntity" OnDeleteEntity="DeleteEntity" OnEditEntity="EditEntity" IsSelected="IsEntitySelected(entity)" />
