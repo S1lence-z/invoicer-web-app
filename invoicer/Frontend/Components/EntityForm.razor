@@ -2,6 +2,7 @@
 @using Domain.AresApiModels;
 @using Domain.Models
 @using Domain.ServiceInterfaces;
+@using Frontend.FormModels;
 @inject IAresApiService aresApiService;
 @inject IAddressService addressService;
 @inject IEntityService entityService;
@@ -9,76 +10,90 @@
 
 <div>
     @* ARES API WINDOW *@
-    <AresApiLookup 
-    UserInputIco="@userInputIco"
-    UserInputIcoChanged="@((string ico) => userInputIco = ico)"
-    AresApiService="aresApiService" 
-    AresApiErrorMessage="@aresApiErrorMessage" 
-    OnFillInAresData="FillInAresData" />
+    <AresApiLookup UserInputIco="@userInputIco"
+        UserInputIcoChanged="@((string ico) => userInputIco = ico)"
+        AresApiService="aresApiService"
+        AresApiErrorMessage="@aresApiErrorMessage"
+        OnFillInAresData="FillInAresData" />
     @* ENTITY FORM *@
-    <EditForm Model="@this" OnValidSubmit="SubmitForm">
+    <EditForm Model="@entityFormModel" OnValidSubmit="SubmitForm">
+        <DataAnnotationsValidator />
+
+        <!-- Entity Fields -->
         <div class="row mb-4">
             <div class="col">
                 <label for="entity-name" class="font-weight-bold">Name</label>
-                <input type="text" class="form-control" id="entity-name" placeholder="Enter Name" @bind="entityName" />
+                <input type="text" class="form-control" id="entity-name" placeholder="Enter Name" @bind="entityFormModel.Name" />
+                <ValidationMessage For="@(() => entityFormModel.Name)" />
             </div>
             <div class="col">
                 <label for="entity-ico" class="font-weight-bold">ICO</label>
-                <input type="number" class="form-control" id="entity-ico" placeholder="Enter ICO" @bind="entityIco" />
+                <input type="text" class="form-control" id="entity-ico" placeholder="Enter ICO" @bind="entityFormModel.Ico" />
+                <ValidationMessage For="@(() => entityFormModel.Ico)" />
             </div>
         </div>
         <div class="row">
             <div class="col">
                 <label for="entity-email" class="font-weight-bold">Email Address</label>
-                <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" @bind="entityEmail" />
+                <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" @bind="entityFormModel.Email" />
+                <ValidationMessage For="@(() => entityFormModel.Email)" />
             </div>
             <div class="col">
                 <label for="entity-phone" class="font-weight-bold">Phone Number</label>
-                <input type="tel" class="form-control" id="entity-phone" placeholder="Enter Phone Number" @bind="entityPhone" />
+                <input type="tel" class="form-control" id="entity-phone" placeholder="Enter Phone Number" @bind="entityFormModel.PhoneNumber" />
+                <ValidationMessage For="@(() => entityFormModel.PhoneNumber)" />
             </div>
         </div>
-        <hr/>
+        <hr />
         @* ADDRESS FORM *@
         <div class="row mb-4">
             <div class="col">
                 <label for="address-street" class="font-weight-bold">Street And Number</label>
-                <input type="text" class="form-control" id="address-street" placeholder="Street And Number" @bind="entityAddressStreet" />
+                <input type="text" class="form-control" id="address-street" placeholder="Street And Number" @bind="entityFormModel.Street" />
+                <ValidationMessage For="@(() => entityFormModel.Street)" />
             </div>
             <div class="col">
                 <label for="address-zipcode" class="font-weight-bold">Zip Code</label>
-                <input type="number" class="form-control" id="address-zipcode" placeholder="Zip Code" @bind="entityAddressZipCode" />
+                <input type="number" class="form-control" id="address-zipcode" placeholder="Zip Code" @bind="entityFormModel.ZipCode" />
+                <ValidationMessage For="@(() => entityFormModel.ZipCode)" />
             </div>
         </div>
         <div class="row mb-4">
             <div class="col">
                 <label for="address-city" class="font-weight-bold">City</label>
-                <input type="text" class="form-control" id="address-city" placeholder="City" @bind="entityAddressCity" />
+                <input type="text" class="form-control" id="address-city" placeholder="City" @bind="entityFormModel.City" />
+                <ValidationMessage For="@(() => entityFormModel.City)" />
             </div>
             <div class="col">
                 <label for="address-country" class="font-weight-bold">Country</label>
-                <input type="text" class="form-control" id="address-country" placeholder="Country" @bind="entityAddressCountry" />
+                <input type="text" class="form-control" id="address-country" placeholder="Country" @bind="entityFormModel.Country" />
+                <ValidationMessage For="@(() => entityFormModel.Country)" />
             </div>
         </div>
         <hr />
-        @* BANK ACCOUNT FORM*@
+        @* BANK ACCOUNT FORM *@
         <div class="row mb-4">
             <div class="col">
                 <label for="bank-acc-accNumber" class="font-weight-bold">Account Number</label>
-                <input type="number" class="form-control" id="bank-acc-accNumber" placeholder="Account Number" @bind="entityBankAccountNumber" />
+                <input type="text" class="form-control" id="bank-acc-accNumber" placeholder="Account Number" @bind="entityFormModel.AccountNumber" />
+                <ValidationMessage For="@(() => entityFormModel.AccountNumber)" />
             </div>
             <div class="col">
                 <label for="bank-acc-accCode" class="font-weight-bold">Bank Code</label>
-                <input type="number" class="form-control" id="bank-acc-accCode" placeholder="Bank Code" @bind="entityBankAccountCode" />
+                <input type="text" class="form-control" id="bank-acc-accCode" placeholder="Bank Code" @bind="entityFormModel.BankCode" />
+                <ValidationMessage For="@(() => entityFormModel.BankCode)" />
             </div>
         </div>
         <div class="row mb-4">
             <div class="col">
                 <label for="bank-acc-name" class="font-weight-bold">Bank Name</label>
-                <input type="text" class="form-control" id="bank-acc-name" placeholder="Bank Name" @bind="entityBankAccountName" />
+                <input type="text" class="form-control" id="bank-acc-name" placeholder="Bank Name" @bind="entityFormModel.BankName" />
+                <ValidationMessage For="@(() => entityFormModel.BankName)" />
             </div>
             <div class="col">
                 <label for="bank-acc-iban" class="font-weight-bold">IBAN</label>
-                <input type="number" class="form-control" id="bank-acc-iban" placeholder="IBAN" @bind="entityBankAccountIban" />
+                <input type="text" class="form-control" id="bank-acc-iban" placeholder="IBAN" @bind="entityFormModel.IBAN" />
+                <ValidationMessage For="@(() => entityFormModel.IBAN)" />
             </div>
         </div>
         <button type="submit" class="btn btn-primary float-end mt-4">Submit</button>
@@ -95,40 +110,14 @@
     private string userInputIco { get; set; } = string.Empty;
     private string aresApiErrorMessage { get; set; } = string.Empty;
 
-    // Fields for the form
-    // Entity
-    private string entityIco { get; set; } = string.Empty;
-    private string entityName { get; set; } = string.Empty;
-    private string entityEmail { get; set; } = string.Empty;
-    private string entityPhone { get; set; } = string.Empty;
-    // Address
-    private string entityAddressStreet { get; set; } = string.Empty;
-    private int? entityAddressZipCode { get; set; } = null;
-    private string entityAddressCity { get; set; } = string.Empty;
-    private string entityAddressCountry { get; set; } = string.Empty;
-    // Bank Account
-    private string entityBankAccountNumber { get; set; } = string.Empty;
-    private string entityBankAccountCode { get; set; } = string.Empty;
-    private string entityBankAccountName { get; set; } = string.Empty;
-    private string entityBankAccountIban { get; set; } = string.Empty;
+    // Entity Form Model
+    private EntityFormModel entityFormModel { get; set; } = new EntityFormModel();
 
     protected override void OnParametersSet()
     {
         if (EntityInstance is not null)
         {
-            entityIco = EntityInstance.Ico;
-            entityName = EntityInstance.Name;
-            entityEmail = EntityInstance.Email;
-            entityPhone = EntityInstance.PhoneNumber;
-            entityAddressStreet = EntityInstance.Address!.Street;
-            entityAddressZipCode = EntityInstance.Address.ZipCode;
-            entityAddressCity = EntityInstance.Address.City;
-            entityAddressCountry = EntityInstance.Address.Country;
-            entityBankAccountNumber = EntityInstance.BankAccount!.AccountNumber;
-            entityBankAccountCode = EntityInstance.BankAccount.BankCode;
-            entityBankAccountName = EntityInstance.BankAccount.BankName;
-            entityBankAccountIban = EntityInstance.BankAccount.IBAN;
-            return;
+            entityFormModel = EntityFormModel.FromEntity(EntityInstance);
         }
         if (!isActive)
             ClearForm();
@@ -171,29 +160,17 @@
         // Clear the error message
         aresApiErrorMessage = string.Empty;
         // Populate the form
-        entityIco = newData.ico!;
-        entityName = newData.obchodniJmeno!;
-        entityAddressStreet = newData.sidlo!.nazevUlice + newData.sidlo.cisloDomovni;
-        entityAddressZipCode = newData.sidlo.psc;
-        entityAddressCity = newData.sidlo.nazevObce!;
-        entityAddressCountry = newData.sidlo.nazevStatu!;
+        entityFormModel.Ico = newData.ico!;
+        entityFormModel.Name = newData.obchodniJmeno!;
+        entityFormModel.Street = newData.sidlo!.nazevUlice + newData.sidlo.cisloDomovni;
+        entityFormModel.ZipCode = newData.sidlo.psc;
+        entityFormModel.City = newData.sidlo.nazevObce!;
+        entityFormModel.Country = newData.sidlo.nazevStatu!;
     }
 
     private void ClearForm()
     {
-        userInputIco = string.Empty;
-        entityIco = string.Empty;
-        entityName = string.Empty;
-        entityEmail = string.Empty;
-        entityPhone = string.Empty;
-        entityAddressStreet = string.Empty;
-        entityAddressZipCode = null;
-        entityAddressCity = string.Empty;
-        entityAddressCountry = string.Empty;
-        entityBankAccountNumber = string.Empty;
-        entityBankAccountCode = string.Empty;
-        entityBankAccountName = string.Empty;
-        entityBankAccountIban = string.Empty;
+        entityFormModel = new EntityFormModel();
     }
 
     private async Task SubmitForm() {
@@ -221,10 +198,10 @@
     private async Task SubmitNewEntity() {
         var newAddress = new Address
             {
-                Street = entityAddressStreet,
-                ZipCode = entityAddressZipCode ?? 0,
-                City = entityAddressCity,
-                Country = entityAddressCountry
+                Street = entityFormModel.Street,
+                ZipCode = entityFormModel.ZipCode,
+                City = entityFormModel.City,
+                Country = entityFormModel.Country
             };
 
         // Create the address
@@ -237,10 +214,10 @@
         // Create the bank account
         var newBankAccount = new BankAccount
             {
-                AccountNumber = entityBankAccountNumber,
-                BankCode = entityBankAccountCode,
-                BankName = entityBankAccountName,
-                IBAN = entityBankAccountIban
+                AccountNumber = entityFormModel.AccountNumber,
+                BankCode = entityFormModel.BankCode,
+                BankName = entityFormModel.BankName,
+                IBAN = entityFormModel.IBAN
             };
         BankAccount? newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
         if (newBankAccountResponse is null)
@@ -251,10 +228,10 @@
         // Create the entity
         var newEntity = new Entity
             {
-                Ico = entityIco,
-                Name = entityName,
-                Email = entityEmail,
-                PhoneNumber = entityPhone,
+                Ico = entityFormModel.Ico,
+                Name = entityFormModel.Name,
+                Email = entityFormModel.Email,
+                PhoneNumber = entityFormModel.PhoneNumber,
                 AddressId = newAddressResponse.Id,
                 BankAccountId = newBankAccountResponse.Id
             };
@@ -278,10 +255,10 @@
         var editedAddress = new Address
             {
                 Id = addressId,
-                Street = entityAddressStreet,
-                ZipCode = entityAddressZipCode ?? 0,
-                City = entityAddressCity,
-                Country = entityAddressCountry
+                Street = entityFormModel.Street,
+                ZipCode = entityFormModel.ZipCode,
+                City = entityFormModel.City,
+                Country = entityFormModel.Country
             };
         Address? editedAddressResponse = await addressService.UpdateAsync(addressId, editedAddress);
         if (editedAddressResponse is null)
@@ -294,10 +271,10 @@
         var editedBankAccount = new BankAccount
             {
                 Id = bankAccountId,
-                AccountNumber = entityBankAccountNumber,
-                BankCode = entityBankAccountCode,
-                BankName = entityBankAccountName,
-                IBAN = entityBankAccountIban
+                AccountNumber = entityFormModel.AccountNumber,
+                BankCode = entityFormModel.BankCode,
+                BankName = entityFormModel.BankName,
+                IBAN = entityFormModel.IBAN
             };
         BankAccount? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, editedBankAccount);
         if (editedBankAccountResponse is null)
@@ -309,12 +286,12 @@
         var editedEntity = new Entity
             {
                 Id = EntityInstance.Id,
-                Ico = entityIco,
-                Name = entityName,
-                Email = entityEmail,
-                PhoneNumber = entityPhone,
-                AddressId = EntityInstance.AddressId,
-                BankAccountId = EntityInstance.BankAccountId
+                Ico = entityFormModel.Ico,
+                Name = entityFormModel.Name,
+                Email = entityFormModel.Email,
+                PhoneNumber = entityFormModel.PhoneNumber,
+                AddressId = editedAddressResponse.Id,
+                BankAccountId = editedBankAccountResponse.Id
             };
         Entity? editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
         if (editedEntityResponse is null)
