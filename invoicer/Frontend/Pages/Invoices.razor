@@ -59,7 +59,7 @@
             {
                 @foreach (var invoice in shownInvoices)
                 {
-                    <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" OnExportInvoice="ExportInvoice" />
+                    <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" OnExportInvoice="ExportInvoice" OnPreviewInvoice="ShowInvoicePreview" />
                 }
             }
         </div>
@@ -73,6 +73,13 @@
 <Modal Title="Edit Invoice" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal">
     <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isAddingNewInvoice" InvoiceInstance="selectedInvoice" />
 </Modal>
+@* PREVIEW MODAL *@
+<Modal Title="Invoice Preview" IsVisible="isPreviewingInvoice" OnClose="ShowInvoicePreviewModal">
+    @if (selectedInvoice is not null)
+    {
+        <InvoicePreview Invoice="selectedInvoice" />
+    }
+</Modal>
 
 @code {
     private IList<Invoice> allInvoices = new List<Invoice>();
@@ -83,6 +90,7 @@
     // Modal related
     private bool isAddingNewInvoice = false;
     private bool isEditingInvoice = false;
+    private bool isPreviewingInvoice = false;
 
     private enum SearchType {
         InvoiceNumber,
@@ -142,6 +150,12 @@
         }
     }
 
+    private void ShowInvoicePreview(Invoice invToShow)
+    {
+        selectedInvoice = invToShow;
+        ShowInvoicePreviewModal();
+    }
+
     private async Task EditInvoice(Invoice invToEdit) {
         selectedInvoice = invToEdit;
         await ShowEditInvoiceModal();
@@ -190,6 +204,12 @@
     {
         isEditingInvoice = !isEditingInvoice;
         await LoadInvoices();
+        StateHasChanged();
+    }
+
+    private void ShowInvoicePreviewModal()
+    {
+        isPreviewingInvoice = !isPreviewingInvoice;
         StateHasChanged();
     }
 }

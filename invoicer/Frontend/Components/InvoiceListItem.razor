@@ -2,19 +2,19 @@
 
 <div class="card border-1 shadow-sm">
     <div class="card-body row align-items-center" style="cursor: pointer;">
-        <div class="col">
+        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
             <span class="fw-bold">@Invoice.InvoiceNumber</span>
         </div>
-        <div class="col">
+        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
             <span class="text-muted">@Invoice.Seller!.Name</span>
         </div>
-        <div class="col">
+        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
             <span class="text-muted">@Invoice.Buyer!.Name</span>
         </div>
-        <div class="col">
+        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
             <span class="text-muted">@Invoice.DueDate.ToString("d")</span>
         </div>
-        <div class="col">
+        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
             <span class="fw-bold">
                 @CalculateInvoiceSum(Invoice) @Invoice.Currency
             </span>
@@ -31,6 +31,18 @@
     [Parameter, EditorRequired]
     public Invoice Invoice { get; set; } = null!;
 
+    [Parameter]
+    public EventCallback<Invoice> OnDeleteInvoice { get; set; }
+
+    [Parameter]
+    public EventCallback<Invoice> OnEditInvoice { get; set; }
+
+    [Parameter]
+    public EventCallback<Invoice> OnExportInvoice { get; set; }
+
+    [Parameter]
+    public EventCallback<Invoice> OnPreviewInvoice { get; set; }
+
     private decimal CalculateInvoiceSum(Invoice invoice) 
     {
         decimal total = 0;
@@ -41,13 +53,4 @@
         }
         return total;
     }
-
-    [Parameter]
-    public EventCallback<Invoice> OnDeleteInvoice { get; set; }
-
-    [Parameter]
-    public EventCallback<Invoice> OnEditInvoice { get; set; }
-
-    [Parameter]
-    public EventCallback<Invoice> OnExportInvoice { get; set; }
 }
