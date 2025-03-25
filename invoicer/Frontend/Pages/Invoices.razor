@@ -2,6 +2,7 @@
 @using Domain.Models
 @using Domain.ServiceInterfaces
 @using Frontend.Components;
+@using System.Collections.ObjectModel
 @inject IInvoiceService invoiceService;
 
 @* PAGE CONTAINER *@
@@ -21,18 +22,13 @@
             <div class="row g-2">
                 <div class="col-md-6">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search invoices..." />
-                        <button class="btn btn-outline-primary">
-                            <i class="bi bi-search"></i> Search
-                        </button>
+                        <input type="text" class="form-control" placeholder="Search invoices..." @oninput="SearchInvoices" />
+                        <select class="btn border-1 border-primary" @bind="searchType">
+                            <option value="InvoiceNumber">Invoice Number</option>
+                            <option value="Buyer">Buyer</option>
+                            <option value="Seller">Seller</option>
+                        </select>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option value="all">All</option>
-                        <option value="paid">Paid</option>
-                        <option value="unpaid">Unpaid</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -49,17 +45,17 @@
         </div>
         @* INVOICES LIST *@
         <div class="d-flex flex-column overflow-auto px-4 mt-2">
-            @if (allInvoices is null)
+            @if (shownInvoices is null)
             {
                 <p>Loading...</p>
             }
-            else if (allInvoices.Count == 0)
+            else if (shownInvoices.Count == 0)
             {
                 <p>No invoices found</p>
             }
             else
             {
-                @foreach (var invoice in allInvoices)
+                @foreach (var invoice in shownInvoices)
                 {
                     <InvoiceListItem Invoice="invoice" />
                 }
@@ -70,7 +66,16 @@
 
 @code {
     private IList<Invoice> allInvoices = new List<Invoice>();
+    private IList<Invoice> shownInvoices = new List<Invoice>();
     private Invoice? selectedInvoice = null;
+    private string searchTerm = string.Empty;
+    private SearchType searchType = SearchType.InvoiceNumber;
+
+    private enum SearchType {
+        InvoiceNumber,
+        Buyer,
+        Seller
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,10 +87,45 @@
         try
         {
             allInvoices = (await invoiceService.GetAllAsync()).ToList();
+            populateShownInvoices(allInvoices);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async void populateShownInvoices(IList<Invoice> newInvoices)
+    {
+        shownInvoices.Clear();
+        foreach (var inv in newInvoices)
+        {
+            shownInvoices.Add(inv);
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void SearchInvoices(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+        if (string.IsNullOrEmpty(searchTerm)) 
+        {
+            populateShownInvoices(allInvoices);
+            return;
+        }
+        string search = searchTerm.ToLower();
+        switch (searchType) {
+            case SearchType.InvoiceNumber:
+                populateShownInvoices(allInvoices.Where(i => i.InvoiceNumber.Contains(search)).ToList());
+                break;
+            case SearchType.Buyer:
+                populateShownInvoices(allInvoices.Where(i => i.Buyer!.Name.ToLower().Contains(search)).ToList());
+                break;
+            case SearchType.Seller:
+                populateShownInvoices(allInvoices.Where(i => i.Seller!.Name.ToLower().Contains(search)).ToList());
+                break;
+            default:
+                break;
         }
     }
 }
