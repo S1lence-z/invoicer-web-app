@@ -35,6 +35,7 @@ namespace Frontend
 			builder.Services.AddScoped<IEntityService, EntityService>();
 			builder.Services.AddScoped<IAddressService, AddressService>();
 			builder.Services.AddScoped<IBankAccountService, BankAccountService>();
+			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 			// Build and run the app
 			await builder.Build().RunAsync();

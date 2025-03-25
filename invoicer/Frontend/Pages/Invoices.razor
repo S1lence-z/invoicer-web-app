@@ -1,0 +1,215 @@
+﻿@page "/invoices";
+@using Domain.Interfaces
+@using Domain.Models
+@using Domain.ServiceInterfaces
+@using Frontend.Components;
+@using System.Collections.ObjectModel
+@inject IInvoiceService invoiceService;
+@inject IJSRuntime jsRuntime;
+
+@* PAGE CONTAINER *@
+<div class="d-flex flex-column border rounded-3">
+    @* HEADER *@
+    <div class="d-flex justify-content-between align-items-center px-4 pt-4">
+        <h3>Invoices</h3>
+        <button class="btn btn-primary" @onclick="ShowAddInvoiceModal">
+            Add New Invoice
+        </button>
+    </div>
+    <hr />
+    @* CONTENT *@
+    <div class="d-flex flex-column pb-4">
+        @* FILTER AND SEARCH BAR *@
+        <div class="card border-0 mx-4">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search invoices..." @oninput="SearchInvoices" />
+                        <select class="btn border-1 border-primary" @bind="searchType">
+                            <option value="InvoiceNumber">Invoice Number</option>
+                            <option value="Buyer">Buyer</option>
+                            <option value="Seller">Seller</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @* LIST HEADER *@
+        <div class="card border-1 shadow-sm mx-4 my-4">
+            <div class="card-body row">
+                <div class="col fw-bold">Invoice Number</div>
+                <div class="col fw-bold">Seller</div>
+                <div class="col fw-bold">Buyer</div>
+                <div class="col fw-bold">Due Date</div>
+                <div class="col fw-bold">Total</div>
+                <div class="col fw-bold">Actions</div>
+            </div>
+        </div>
+        @* INVOICES LIST *@
+        <div class="d-flex flex-column overflow-auto px-4 gap-2">
+            @if (shownInvoices is null)
+            {
+                <p>Loading...</p>
+            }
+            else if (shownInvoices.Count == 0)
+            {
+                <p>No invoices found</p>
+            }
+            else
+            {
+                @foreach (var invoice in shownInvoices)
+                {
+                    <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" OnExportInvoice="ExportInvoice" OnPreviewInvoice="ShowInvoicePreview" />
+                }
+            }
+        </div>
+    </div>
+</div>
+@* ADD NEW INVOICE MODAL *@
+<Modal Title="Add New Invoice" IsVisible="isAddingNewInvoice" OnClose="ShowAddInvoiceModal">
+    <InvoiceForm SubmitCallback="ShowAddInvoiceModal" isActive="isAddingNewInvoice" />
+</Modal>
+@* EDIT INVOICE MODAL *@
+<Modal Title="Edit Invoice" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal">
+    <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isAddingNewInvoice" InvoiceInstance="selectedInvoice" />
+</Modal>
+@* PREVIEW MODAL *@
+<Modal Title="Invoice Preview" IsVisible="isPreviewingInvoice" OnClose="ShowInvoicePreviewModal">
+    @if (selectedInvoice is not null)
+    {
+        <InvoicePreview Invoice="selectedInvoice" />
+    }
+</Modal>
+
+@code {
+    private IList<Invoice> allInvoices = new List<Invoice>();
+    private IList<Invoice> shownInvoices = new List<Invoice>();
+    private Invoice? selectedInvoice = null;
+    private string searchTerm = string.Empty;
+    private SearchType searchType = SearchType.InvoiceNumber;
+    // Modal related
+    private bool isAddingNewInvoice = false;
+    private bool isEditingInvoice = false;
+    private bool isPreviewingInvoice = false;
+
+    private enum SearchType {
+        InvoiceNumber,
+        Buyer,
+        Seller
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInvoices();
+    }
+
+    private async Task LoadInvoices()
+    {
+        try
+        {
+            allInvoices = (await invoiceService.GetAllAsync()).ToList();
+            populateShownInvoices(allInvoices);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async void populateShownInvoices(IList<Invoice> newInvoices)
+    {
+        shownInvoices.Clear();
+        foreach (var inv in newInvoices)
+        {
+            shownInvoices.Add(inv);
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void SearchInvoices(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+        if (string.IsNullOrEmpty(searchTerm)) 
+        {
+            populateShownInvoices(allInvoices);
+            return;
+        }
+        string search = searchTerm.ToLower();
+        switch (searchType) {
+            case SearchType.InvoiceNumber:
+                populateShownInvoices(allInvoices.Where(i => i.InvoiceNumber.Contains(search)).ToList());
+                break;
+            case SearchType.Buyer:
+                populateShownInvoices(allInvoices.Where(i => i.Buyer!.Name.ToLower().Contains(search)).ToList());
+                break;
+            case SearchType.Seller:
+                populateShownInvoices(allInvoices.Where(i => i.Seller!.Name.ToLower().Contains(search)).ToList());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void ShowInvoicePreview(Invoice invToShow)
+    {
+        selectedInvoice = invToShow;
+        ShowInvoicePreviewModal();
+    }
+
+    private async Task EditInvoice(Invoice invToEdit) {
+        selectedInvoice = invToEdit;
+        await ShowEditInvoiceModal();
+    }
+
+    private async Task DeleteInvoice(Invoice invToDelete) {
+        var status = await invoiceService.DeleteAsync(invToDelete.Id);
+        if (status) {
+            await LoadInvoices();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ExportInvoice(Invoice invToExport) {
+        IPdfGenerationResult response = await invoiceService.ExportInvoicePdf(invToExport.Id);
+        if (!response.IsSuccess)
+        {
+            Console.WriteLine(response.ErrorMessage);
+        }
+
+        string defaultFileName = $"Invoice_{invToExport.InvoiceNumber}.pdf";
+        string? userFileName = await jsRuntime.InvokeAsync<string>("promptFilename", defaultFileName);
+
+        if (string.IsNullOrWhiteSpace(userFileName))
+        {
+            Console.WriteLine("Download canceled.");
+            return;
+        }
+
+        if (!userFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            userFileName += ".pdf";
+        }
+
+        await jsRuntime.InvokeVoidAsync("downloadPdf", userFileName, response.Data);
+    }
+
+    private async Task ShowAddInvoiceModal()
+    {
+        isAddingNewInvoice = !isAddingNewInvoice;
+        await LoadInvoices();
+        StateHasChanged();
+    }
+
+    private async Task ShowEditInvoiceModal()
+    {
+        isEditingInvoice = !isEditingInvoice;
+        await LoadInvoices();
+        StateHasChanged();
+    }
+
+    private void ShowInvoicePreviewModal()
+    {
+        isPreviewingInvoice = !isPreviewingInvoice;
+        StateHasChanged();
+    }
+}

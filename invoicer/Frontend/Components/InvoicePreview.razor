@@ -1,0 +1,99 @@
+﻿@using Domain.Models
+@using Domain.Enums
+
+<div class="container my-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <!-- Invoice Header -->
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h5>Invoice Number: @Invoice.InvoiceNumber</h5>
+                    <p><strong>Issue Date:</strong> @Invoice.IssueDate.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Due Date:</strong> @Invoice.DueDate.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="text-end">
+                    <h5>Invoice</h5>
+                    <p><strong>Payment Method:</strong> @Invoice.PaymentMethod</p>
+                    <p><strong>Delivery Method:</strong> @Invoice.DeliveryMethod</p>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Seller and Buyer Information -->
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6>Seller:</h6>
+                    <p>@Invoice.Seller?.Name</p>
+                    <p>@Invoice.Seller?.Address</p>
+                    <p>@Invoice.Seller?.Email</p>
+                    <p>@Invoice.Seller?.PhoneNumber</p>
+                </div>
+                <div>
+                    <h6>Buyer:</h6>
+                    <p>@Invoice.Buyer?.Name</p>
+                    <p>@Invoice.Buyer?.Address</p>
+                    <p>@Invoice.Buyer?.Email</p>
+                    <p>@Invoice.Buyer?.PhoneNumber</p>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Invoice Items Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Unit</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                            <th>VAT Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Invoice.Items)
+                        {
+                            <tr>
+                                <td>@item.Description</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Unit</td>
+                                <td>@item.UnitPrice @Invoice.Currency</td>
+                                <td>@(item.Quantity * item.UnitPrice) @Invoice.Currency</td>
+                                <td>@item.VatRate * 100 %</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <hr />
+
+            <!-- Totals Section -->
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p><strong>Total Price without VAT:</strong> @Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) @Invoice.Currency</p>
+                    <p><strong>Total VAT:</strong> @(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)0.21) @Invoice.Currency</p>
+                </div>
+                <div>
+                    <p><strong>Total Price with VAT:</strong> @(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)1.21) @Invoice.Currency</p>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Final Price -->
+            <div class="text-end">
+                <h5><strong>Final Price:</strong> @(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)1.21) @Invoice.Currency</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public Invoice Invoice { get; set; } = null!;
+}

@@ -29,7 +29,7 @@ namespace Frontend.Api
 
 		public async Task<IList<Entity>> GetAllAsync()
 		{
-			return await _httpClient.GetFromJsonAsync<IList<Entity>>("api/Entity");
+			return await _httpClient.GetFromJsonAsync<IList<Entity>>(_urlPath);
 		}
 
 		public async Task<Entity?> GetByIdAsync(int id)

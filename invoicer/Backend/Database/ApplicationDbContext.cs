@@ -88,6 +88,7 @@ namespace Backend.Database
 				invoiceItem.Property(ii => ii.Quantity).IsRequired();
 				invoiceItem.Property(ii => ii.Description).IsRequired();
 				invoiceItem.Property(ii => ii.UnitPrice).IsRequired();
+				invoiceItem.Property(ii => ii.VatRate).IsRequired().HasDefaultValue(0.21m);
 			});
 		}
 	}

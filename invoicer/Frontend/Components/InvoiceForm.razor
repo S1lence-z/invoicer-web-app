@@ -1,0 +1,242 @@
+﻿@using Domain.Enums
+@using Domain.Interfaces;
+@using Domain.Models;
+@using Domain.ServiceInterfaces;
+@inject IInvoiceService invoiceService;
+@inject IEntityService entityService;
+
+<EditForm Model="@this" OnValidSubmit="SubmitForm">
+    <div class="row mb-4">
+        <div class="col">
+            <label for="invoice-number" class="font-weight-bold">Invoice Number</label>
+            <input type="text" class="form-control" id="invoice-number" placeholder="Enter Invoice Number" @bind="invoiceNumber" />
+        </div>
+        <div class="col">
+            <label for="issue-date" class="font-weight-bold">Issue Date</label>
+            <input type="date" class="form-control" id="issue-date" @bind="issueDate" />
+        </div>
+        <div class="col">
+            <label for="due-date" class="font-weight-bold">Due Date</label>
+            <input type="date" class="form-control" id="due-date" @bind="dueDate" />
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <label for="seller" class="font-weight-bold">Seller</label>
+            <select class="form-control" id="seller" @bind="sellerId">
+                <option value="">Select Seller</option>
+                @foreach (var entity in allEntities)
+                {
+                    <option value="@entity.Id">@entity.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col">
+            <label for="buyer" class="font-weight-bold">Buyer</label>
+            <select class="form-control" id="buyer" @bind="buyerId">
+                <option value="">Select Buyer</option>
+                @foreach (var entity in allEntities)
+                {
+                    <option value="@entity.Id">@entity.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <label for="currency" class="font-weight-bold">Currency</label>
+            <select class="form-control" id="currency" @bind="currency">
+                @foreach (var value in Enum.GetValues(typeof(Currency)))
+                {
+                    <option value="@value">@value</option>
+                }
+            </select>
+        </div>
+        <div class="col">
+            <label for="payment-method" class="font-weight-bold">Payment Method</label>
+            <select class="form-control" id="payment-method" @bind="paymentMethod">
+                @foreach (var value in Enum.GetValues(typeof(PaymentMethod)))
+                {
+                    <option value="@value">@value</option>
+                }
+            </select>
+        </div>
+        <div class="col">
+            <label for="delivery-method" class="font-weight-bold">Delivery Method</label>
+            <select class="form-control" id="delivery-method" @bind="deliveryMethod">
+                @foreach (var value in Enum.GetValues(typeof(DeliveryMethod)))
+                {
+                    <option value="@value">@value</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <hr />
+    <h4>Invoice Items</h4>
+    <div class="mb-3">
+        <button type="button" class="btn btn-success" @onclick="AddInvoiceItem">Add Item</button>
+    </div>
+    @foreach (var item in invoiceItems)
+    {
+        <div class="row mb-2">
+            <div class="col">
+                <input type="text" class="form-control" placeholder="Description" @bind="item.Description" />
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" placeholder="Quantity" @bind="item.Quantity" />
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" placeholder="Unit" @bind="item.Unit" />
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" placeholder="Unit Price" @bind="item.UnitPrice" />
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" placeholder="VAT Rate" @bind="item.VatRate" step="0.01" />
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-danger" @onclick="() => RemoveInvoiceItem(item)">Remove</button>
+            </div>
+        </div>
+    }
+    <button type="submit" class="btn btn-primary float-end mt-4">Submit Invoice</button>
+</EditForm>
+
+@code {
+    // Parameters
+    [Parameter] public EventCallback SubmitCallback { get; set; }
+    [Parameter] public Invoice? InvoiceInstance { get; set; } = null;
+    [Parameter, EditorRequired] public bool isActive { get; set; }
+
+    // Form fields
+    private string invoiceNumber { get; set; } = string.Empty;
+    private DateTime issueDate { get; set; } = DateTime.Now;
+    private DateTime dueDate { get; set; } = DateTime.Now.AddDays(14);
+    private int sellerId { get; set; }
+    private int buyerId { get; set; }
+    private Currency currency { get; set; } = Currency.CZK;
+    private PaymentMethod paymentMethod { get; set; } = PaymentMethod.BankTransfer;
+    private DeliveryMethod deliveryMethod { get; set; } = DeliveryMethod.Courier;
+    private List<InvoiceItem> invoiceItems { get; set; } = new();
+
+    // Data
+    private IList<Entity> allEntities = new List<Entity>();
+
+    // Methods
+    protected override void OnParametersSet()
+    {
+        if (InvoiceInstance is not null)
+        {
+            invoiceNumber = InvoiceInstance.InvoiceNumber;
+            issueDate = InvoiceInstance.IssueDate;
+            dueDate = InvoiceInstance.DueDate;
+            sellerId = InvoiceInstance.SellerId;
+            buyerId = InvoiceInstance.BuyerId;
+            currency = InvoiceInstance.Currency;
+            paymentMethod = InvoiceInstance.PaymentMethod;
+            deliveryMethod = InvoiceInstance.DeliveryMethod;
+            invoiceItems = InvoiceInstance.Items.ToList();
+            return;
+        }
+        if (!isActive)
+            ClearForm();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        allEntities = await entityService.GetAllAsync();
+    }
+
+    private async Task SubmitForm() {
+        try 
+        {
+            if (InvoiceInstance is null) {
+                await SubmitNewInvoice();
+                return;
+            }
+            await SubmitEditInvoice();
+        } 
+        catch (Exception e) 
+        {
+            Console.WriteLine(e.Message);
+        }
+        finally 
+        {
+            await SubmitCallback.InvokeAsync();
+            ClearForm();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitNewInvoice() 
+    {
+        Invoice newInvoice = new Invoice
+            {
+                InvoiceNumber = invoiceNumber,
+                IssueDate = issueDate,
+                DueDate = dueDate,
+                SellerId = sellerId,
+                BuyerId = buyerId,
+                Currency = currency,
+                PaymentMethod = paymentMethod,
+                DeliveryMethod = deliveryMethod,
+                Items = invoiceItems
+            };
+        Invoice? createdInvoice = await invoiceService.CreateAsync(newInvoice);
+        if (createdInvoice is null) {
+            Console.WriteLine("Failed to create invoice");
+            return;
+        }
+        Console.WriteLine("Invoice created");
+    }
+
+    private async Task SubmitEditInvoice()
+    {
+        Invoice editedInvoice = new Invoice
+            {
+                Id = InvoiceInstance.Id,
+                InvoiceNumber = invoiceNumber,
+                IssueDate = issueDate,
+                DueDate = dueDate,
+                SellerId = sellerId,
+                BuyerId = buyerId,
+                Currency = currency,
+                PaymentMethod = paymentMethod,
+                DeliveryMethod = deliveryMethod,
+                Items = invoiceItems
+            };
+        Invoice? updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
+        if (updatedInvoice is null)
+        {
+            Console.WriteLine("Failed to update invoice");
+            return;
+        }
+        Console.WriteLine("Invoice updated");
+    }
+
+    private void ClearForm()
+    {
+        invoiceNumber = string.Empty;
+        issueDate = DateTime.Now;
+        dueDate = DateTime.Now.AddDays(14);
+        sellerId = 0;
+        buyerId = 0;
+        currency = Currency.CZK;
+        paymentMethod = PaymentMethod.BankTransfer;
+        deliveryMethod = DeliveryMethod.Courier;
+        invoiceItems.Clear();
+    }
+
+    private void AddInvoiceItem()
+    {
+        invoiceItems.Add(new InvoiceItem());
+    }
+
+    private void RemoveInvoiceItem(InvoiceItem item)
+    {
+        invoiceItems.Remove(item);
+    }
+}

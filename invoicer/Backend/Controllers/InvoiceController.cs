@@ -1,7 +1,7 @@
 ﻿using Domain.ServiceInterfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Backend.Utils;
+using Domain.Interfaces;
 
 namespace Backend.Controllers
 {
@@ -79,12 +79,21 @@ namespace Backend.Controllers
 		{
 			try
 			{
-				byte[] invoicePdf = await invoiceService.ExportInvoicePdf(id);
-				return File(invoicePdf, "application/pdf", $"invoice_{id}.pdf");
+				IPdfGenerationResult invoiceResult = await invoiceService.ExportInvoicePdf(id);
+				if (!invoiceResult.IsSuccess)
+				{
+					return StatusCode(invoiceResult.StatusCode, invoiceResult.ErrorMessage);
+				}
+				byte[] pdfFile = invoiceResult.Data!;
+				return File(pdfFile, "application/pdf", $"invoice_{id}.pdf");
 			}
 			catch (ArgumentException e)
 			{
 				return NotFound(e.Message);
+			}
+			catch (InvalidOperationException e)
+			{
+				return BadRequest(e.Message);
 			}
 			catch (Exception e)
 			{
