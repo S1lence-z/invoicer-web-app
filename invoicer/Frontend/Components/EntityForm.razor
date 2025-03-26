@@ -1,8 +1,9 @@
-﻿@using Domain.Interfaces;
-@using Domain.AresApiModels;
+﻿@using Domain.AresApiModels;
+@using Domain.Interfaces;
 @using Domain.Models
 @using Domain.ServiceInterfaces;
-@using Frontend.FormModels;
+@using Frontend.Models;
+@using Frontend.Models.FormModels;
 @inject IAresApiService aresApiService;
 @inject IAddressService addressService;
 @inject IEntityService entityService;
@@ -18,8 +19,6 @@
     @* ENTITY FORM *@
     <EditForm Model="@entityFormModel" OnValidSubmit="SubmitForm">
         <DataAnnotationsValidator />
-
-        <!-- Entity Fields -->
         <div class="row mb-4">
             <div class="col">
                 <label for="entity-name" class="font-weight-bold">Name</label>
@@ -113,12 +112,11 @@
     // Entity Form Model
     private EntityFormModel entityFormModel { get; set; } = new EntityFormModel();
 
+    // Methods
     protected override void OnParametersSet()
     {
         if (EntityInstance is not null)
-        {
             entityFormModel = EntityFormModel.FromEntity(EntityInstance);
-        }
         if (!isActive)
             ClearForm();
     }

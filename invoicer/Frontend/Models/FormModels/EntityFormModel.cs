@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Domain.Models;
 
-namespace Frontend.FormModels
+namespace Frontend.Models.FormModels
 {
 	public class EntityFormModel
 	{
