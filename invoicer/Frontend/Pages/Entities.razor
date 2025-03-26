@@ -15,7 +15,7 @@
     </div>
     <hr/>
     @* CONTENT *@
-    <div class="d-flex flex-row px-4 pb-4 gap-4">
+    <div class="d-flex flex-row px-4 pb-4">
         @if (allEntities is null) 
         {
             <p>Loading...</p>
@@ -27,7 +27,7 @@
         else 
         {
             @* ENTITIES LIST *@
-            <div class="d-flex flex-column pe-2 overflow-auto gap-2" style="max-height: 600px">
+            <div class="d-flex flex-column overflow-auto gap-2" style="max-height: 800px;">
                 @foreach (var entity in allEntities)
                 {
                     <EntityListItem Entity="entity" OnSelectEntity="SelectEntity" OnDeleteEntity="DeleteEntity" OnEditEntity="EditEntity" IsSelected="IsEntitySelected(entity)" />
@@ -35,7 +35,7 @@
             </div>
         }
         @* DETAILS OF THE SELECTED ENTITY *@
-        <div class="d-flex flex-column border border-black flex-grow-1 rounded">
+        <div class="d-flex flex-column border border-black rounded ms-2 flex-grow-1">
             @if (selectedEntity is null) 
             {
                 <p class="px-4 pt-4 text-black"> Select an entity... </p>
