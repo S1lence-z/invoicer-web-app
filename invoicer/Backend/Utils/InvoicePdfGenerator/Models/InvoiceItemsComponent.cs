@@ -1,15 +1,12 @@
 ﻿using Domain.Enums;
 using Domain.Models;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Backend.Utils.InvoicePdfGenerator.Models
 {
 	public class InvoiceItemsComponent(ICollection<InvoiceItem> items, Currency invoiceCurrency) : IComponent
 	{
-		private decimal TotalPriceWithoutVat { get; set; }
-
 		private void ComposeInvoiceItemsTable(IContainer container)
 		{
 			container.Table(table =>
@@ -35,10 +32,10 @@ namespace Backend.Utils.InvoicePdfGenerator.Models
 				foreach (var item in items)
 				{
 					table.Cell().Text(item.Description);
-					table.Cell().Text(item.Quantity.ToString());
+					table.Cell().Text(item.Quantity.ToString());	
 					table.Cell().Text(item.Unit);
-					table.Cell().Text($"{item.UnitPrice} {invoiceCurrency}");
-					table.Cell().Text($"{(item.Quantity * item.UnitPrice)} {invoiceCurrency}");
+					table.Cell().Text(invoiceCurrency.FormatAmount(item.UnitPrice));
+					table.Cell().Text(invoiceCurrency.FormatAmount(item.Quantity * item.UnitPrice));
 					table.Cell().Text($"{(int)(item.VatRate * 100)}%");
 				}
 			});
@@ -66,9 +63,9 @@ namespace Backend.Utils.InvoicePdfGenerator.Models
 					header.Cell().Text("Total Price with VAT").Bold().AlignCenter();
 				});
 				// Row with prices
-				table.Cell().Text($"{totalPrice} {invoiceCurrency}").AlignCenter();
-				table.Cell().Text($"{vatPrice:F1} {invoiceCurrency}").AlignCenter();
-				table.Cell().Text($"{totalPriceWithVat:F1} {invoiceCurrency}").AlignCenter();
+				table.Cell().Text(invoiceCurrency.FormatAmount(totalPrice)).AlignCenter();
+				table.Cell().Text(invoiceCurrency.FormatAmount(vatPrice)).AlignCenter();
+				table.Cell().Text(invoiceCurrency.FormatAmount(totalPriceWithVat)).AlignCenter();
 				// The final row
 				table.Cell().ColumnSpan(3)
 					.PaddingTop(20)
@@ -77,7 +74,7 @@ namespace Backend.Utils.InvoicePdfGenerator.Models
 					.Text(text =>
 					{
 						text.Span("Final Price: ").Bold().FontSize(14);
-						text.Span($"{totalPriceWithVat:F1} {invoiceCurrency}").FontSize(14);
+						text.Span(invoiceCurrency.FormatAmount(totalPriceWithVat)).FontSize(14);
 					});
 			});
 		}
