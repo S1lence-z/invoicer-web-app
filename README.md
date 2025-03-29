@@ -4,7 +4,7 @@
 Invoicer is a simple application for creating invoices. It is a fullstack C# web application. The application is designed to be simple and easy to use.
 
 ## Specification
-Here you can find the specification of the Invoicer application in [czech](./docs/specification.md).
+Here you can see the specification of the Invoicer application in both [czech](./docs/specification_cz.md) and [english](./docs/specification_en.md).
 
 ## Prerequisites
 *TBD*
@@ -28,8 +28,8 @@ docker run -d -p 8080:8080 -p 8081:8081 --name invoicer-backend invoicer-backend
 *TBD*
 
 ## Documentation
-- User Documentation: *TBD*
-- Developer Documentation: *TBD*
+- User Documentation: [Click here](./docs/user-docs.md)
+- Developer Documentation: [Click here](./docs/developer-docs.md)
 
 ## License
 *TBD*
