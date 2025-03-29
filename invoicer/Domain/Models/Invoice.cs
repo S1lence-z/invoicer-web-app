@@ -12,9 +12,11 @@ namespace Domain.Models
 		public string InvoiceNumber { get; set; } = string.Empty;
 		public DateTime IssueDate { get; set; } = DateTime.Now;
 		public DateTime DueDate { get; set; }
+		public DateTime VatDate { get; set; } = DateTime.Now;
 		public Currency Currency { get; set; }
 		public PaymentMethod PaymentMethod { get; set; }
 		public DeliveryMethod DeliveryMethod { get; set; }
+		public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
 		public ICollection<InvoiceItem> Items { get; set; } = new List<InvoiceItem>();
 	}
 }
