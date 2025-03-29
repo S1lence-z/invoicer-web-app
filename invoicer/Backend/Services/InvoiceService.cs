@@ -91,6 +91,8 @@ namespace Backend.Services
 			existingInvoice.DueDate = updatedInvoice.DueDate;
 			existingInvoice.Currency = updatedInvoice.Currency;
 			existingInvoice.PaymentMethod = updatedInvoice.PaymentMethod;
+			existingInvoice.VatDate = updatedInvoice.VatDate;
+			existingInvoice.Status = updatedInvoice.Status;
 			existingInvoice.DeliveryMethod = updatedInvoice.DeliveryMethod;
 			existingInvoice.Items = updatedInvoice.Items;
 
