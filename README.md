@@ -28,8 +28,8 @@ docker run -d -p 8080:8080 -p 8081:8081 --name invoicer-backend invoicer-backend
 *TBD*
 
 ## Documentation
-- User Documentation: [Click here](./docs/user-docs.md)
-- Developer Documentation: [Click here](./docs/developer-docs.md)
+- User Documentation: [Click here](./docs/user_docs.md)
+- Developer Documentation: [Click here](./docs/developer_docs.md)
 
 ## License
 *TBD*
