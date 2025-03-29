@@ -41,6 +41,7 @@ namespace Backend.Utils.InvoicePdfGenerator.Models
 						col.Spacing(5);
 						col.Item().Text($"Issue Date: {invoiceModel.IssueDate:dd/MM/yyyy}").SemiBold();
 						col.Item().Text($"Due Date: {invoiceModel.DueDate:dd/MM/yyyy}").SemiBold();
+						col.Item().Text($"VAT Date: {invoiceModel.VatDate:dd/MM/yyyy}").SemiBold();
 					});
 
 					row.RelativeItem().AlignRight().Column(col =>
