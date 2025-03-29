@@ -24,7 +24,7 @@ namespace Backend.Services
 				.ToListAsync();
 		}
 
-		public async Task<Entity> CreateAsync(Entity newEntity)
+		public async Task<Entity?> CreateAsync(Entity newEntity)
 		{
 			Address? address = await context.Address.FindAsync(newEntity.AddressId);
 			BankAccount? bankAccount = await context.BankAccount.FindAsync(newEntity.BankAccountId);
