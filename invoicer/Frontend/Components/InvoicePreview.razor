@@ -1,20 +1,22 @@
 ﻿@using Domain.Models
 @using Domain.Enums
+@using Domain.Extensions
+@using Frontend.Utils
 
 <div class="container my-4">
     <div class="card border-0 shadow-sm">
         <div class="card-body">
             <!-- Invoice Header -->
+            <h5 class="text-center">Invoice</h5>
             <div class="d-flex justify-content-between">
                 <div>
                     <h5>Invoice Number: @Invoice.InvoiceNumber</h5>
-                    <p><strong>Issue Date:</strong> @Invoice.IssueDate.ToString("dd/MM/yyyy")</p>
-                    <p><strong>Due Date:</strong> @Invoice.DueDate.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Issue Date:</strong> @Invoice.IssueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
+                    <p><strong>Due Date:</strong> @Invoice.DueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
                 </div>
                 <div class="text-end">
-                    <h5>Invoice</h5>
-                    <p><strong>Payment Method:</strong> @Invoice.PaymentMethod</p>
-                    <p><strong>Delivery Method:</strong> @Invoice.DeliveryMethod</p>
+                    <p><strong>Payment Method:</strong> @Invoice.PaymentMethod.ToString().SeperateCamelCase()</p>
+                    <p><strong>Delivery Method:</strong> @Invoice.DeliveryMethod.ToString().SeperateCamelCase()</p>
                 </div>
             </div>
 
@@ -23,18 +25,18 @@
             <!-- Seller and Buyer Information -->
             <div class="d-flex justify-content-between">
                 <div>
-                    <h6>Seller:</h6>
-                    <p>@Invoice.Seller?.Name</p>
-                    <p>@Invoice.Seller?.Address</p>
-                    <p>@Invoice.Seller?.Email</p>
-                    <p>@Invoice.Seller?.PhoneNumber</p>
+                    <h5>Seller</h5>
+                    <p><strong>Name:</strong> @Invoice.Seller?.Name</p>
+                    <p><strong>Address:</strong> @Invoice.Seller?.Address?.Street, @Invoice.Seller?.Address?.City @Invoice.Seller?.Address?.ZipCode, @Invoice.Seller?.Address?.Country</p>
+                    <p><strong>Email:</strong> @Invoice.Seller?.Email</p>
+                    <p><strong>Phone Number:</strong> @Invoice.Seller?.PhoneNumber</p>
                 </div>
                 <div>
-                    <h6>Buyer:</h6>
-                    <p>@Invoice.Buyer?.Name</p>
-                    <p>@Invoice.Buyer?.Address</p>
-                    <p>@Invoice.Buyer?.Email</p>
-                    <p>@Invoice.Buyer?.PhoneNumber</p>
+                    <h5>Buyer</h5>
+                    <p><strong>Name:</strong> @Invoice.Buyer?.Name</p>
+                    <p><strong>Address:</strong> @Invoice.Buyer?.Address?.Street, @Invoice.Buyer?.Address?.City @Invoice.Buyer?.Address?.ZipCode, @Invoice.Buyer?.Address?.Country </p>
+                    <p><strong>Email:</strong> @Invoice.Buyer?.Email</p>
+                    <p><strong>Phone Number:</strong> @Invoice.Buyer?.PhoneNumber</p>
                 </div>
             </div>
 
@@ -60,9 +62,9 @@
                                 <td>@item.Description</td>
                                 <td>@item.Quantity</td>
                                 <td>@item.Unit</td>
-                                <td>@item.UnitPrice @Invoice.Currency</td>
-                                <td>@(item.Quantity * item.UnitPrice) @Invoice.Currency</td>
-                                <td>@item.VatRate * 100 %</td>
+                                <td>@Invoice.Currency.FormatAmount(item.UnitPrice)</td>
+                                <td>@Invoice.Currency.FormatAmount(item.Quantity * item.UnitPrice)</td>
+                                <td>@((item.VatRate * 100).ToString("F0")) %</td>
                             </tr>
                         }
                     </tbody>
@@ -74,11 +76,11 @@
             <!-- Totals Section -->
             <div class="d-flex justify-content-between">
                 <div>
-                    <p><strong>Total Price without VAT:</strong> @Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) @Invoice.Currency</p>
-                    <p><strong>Total VAT:</strong> @(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)0.21) @Invoice.Currency</p>
+                    <p><strong>Total Price without VAT:</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice))</p>
+                    <p><strong>Total VAT:</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)0.21)</p>
                 </div>
                 <div>
-                    <p><strong>Total Price with VAT:</strong> @(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)1.21) @Invoice.Currency</p>
+                    <p><strong>Total Price with VAT:</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)1.21)</p>
                 </div>
             </div>
 
@@ -86,7 +88,7 @@
 
             <!-- Final Price -->
             <div class="text-end">
-                <h5><strong>Final Price:</strong> @(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)1.21) @Invoice.Currency</h5>
+                <h5><strong>Final Price:</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)1.21)</h5>
             </div>
         </div>
     </div>
