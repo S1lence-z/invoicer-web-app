@@ -72,20 +72,24 @@
 </Modal>
 @* EDIT INVOICE MODAL *@
 <Modal Title="Edit Invoice" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal">
-    <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isAddingNewInvoice" InvoiceInstance="selectedInvoice" />
+    @if (invoiceToEdit is not null)
+    {
+        <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isEditingInvoice" InvoiceInstance="invoiceToEdit" />
+    }
 </Modal>
 @* PREVIEW MODAL *@
 <Modal Title="Invoice Preview" IsVisible="isPreviewingInvoice" OnClose="ShowInvoicePreviewModal">
-    @if (selectedInvoice is not null)
+    @if (invoiceToPreview is not null)
     {
-        <InvoicePreview Invoice="selectedInvoice" />
+        <InvoicePreview Invoice="invoiceToPreview" />
     }
 </Modal>
 
 @code {
     private IList<Invoice> allInvoices = new List<Invoice>();
     private IList<Invoice> shownInvoices = new List<Invoice>();
-    private Invoice? selectedInvoice = null;
+    private Invoice? invoiceToEdit = null;
+    private Invoice? invoiceToPreview = null;
     private string searchTerm = string.Empty;
     private SearchType searchType = SearchType.InvoiceNumber;
     // Modal related
@@ -153,16 +157,19 @@
 
     private void ShowInvoicePreview(Invoice invToShow)
     {
-        selectedInvoice = invToShow;
+        invoiceToPreview = invToShow;
         ShowInvoicePreviewModal();
     }
 
-    private async Task EditInvoice(Invoice invToEdit) {
-        selectedInvoice = invToEdit;
+    private async Task EditInvoice(Invoice invToEdit) 
+    {
+        invoiceToEdit = invToEdit;
         await ShowEditInvoiceModal();
+        StateHasChanged();
     }
 
-    private async Task DeleteInvoice(Invoice invToDelete) {
+    private async Task DeleteInvoice(Invoice invToDelete) 
+    {
         var status = await invoiceService.DeleteAsync(invToDelete.Id);
         if (status) {
             await LoadInvoices();
@@ -170,7 +177,8 @@
         }
     }
 
-    private async Task ExportInvoice(Invoice invToExport) {
+    private async Task ExportInvoice(Invoice invToExport) 
+    {
         IPdfGenerationResult response = await invoiceService.ExportInvoicePdf(invToExport.Id);
         if (!response.IsSuccess)
         {
@@ -197,14 +205,16 @@
     private async Task ShowAddInvoiceModal()
     {
         isAddingNewInvoice = !isAddingNewInvoice;
-        await LoadInvoices();
+        if(!isAddingNewInvoice)
+            await LoadInvoices();
         StateHasChanged();
     }
 
     private async Task ShowEditInvoiceModal()
     {
         isEditingInvoice = !isEditingInvoice;
-        await LoadInvoices();
+        if (!isEditingInvoice)
+            await LoadInvoices();
         StateHasChanged();
     }
 

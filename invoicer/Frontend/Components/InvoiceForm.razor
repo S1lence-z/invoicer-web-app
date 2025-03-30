@@ -155,13 +155,17 @@
     private IList<Entity> allEntities = new List<Entity>();
 
     // Methods
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        allEntities = await entityService.GetAllAsync();
         if (InvoiceInstance is not null)
             invoiceFormModel = InvoiceFormModel.FromInvoice(InvoiceInstance);
         if (!isActive)
             ClearForm();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        allEntities = await entityService.GetAllAsync();
     }
 
     private async Task SubmitForm() {
@@ -171,6 +175,7 @@
                 await SubmitNewInvoice();
                 return;
             }
+            Console.WriteLine(invoiceFormModel);
             await SubmitEditInvoice();
         } 
         catch (Exception e) 
@@ -192,6 +197,8 @@
                 InvoiceNumber = invoiceFormModel.InvoiceNumber,
                 IssueDate = invoiceFormModel.IssueDate,
                 DueDate = invoiceFormModel.DueDate,
+                VatDate = invoiceFormModel.VatDate,
+                Status = invoiceFormModel.Status,
                 SellerId = invoiceFormModel.SellerId ?? 0,
                 BuyerId = invoiceFormModel.BuyerId ?? 0,
                 Currency = invoiceFormModel.Currency,
@@ -216,6 +223,8 @@
                 InvoiceNumber = invoiceFormModel.InvoiceNumber,
                 IssueDate = invoiceFormModel.IssueDate,
                 DueDate = invoiceFormModel.DueDate,
+                VatDate = invoiceFormModel.VatDate,
+                Status = invoiceFormModel.Status,
                 SellerId = invoiceFormModel.SellerId ?? 0,
                 BuyerId = invoiceFormModel.BuyerId ?? 0,
                 Currency = invoiceFormModel.Currency,
