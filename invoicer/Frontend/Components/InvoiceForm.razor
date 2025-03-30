@@ -1,8 +1,9 @@
-﻿@using Domain.Enums
+﻿@using Domain.Enums;
 @using Domain.Interfaces;
 @using Domain.Models;
 @using Domain.ServiceInterfaces;
 @using Frontend.Models.FormModels;
+@using Frontend.Utils
 @inject IInvoiceService invoiceService;
 @inject IEntityService entityService;
 
@@ -16,6 +17,9 @@
             <input type="text" class="form-control" id="invoice-number" placeholder="Enter Invoice Number" @bind="invoiceFormModel.InvoiceNumber" />
             <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
         </div>
+    </div>
+
+    <div class="row mb-4">
         <div class="col">
             <label for="issue-date" class="font-weight-bold">Issue Date</label>
             <input type="date" class="form-control" id="issue-date" @bind="invoiceFormModel.IssueDate" />
@@ -25,6 +29,11 @@
             <label for="due-date" class="font-weight-bold">Due Date</label>
             <input type="date" class="form-control" id="due-date" @bind="invoiceFormModel.DueDate" />
             <ValidationMessage For="@(() => invoiceFormModel.DueDate)" />
+        </div>
+        <div class="col">
+            <label for="vate-date" class="font-weight-bold">Vat Date</label>
+            <input type="date" class="form-control" id="vat-date" @bind="invoiceFormModel.VatDate" />
+            <ValidationMessage For="@(() => invoiceFormModel.VatDate)" />
         </div>
     </div>
 
@@ -57,7 +66,7 @@
         <div class="col">
             <label for="currency" class="font-weight-bold">Currency</label>
             <select class="form-control" id="currency" @bind="invoiceFormModel.Currency">
-                @foreach (var value in Enum.GetValues(typeof(Currency)))
+                @foreach (object value in Enum.GetValues(typeof(Currency)))
                 {
                     <option value="@value">@value</option>
                 }
@@ -67,9 +76,9 @@
         <div class="col">
             <label for="payment-method" class="font-weight-bold">Payment Method</label>
             <select class="form-control" id="payment-method" @bind="invoiceFormModel.PaymentMethod">
-                @foreach (var value in Enum.GetValues(typeof(PaymentMethod)))
+                @foreach (object value in Enum.GetValues(typeof(PaymentMethod)))
                 {
-                    <option value="@value">@value</option>
+                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                 }
             </select>
             <ValidationMessage For="@(() => invoiceFormModel.PaymentMethod)" />
@@ -77,12 +86,25 @@
         <div class="col">
             <label for="delivery-method" class="font-weight-bold">Delivery Method</label>
             <select class="form-control" id="delivery-method" @bind="invoiceFormModel.DeliveryMethod">
-                @foreach (var value in Enum.GetValues(typeof(DeliveryMethod)))
+                @foreach (object value in Enum.GetValues(typeof(DeliveryMethod)))
                 {
-                    <option value="@value">@value</option>
+                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                 }
             </select>
             <ValidationMessage For="@(() => invoiceFormModel.DeliveryMethod)" />
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <label for="status" class="font-weight-bold">Status</label>
+            <select class="form-control" id="status" @bind="invoiceFormModel.Status">
+                @foreach (object value in Enum.GetValues(typeof(InvoiceStatus)))
+                {
+                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => invoiceFormModel.Status)" />
         </div>
     </div>
 

@@ -30,6 +30,14 @@ namespace Frontend.Models.FormModels
 		[DataType(DataType.DateTime)]
 		public DateTime DueDate { get; set; } = DateTime.Now.AddDays(14);
 
+		[Required(ErrorMessage = "Vat Date is required")]
+		[DataType(DataType.DateTime)]
+		public DateTime VatDate { get; set; } = DateTime.Now;
+
+		[Required(ErrorMessage = "Status is required")]
+		[EnumDataType(typeof(InvoiceStatus), ErrorMessage = "Invalid status")]
+		public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
+
 		[Required(ErrorMessage = "Currency is required")]
 		[EnumDataType(typeof(Currency), ErrorMessage = "Invalid currency")]
 		public Currency Currency { get; set; } = Currency.CZK;
@@ -43,7 +51,7 @@ namespace Frontend.Models.FormModels
 		public DeliveryMethod DeliveryMethod { get; set; } = DeliveryMethod.Courier;
 
 		[MinItemsRequired(1, typeof(InvoiceItemFormModel), ErrorMessage = "At least one item is required")]
-		public IList<InvoiceItemFormModel> Items { get; set; } = new List<InvoiceItemFormModel>();
+		public IList<InvoiceItemFormModel> Items { get; set; } = [];
 
 		public static InvoiceFormModel FromInvoice(Invoice invoice)
 		{
@@ -55,6 +63,8 @@ namespace Frontend.Models.FormModels
 				InvoiceNumber = invoice.InvoiceNumber,
 				IssueDate = invoice.IssueDate,
 				DueDate = invoice.DueDate,
+				VatDate = invoice.VatDate,
+				Status = invoice.Status,
 				Currency = invoice.Currency,
 				PaymentMethod = invoice.PaymentMethod,
 				DeliveryMethod = invoice.DeliveryMethod,
