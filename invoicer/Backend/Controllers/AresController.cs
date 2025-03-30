@@ -9,6 +9,9 @@ namespace Backend.Controllers
 	public class AresController(IAresApiService aresApiService) : ControllerBase
 	{
 		[HttpGet("{ico:int}", Name = "GetEntityInformationByIco")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(500)]
+
 		public async Task<IActionResult> GetEntityInformationByIco(string ico)
 		{
 			IResult<IAresApiResponse> responseData = await aresApiService.GetEntityInformationByIcoAsync(ico);

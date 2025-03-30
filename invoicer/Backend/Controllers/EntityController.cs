@@ -9,6 +9,8 @@ namespace Backend.Controllers
 	public class EntityController(IEntityService entityService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetEntityById")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			Entity? entity = await entityService.GetByIdAsync(id);
@@ -20,6 +22,7 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet(Name = "GetAllEntities")]
+		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAll()
 		{
 			IList<Entity> entityList = await entityService.GetAllAsync();
@@ -27,6 +30,8 @@ namespace Backend.Controllers
 		}
 
 		[HttpPost(Name = "PostEntity")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> Post([FromBody] Entity entity)
 		{
 			if (entity is null)
@@ -42,10 +47,13 @@ namespace Backend.Controllers
 			{
 				return BadRequest(e.Message);
 			}
-			return CreatedAtRoute("GetEntityById", new { id = newEntity.Id }, newEntity);
+			return CreatedAtRoute("GetEntityById", new { id = newEntity!.Id }, newEntity);
 		}
 
 		[HttpPut("{id:int}", Name = "PutEntity")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Put(int id, [FromBody] Entity entity)
 		{
 			if (entity is null)
@@ -69,6 +77,8 @@ namespace Backend.Controllers
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteEntity")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			bool wasDeleted = await entityService.DeleteAsync(id);

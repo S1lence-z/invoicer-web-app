@@ -15,6 +15,9 @@
             <span class="text-muted">@Invoice.DueDate.ToString("d")</span>
         </div>
         <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
+            <span class="text-muted">@Invoice.Status.ToString()</span>
+        </div>
+        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
             <span class="fw-bold">
                 @CalculateInvoiceSum(Invoice) @Invoice.Currency
             </span>

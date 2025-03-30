@@ -9,6 +9,8 @@ namespace Backend.Controllers
 	public class AddressController(IAddressService addressService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetAddressById")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			Address? address = await addressService.GetByIdAsync(id);
@@ -20,6 +22,7 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet(Name = "GetAllAddresses")]
+		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAll()
 		{
 			IList<Address> addressList = await addressService.GetAllAsync();
@@ -27,16 +30,21 @@ namespace Backend.Controllers
 		}
 
 		[HttpPost(Name = "PostAddress")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> Post([FromBody] Address address)
 		{
 			if (address is null) {
 				return BadRequest("Address is null");
 			}
-			Address newAddres = await addressService.CreateAsync(address);
-			return CreatedAtRoute("GetAddressById", new { id = newAddres.Id }, newAddres);
+			Address? newAddres = await addressService.CreateAsync(address);
+			return CreatedAtRoute("GetAddressById", new { id = newAddres!.Id }, newAddres);
 		}
 
 		[HttpPut("{id:int}", Name = "PutAddress")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Put(int id, [FromBody] Address address)
 		{
 			if (address is null)
@@ -53,6 +61,8 @@ namespace Backend.Controllers
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteAddress")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			bool wasDeleted = await addressService.DeleteAsync(id);

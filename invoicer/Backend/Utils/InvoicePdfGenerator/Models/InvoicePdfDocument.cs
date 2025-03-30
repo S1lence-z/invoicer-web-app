@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Domain.Enums;
+using Domain.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -31,6 +32,7 @@ namespace Backend.Utils.InvoicePdfGenerator.Models
 
 		private void ComposeContent(IContainer container)
 		{
+			Currency invoiceCurrency = invoiceModel.Currency;
 			container.Column(col =>
 			{
 				// Invoice Data
@@ -39,8 +41,9 @@ namespace Backend.Utils.InvoicePdfGenerator.Models
 					row.RelativeItem().Column(col =>
 					{
 						col.Spacing(5);
-						col.Item().Text($"Issue Date: {invoiceModel.IssueDate:dd/MM/yyyy}").SemiBold();
-						col.Item().Text($"Due Date: {invoiceModel.DueDate:dd/MM/yyyy}").SemiBold();
+						col.Item().Text($"Issue Date: {invoiceModel.IssueDate.FormatByCurrencyLocale(invoiceCurrency)}").SemiBold();
+						col.Item().Text($"Due Date: {invoiceModel.DueDate.FormatByCurrencyLocale(invoiceCurrency)}").SemiBold();
+						col.Item().Text($"VAT Date: {invoiceModel.VatDate.FormatByCurrencyLocale(invoiceCurrency)}").SemiBold();
 					});
 
 					row.RelativeItem().AlignRight().Column(col =>

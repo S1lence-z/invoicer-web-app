@@ -63,7 +63,7 @@ namespace Backend.Services
 			return newInvoice;
 		}
 
-		public async Task<Invoice> UpdateAsync(int id, Invoice updatedInvoice)
+		public async Task<Invoice?> UpdateAsync(int id, Invoice updatedInvoice)
 		{
 			Invoice? existingInvoice = await context.Invoice.FindAsync(id);
 			if (existingInvoice is null)
@@ -91,6 +91,8 @@ namespace Backend.Services
 			existingInvoice.DueDate = updatedInvoice.DueDate;
 			existingInvoice.Currency = updatedInvoice.Currency;
 			existingInvoice.PaymentMethod = updatedInvoice.PaymentMethod;
+			existingInvoice.VatDate = updatedInvoice.VatDate;
+			existingInvoice.Status = updatedInvoice.Status;
 			existingInvoice.DeliveryMethod = updatedInvoice.DeliveryMethod;
 			existingInvoice.Items = updatedInvoice.Items;
 

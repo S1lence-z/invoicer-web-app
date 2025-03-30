@@ -29,7 +29,7 @@ namespace Frontend.Api
 
 		public async Task<IList<BankAccount>> GetAllAsync()
 		{
-			return await _httpClient.GetFromJsonAsync<IList<BankAccount>>(_urlPath);
+			return await _httpClient.GetFromJsonAsync<IList<BankAccount>>(_urlPath) ?? [];
 		}
 
 		public async Task<BankAccount?> GetByIdAsync(int id)
@@ -37,7 +37,7 @@ namespace Frontend.Api
 			return await _httpClient.GetFromJsonAsync<BankAccount>($"{_urlPath}/{id}");
 		}
 
-		public async Task<BankAccount> UpdateAsync(int id, BankAccount obj)
+		public async Task<BankAccount?> UpdateAsync(int id, BankAccount obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			return await response.Content.ReadFromJsonAsync<BankAccount>();

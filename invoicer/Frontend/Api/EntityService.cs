@@ -29,7 +29,7 @@ namespace Frontend.Api
 
 		public async Task<IList<Entity>> GetAllAsync()
 		{
-			return await _httpClient.GetFromJsonAsync<IList<Entity>>(_urlPath);
+			return await _httpClient.GetFromJsonAsync<IList<Entity>>(_urlPath) ?? [];
 		}
 
 		public async Task<Entity?> GetByIdAsync(int id)
@@ -37,7 +37,7 @@ namespace Frontend.Api
 			return await _httpClient.GetFromJsonAsync<Entity>($"{_urlPath}/{id}");
 		}
 
-		public async Task<Entity> UpdateAsync(int id, Entity obj)
+		public async Task<Entity?> UpdateAsync(int id, Entity obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			return await response.Content.ReadFromJsonAsync<Entity>();

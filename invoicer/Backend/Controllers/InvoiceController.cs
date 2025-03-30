@@ -10,6 +10,8 @@ namespace Backend.Controllers
 	public class InvoiceController(IInvoiceService invoiceService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetInvoiceById")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			Invoice? invoice = await invoiceService.GetByIdAsync(id);
@@ -19,6 +21,7 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet(Name = "GetAllInvoices")]
+		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAll()
 		{
 			IList<Invoice> invoices = await invoiceService.GetAllAsync();
@@ -26,6 +29,8 @@ namespace Backend.Controllers
 		}
 
 		[HttpPost(Name = "PostInvoice")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> Post([FromBody] Invoice invoice)
 		{
 			if (invoice.Items is null || invoice.Items.Count == 0)
@@ -46,6 +51,8 @@ namespace Backend.Controllers
 		}
 
 		[HttpPut("{id:int}", Name = "PutInvoice")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> Put(int id, [FromBody] Invoice invoice)
 		{
 			if (invoice.Items is null || invoice.Items.Count == 0)
@@ -53,7 +60,7 @@ namespace Backend.Controllers
 				return BadRequest("Invoice must have at least one item");
 			}
 
-			Invoice updatedInvoice;
+			Invoice? updatedInvoice;
 			try
 			{
 				updatedInvoice = await invoiceService.UpdateAsync(id, invoice);
@@ -66,6 +73,8 @@ namespace Backend.Controllers
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteInvoice")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			bool wasDeleted = await invoiceService.DeleteAsync(id);
@@ -75,6 +84,10 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet("{id:int}/export-pdf", Name = "ExportInvoicePdf")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		[ProducesResponseType(500)]
 		public async Task<IActionResult> ExportPdf(int id)
 		{
 			try

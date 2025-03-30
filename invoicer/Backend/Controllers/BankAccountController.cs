@@ -9,6 +9,8 @@ namespace Backend.Controllers
 	public class BankAccountController(IBankAccountService bankAccountService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetBankAccountById")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			BankAccount? bankAccount = await bankAccountService.GetByIdAsync(id);
@@ -20,6 +22,7 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet(Name = "GetAllBankAccounts")]
+		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAll()
 		{
 			IList<BankAccount> bankAccountList = await bankAccountService.GetAllAsync();
@@ -27,17 +30,22 @@ namespace Backend.Controllers
 		}
 
 		[HttpPost(Name = "PostBankAccount")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> Post([FromBody] BankAccount bankAccount)
 		{
 			if (bankAccount is null)
 			{
 				return BadRequest("Bank account is null");
 			}
-			BankAccount newBankAcc = await bankAccountService.CreateAsync(bankAccount);
-			return CreatedAtRoute("GetBankAccountById", new { id = newBankAcc.Id }, newBankAcc);
+			BankAccount? newBankAcc = await bankAccountService.CreateAsync(bankAccount);
+			return CreatedAtRoute("GetBankAccountById", new { id = newBankAcc!.Id }, newBankAcc);
 		}
 
 		[HttpPut("{id:int}", Name = "PutBankAccount")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Put(int id, [FromBody] BankAccount bankAccount)
 		{
 			if (bankAccount is null)
@@ -54,6 +62,8 @@ namespace Backend.Controllers
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteBankAccount")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			bool wasDeleted = await bankAccountService.DeleteAsync(id);

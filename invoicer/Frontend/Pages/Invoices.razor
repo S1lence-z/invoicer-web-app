@@ -1,7 +1,7 @@
 ﻿@page "/invoices";
-@using Domain.Interfaces
-@using Domain.Models
-@using Domain.ServiceInterfaces
+@using Domain.Interfaces;
+@using Domain.Models;
+@using Domain.ServiceInterfaces;
 @using Frontend.Components;
 @using System.Collections.ObjectModel
 @inject IInvoiceService invoiceService;
@@ -42,6 +42,7 @@
                 <div class="col fw-bold">Buyer</div>
                 <div class="col fw-bold">Due Date</div>
                 <div class="col fw-bold">Total</div>
+                <div class="col fw-bold">Status</div>
                 <div class="col fw-bold">Actions</div>
             </div>
         </div>

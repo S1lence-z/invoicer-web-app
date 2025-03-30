@@ -17,7 +17,7 @@ namespace Backend.Services
 			return await context.BankAccount.ToListAsync();
 		}
 
-		public async Task<BankAccount> CreateAsync(BankAccount newBankAcc)
+		public async Task<BankAccount?> CreateAsync(BankAccount newBankAcc)
 		{
 			// TODO: Add db exception handling
 			await context.BankAccount.AddAsync(newBankAcc);
@@ -25,7 +25,7 @@ namespace Backend.Services
 			return newBankAcc;
 		}
 
-		public async Task<BankAccount> UpdateAsync(int id, BankAccount updatedBankAcc)
+		public async Task<BankAccount?> UpdateAsync(int id, BankAccount updatedBankAcc)
 		{
 			BankAccount? bankAcc = await context.BankAccount.FindAsync(id);
 			if (bankAcc is null)
