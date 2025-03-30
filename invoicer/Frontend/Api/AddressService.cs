@@ -29,7 +29,8 @@ namespace Frontend.Api
 
 		public async Task<IList<Address>> GetAllAsync()
 		{
-			return await _httpClient.GetFromJsonAsync<IList<Address>>(_urlPath);
+			var reponse = await _httpClient.GetFromJsonAsync<IList<Address>>(_urlPath);
+			return reponse ?? [];
 		}
 
 		public async Task<Address?> GetByIdAsync(int id)
@@ -37,7 +38,7 @@ namespace Frontend.Api
 			return await _httpClient.GetFromJsonAsync<Address>($"{_urlPath}/{id}");
 		}
 
-		public async Task<Address> UpdateAsync(int id, Address obj)
+		public async Task<Address?> UpdateAsync(int id, Address obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			return await response.Content.ReadFromJsonAsync<Address>();

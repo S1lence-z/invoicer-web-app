@@ -17,7 +17,7 @@ namespace Backend.Services
 			return await context.Address.ToListAsync();
 		}
 
-		public async Task<Address> CreateAsync(Address newAddress)
+		public async Task<Address?> CreateAsync(Address newAddress)
 		{
 			// TODO: Add db exception handling
 			await context.Address.AddAsync(newAddress);
@@ -25,7 +25,7 @@ namespace Backend.Services
 			return newAddress;
 		}
 
-		public async Task<Address> UpdateAsync(int id, Address updatedAddress)
+		public async Task<Address?> UpdateAsync(int id, Address updatedAddress)
 		{
 			Address? existingAddress = await context.Address.FindAsync(id);
 			if (existingAddress is null)

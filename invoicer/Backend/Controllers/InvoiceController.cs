@@ -53,7 +53,7 @@ namespace Backend.Controllers
 				return BadRequest("Invoice must have at least one item");
 			}
 
-			Invoice updatedInvoice;
+			Invoice? updatedInvoice;
 			try
 			{
 				updatedInvoice = await invoiceService.UpdateAsync(id, invoice);

@@ -24,7 +24,7 @@ namespace Backend.Services
 				.ToListAsync();
 		}
 
-		public async Task<Entity> CreateAsync(Entity newEntity)
+		public async Task<Entity?> CreateAsync(Entity newEntity)
 		{
 			Address? address = await context.Address.FindAsync(newEntity.AddressId);
 			BankAccount? bankAccount = await context.BankAccount.FindAsync(newEntity.BankAccountId);
@@ -43,7 +43,7 @@ namespace Backend.Services
 			return newEntity;
 		}
 
-		public async Task<Entity> UpdateAsync(int id, Entity newEntityData)
+		public async Task<Entity?> UpdateAsync(int id, Entity newEntityData)
 		{
 			Entity? existingEntity = await context.Entity.FindAsync(id);
 			if (existingEntity is null)

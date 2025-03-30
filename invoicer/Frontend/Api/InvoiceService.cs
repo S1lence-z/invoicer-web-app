@@ -44,7 +44,7 @@ namespace Frontend.Api
 
 		public async Task<IList<Invoice>> GetAllAsync()
 		{
-			return await _httpClient.GetFromJsonAsync<IList<Invoice>>(_urlPath);
+			return await _httpClient.GetFromJsonAsync<IList<Invoice>>(_urlPath) ?? [];
 		}
 
 		public async Task<Invoice?> GetByIdAsync(int id)
@@ -52,7 +52,7 @@ namespace Frontend.Api
 			return await _httpClient.GetFromJsonAsync<Invoice>($"{_urlPath}/{id}");
 		}
 
-		public async Task<Invoice> UpdateAsync(int id, Invoice obj)
+		public async Task<Invoice?> UpdateAsync(int id, Invoice obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			return await response.Content.ReadFromJsonAsync<Invoice>();

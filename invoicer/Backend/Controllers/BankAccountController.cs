@@ -33,8 +33,8 @@ namespace Backend.Controllers
 			{
 				return BadRequest("Bank account is null");
 			}
-			BankAccount newBankAcc = await bankAccountService.CreateAsync(bankAccount);
-			return CreatedAtRoute("GetBankAccountById", new { id = newBankAcc.Id }, newBankAcc);
+			BankAccount? newBankAcc = await bankAccountService.CreateAsync(bankAccount);
+			return CreatedAtRoute("GetBankAccountById", new { id = newBankAcc!.Id }, newBankAcc);
 		}
 
 		[HttpPut("{id:int}", Name = "PutBankAccount")]

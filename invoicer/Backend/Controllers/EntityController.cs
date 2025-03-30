@@ -42,7 +42,7 @@ namespace Backend.Controllers
 			{
 				return BadRequest(e.Message);
 			}
-			return CreatedAtRoute("GetEntityById", new { id = newEntity.Id }, newEntity);
+			return CreatedAtRoute("GetEntityById", new { id = newEntity!.Id }, newEntity);
 		}
 
 		[HttpPut("{id:int}", Name = "PutEntity")]

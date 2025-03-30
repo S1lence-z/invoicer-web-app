@@ -63,7 +63,7 @@ namespace Backend.Services
 			return newInvoice;
 		}
 
-		public async Task<Invoice> UpdateAsync(int id, Invoice updatedInvoice)
+		public async Task<Invoice?> UpdateAsync(int id, Invoice updatedInvoice)
 		{
 			Invoice? existingInvoice = await context.Invoice.FindAsync(id);
 			if (existingInvoice is null)
