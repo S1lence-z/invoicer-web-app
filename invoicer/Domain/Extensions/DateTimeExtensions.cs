@@ -1,6 +1,6 @@
 ﻿using Domain.Enums;
 
-namespace Backend.Utils
+namespace Domain.Extensions
 {
 	public static class DateTimeExtensions
 	{

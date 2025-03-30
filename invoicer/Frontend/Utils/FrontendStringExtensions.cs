@@ -2,7 +2,7 @@
 
 namespace Frontend.Utils
 {
-	public static class StringExtensions
+	public static class FrontendStringExtensions
 	{
 		public static string SeperateCamelCase(this string inputString)
 		{

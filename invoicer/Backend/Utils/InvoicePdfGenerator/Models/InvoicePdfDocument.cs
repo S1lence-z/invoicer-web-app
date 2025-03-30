@@ -1,4 +1,5 @@
 ﻿using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
