@@ -11,6 +11,7 @@ namespace Backend.Database
 		public DbSet<Entity> Entity { get; set; }
 		public DbSet<Invoice> Invoice { get; set; }
 		public DbSet<InvoiceItem> InvoiceItem { get; set; }
+		public DbSet<InvoiceNumberScheme> InvoiceNumberScheme { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -19,6 +20,7 @@ namespace Backend.Database
 			SetUpEntity(modelBuilder);
 			SetUpInvoice(modelBuilder);
 			SetUpInvoiceItem(modelBuilder);
+			SetUpInvoiceNumberScheme(modelBuilder);
 		}
 
 		private static void SetUpAddress(ModelBuilder modelBuilder)
@@ -89,6 +91,27 @@ namespace Backend.Database
 				invoiceItem.Property(ii => ii.Description).IsRequired();
 				invoiceItem.Property(ii => ii.UnitPrice).IsRequired();
 				invoiceItem.Property(ii => ii.VatRate).IsRequired().HasDefaultValue(0.21m);
+			});
+		}
+
+		private static void SetUpInvoiceNumberScheme(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<InvoiceNumberScheme>(invoiceNumberScheme =>
+			{
+				invoiceNumberScheme.HasKey(ins => ins.Id);
+				invoiceNumberScheme.Property(ins => ins.EntityId).IsRequired();
+				invoiceNumberScheme.HasOne(ins => ins.Entity).WithMany().HasForeignKey(ins => ins.EntityId);
+				invoiceNumberScheme.Property(ins => ins.Prefix).HasConversion<string>().HasDefaultValue(string.Empty);
+				invoiceNumberScheme.Property(ins => ins.UseSeperator).HasDefaultValue(true);
+				invoiceNumberScheme.Property(ins => ins.Seperator).HasConversion<string>().HasDefaultValue("-");
+				invoiceNumberScheme.Property(ins => ins.SequencePosition).HasConversion<string>().HasDefaultValue(InvoiceNumberSequencePosition.Start);
+				invoiceNumberScheme.Property(ins => ins.SequencePadding).HasDefaultValue(3);
+				invoiceNumberScheme.Property(ins => ins.InvoiceNumberYearFormat).HasConversion<string>().HasDefaultValue(InvoiceNumberYearFormat.None);
+				invoiceNumberScheme.Property(ins => ins.IncludeMonth).HasDefaultValue(true);
+				invoiceNumberScheme.Property(ins => ins.ResetFrequency).HasConversion<string>().HasDefaultValue(InvoiceNumberResetFrequency.Yearly);
+				invoiceNumberScheme.Property(ins => ins.LastSequenceNumber).HasDefaultValue(0);
+				invoiceNumberScheme.Property(ins => ins.LastGenerationYear).HasDefaultValue(0);
+				invoiceNumberScheme.Property(ins => ins.LastGenerationMonth).HasDefaultValue(0);
 			});
 		}
 	}

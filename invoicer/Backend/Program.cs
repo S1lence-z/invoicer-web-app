@@ -25,6 +25,7 @@ namespace Backend
 			builder.Services.AddScoped<IEntityService, EntityService>();
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 			builder.Services.AddScoped<IAresApiService, AresApiService>();
+			builder.Services.AddScoped<IInvoiceNumberingService, InvoiceNumberingService>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
