@@ -45,11 +45,6 @@ namespace Backend.Services
 
 			try
 			{
-				// Ensure state is reset
-				newInvoiceNumberScheme.LastSequenceNumber = 0;
-				newInvoiceNumberScheme.LastGenerationYear = 0;
-				newInvoiceNumberScheme.LastGenerationMonth = 0;
-
 				await context.InvoiceNumberScheme.AddAsync(newInvoiceNumberScheme);
 				await context.SaveChangesAsync();
 				return newInvoiceNumberScheme;
@@ -143,7 +138,7 @@ namespace Backend.Services
 				.FirstOrDefaultAsync(e => e.Id == entityId);
 
 			if (existingEntity is null)
-				throw new KeyNotFoundException($"Entity with id {entityId} not found");
+				throw new ArgumentException($"Entity with id {entityId} not found");
 
 			InvoiceNumberScheme? numberingScheme = await context.InvoiceNumberScheme
 				.FirstOrDefaultAsync(ins => ins.EntityId == entityId);
@@ -156,6 +151,9 @@ namespace Backend.Services
 				isNewScheme = true;
 			}
 			string newInvoiceNumber = InvoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, generationDate, isNewScheme);
+
+			// Update the numbering scheme with the new sequence number
+			numberingScheme.UpdateForNext();
 			if (isNewScheme)
 				await CreateAsync(numberingScheme);
 			else

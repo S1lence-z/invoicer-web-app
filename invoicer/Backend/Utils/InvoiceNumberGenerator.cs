@@ -1,6 +1,5 @@
 ﻿using Domain.Models;
 using Domain.Enums;
-using System.Text;
 
 namespace Backend.Utils
 {
@@ -8,7 +7,6 @@ namespace Backend.Utils
 	{
 		public static string GenerateInvoiceNumber(InvoiceNumberScheme scheme, DateTime generationDate, bool isNewScheme)
 		{
-			// Step 1: Initialize components for the number
 			string prefix = scheme.Prefix;
 			string yearPart = GetYearPart(generationDate, scheme.InvoiceNumberYearFormat);
 
@@ -16,7 +14,7 @@ namespace Backend.Utils
 			string monthPart = string.Empty;
 			if (scheme.IncludeMonth)
 			{
-				monthPart = generationDate.ToString("MM"); // Always two digits
+				monthPart = GetMonthPart(generationDate);
 			}
 
 			// Step 3: Handle the sequence number
@@ -24,7 +22,7 @@ namespace Backend.Utils
 
 			// Step 4: Format the invoice number
 			string invoiceNumber = FormatInvoiceNumber(scheme, prefix, yearPart, monthPart, sequenceNumber);
-
+			
 			return invoiceNumber;
 		}
 
@@ -39,49 +37,33 @@ namespace Backend.Utils
 			};
 		}
 
+		private static string GetMonthPart(DateTime generationDate)
+		{
+			return generationDate.ToString("MM");
+		}
+
 		private static string GenerateSequenceNumber(InvoiceNumberScheme scheme, DateTime generationDate, bool isNewScheme)
 		{
 			// Retrieve the last sequence number and handle reset logic
 			int sequence = isNewScheme ? 1 : scheme.LastSequenceNumber + 1;
 
 			// Check for reset conditions based on the reset frequency
-			if (ShouldResetSequence(scheme, generationDate))
+			if (scheme.ShouldResetSequence(generationDate))
 			{
 				sequence = 1;
 			}
 
-			// Update the scheme's last sequence number
-			scheme.LastSequenceNumber = sequence;
-
 			// Format the sequence number with padding
-			return sequence.ToString($"D{scheme.SequencePadding}"); // D{padding} formats with leading zeros
-		}
-
-		private static bool ShouldResetSequence(InvoiceNumberScheme scheme, DateTime generationDate)
-		{
-			// Reset frequency logic: monthly, yearly, etc.
-			if (scheme.ResetFrequency == InvoiceNumberResetFrequency.Yearly && scheme.LastGenerationYear != generationDate.Year)
-			{
-				scheme.LastGenerationYear = generationDate.Year;
-				return true;
-			}
-
-			if (scheme.ResetFrequency == InvoiceNumberResetFrequency.Monthly && scheme.LastGenerationMonth != generationDate.Month)
-			{
-				scheme.LastGenerationMonth = generationDate.Month;
-				return true;
-			}
-
-			return false;
+			return sequence.ToString($"D{scheme.SequencePadding}");
 		}
 
 		private static string FormatInvoiceNumber(InvoiceNumberScheme scheme, string prefix, string yearPart, string monthPart, string sequenceNumber)
 		{
-			// Format the invoice number based on the position of the sequence
+			string seperator = scheme.UseSeperator ? scheme.Seperator : string.Empty;
 			return scheme.SequencePosition switch
 			{
-				InvoiceNumberSequencePosition.Start => $"{prefix}{yearPart}{monthPart}-{sequenceNumber}",
-				InvoiceNumberSequencePosition.End => $"{prefix}{yearPart}{monthPart}-{sequenceNumber}",
+				InvoiceNumberSequencePosition.Start => $"{prefix}{sequenceNumber}{seperator}{yearPart}{seperator}{monthPart}",
+				InvoiceNumberSequencePosition.End => $"{prefix}{yearPart}{seperator}{monthPart}{seperator}{sequenceNumber}",
 				_ => throw new InvalidOperationException("Invalid sequence position."),
 			};
 		}

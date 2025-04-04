@@ -7,7 +7,7 @@ using Domain.Interfaces;
 
 namespace Backend.Services
 {
-	public class InvoiceService(ApplicationDbContext context) : IInvoiceService
+	public class InvoiceService(ApplicationDbContext context, IInvoiceNumberingService numberingService) : IInvoiceService
 	{
 		public async Task<Invoice?> GetByIdAsync(int id)
 		{
@@ -57,6 +57,12 @@ namespace Backend.Services
 
 			newInvoice.Seller = seller;
 			newInvoice.Buyer = buyer;
+
+			// Generate invoice number
+			string newInvoiceNumber = await numberingService.GetNextInvoiceNumberAsync(seller.Id, DateTime.Now);
+			if (string.IsNullOrEmpty(newInvoiceNumber))
+				throw new ArgumentException($"Failed to generate invoice number for seller with id {seller.Id}");
+			newInvoice.InvoiceNumber = newInvoiceNumber;
 
 			context.Invoice.Add(newInvoice);
 			await context.SaveChangesAsync();
