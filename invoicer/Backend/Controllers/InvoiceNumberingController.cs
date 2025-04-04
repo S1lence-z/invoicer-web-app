@@ -29,5 +29,19 @@ namespace Backend.Controllers
 			IList<InvoiceNumberScheme> schemes = await numberingService.GetAllAsync();
 			return Ok(schemes);
 		}
+
+		[HttpDelete("{id:int}", Name = "DeleteInvoiceNumberingScheme")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> Delete(int id)
+		{
+			InvoiceNumberScheme? scheme = await numberingService.GetByIdAsync(id);
+			if (scheme is null)
+				return NotFound($"Invoice Numbering Scheme with id {id} not found");
+			bool wasDeleted = await numberingService.DeleteAsync(id);
+			if (!wasDeleted)
+				return BadRequest($"Invoice Numbering Scheme with id {id} could not be deleted");
+			return Ok($"Numbering scheme with id {scheme.Id} for entity {scheme.Entity?.Name} deleted");
+		}
 	}
 }
