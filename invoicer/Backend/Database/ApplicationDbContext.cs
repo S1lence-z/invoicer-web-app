@@ -106,7 +106,7 @@ namespace Backend.Database
 				invoiceNumberScheme.Property(ins => ins.Seperator).HasConversion<string>().HasDefaultValue("-");
 				invoiceNumberScheme.Property(ins => ins.SequencePosition).HasConversion<string>().HasDefaultValue(InvoiceNumberSequencePosition.Start);
 				invoiceNumberScheme.Property(ins => ins.SequencePadding).HasDefaultValue(3);
-				invoiceNumberScheme.Property(ins => ins.InvoiceNumberYearFormat).HasConversion<string>().HasDefaultValue(InvoiceNumberYearFormat.None);
+				invoiceNumberScheme.Property(ins => ins.InvoiceNumberYearFormat).HasConversion<string>().HasDefaultValue(InvoiceNumberYearFormat.FourDigit);
 				invoiceNumberScheme.Property(ins => ins.IncludeMonth).HasDefaultValue(true);
 				invoiceNumberScheme.Property(ins => ins.ResetFrequency).HasConversion<string>().HasDefaultValue(InvoiceNumberResetFrequency.Yearly);
 				invoiceNumberScheme.Property(ins => ins.LastSequenceNumber).HasDefaultValue(0);

@@ -12,7 +12,7 @@ namespace Domain.Models
 
 		// Prefix
 		public string Prefix { get; set; } = string.Empty;
-		
+
 		// Seperator
 		public bool UseSeperator { get; set; } = true;
 		public string Seperator { get; set; } = "-";
@@ -22,7 +22,7 @@ namespace Domain.Models
 		public int SequencePadding { get; set; } = 3;
 
 		// Year and month
-		public InvoiceNumberYearFormat InvoiceNumberYearFormat { get; set; } = InvoiceNumberYearFormat.None;
+		public InvoiceNumberYearFormat InvoiceNumberYearFormat { get; set; } = InvoiceNumberYearFormat.FourDigit;
 		public bool IncludeMonth { get; set; } = true;
 		public InvoiceNumberResetFrequency ResetFrequency { get; set; } = InvoiceNumberResetFrequency.Yearly;
 
@@ -49,6 +49,27 @@ namespace Domain.Models
 				LastGenerationYear = 0,
 				LastGenerationMonth = 0
 			};
+		}
+
+		public InvoiceNumberScheme UpdateForNext()
+		{
+			LastSequenceNumber++;
+			LastGenerationYear = DateTime.Now.Year;
+			LastGenerationMonth = DateTime.Now.Month;
+			return this;
+		}
+
+		public bool ShouldResetSequence(DateTime currentDate)
+		{
+			if (ResetFrequency == InvoiceNumberResetFrequency.Yearly && LastGenerationYear != currentDate.Year)
+			{
+				return true;
+			}
+			if (ResetFrequency == InvoiceNumberResetFrequency.Monthly && LastGenerationMonth != currentDate.Month)
+			{
+				return true;
+			}
+			return false;
 		}
 	}
 }
