@@ -1,6 +1,6 @@
 ﻿using Domain.Interfaces;
 
-namespace Domain.AresApiModels
+namespace Application.AresApiModels
 {
 	public class AresApiResult<TData> : IResult<TData> where TData : IAresApiResponse
 	{

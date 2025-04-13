@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Domain.AresApiModels;
+using Application.AresApiModels;
 using Domain.Interfaces;
 using Domain.ServiceInterfaces;
 using Frontend.Models;
