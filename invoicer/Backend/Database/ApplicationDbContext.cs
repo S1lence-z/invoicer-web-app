@@ -64,6 +64,7 @@ namespace Backend.Database
 				entity.Property(e => e.PhoneNumber).HasDefaultValue(string.Empty);
 				entity.HasOne(e => e.BankAccount).WithMany().HasForeignKey(e => e.BankAccountId);
 				entity.HasOne(e => e.Address).WithMany().HasForeignKey(e => e.AddressId);
+				entity.Property(e => e.InvoiceNumberSchemeId).IsRequired();
 				// Invoice Number Scheme
 				entity.HasOne(e => e.InvoiceNumberScheme)
 					.WithMany(ins => ins.EntitiesUsingScheme)
