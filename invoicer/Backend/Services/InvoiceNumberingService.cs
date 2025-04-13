@@ -13,7 +13,6 @@ namespace Backend.Services
 			try
 			{
 				return await context.InvoiceNumberScheme
-					.Include(ins => ins.Entity)
 					.AsNoTracking()
 					.FirstOrDefaultAsync(ins => ins.Id == id);
 			}
@@ -28,7 +27,6 @@ namespace Backend.Services
 			try
 			{
 				return await context.InvoiceNumberScheme
-					.Include(ins => ins.Entity)
 					.AsNoTracking()
 					.ToListAsync();
 			}
@@ -110,26 +108,6 @@ namespace Backend.Services
 			}
 		}
 
-		public async Task<InvoiceNumberScheme?> GetByEntityId(int entityId)
-		{
-			Entity? entity = await context.Entity
-				.FirstOrDefaultAsync(e => e.Id == entityId);
-			if (entity is null)
-				throw new KeyNotFoundException($"Entity with id {entityId} not found");
-
-			try
-			{
-				return await context.InvoiceNumberScheme
-					.Include(ins => ins.Entity)
-					.AsNoTracking()
-					.FirstOrDefaultAsync(ins => ins.EntityId == entityId);
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-		}
-
 		public async Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate)
 		{
 			// Get the entity
@@ -140,25 +118,57 @@ namespace Backend.Services
 			if (existingEntity is null)
 				throw new ArgumentException($"Entity with id {entityId} not found");
 
+			// Get the numbering scheme
+			int numberingSchemeId = existingEntity.InvoiceNumberSchemeId;
 			InvoiceNumberScheme? numberingScheme = await context.InvoiceNumberScheme
-				.FirstOrDefaultAsync(ins => ins.EntityId == entityId);
+				.AsNoTracking()
+				.FirstOrDefaultAsync(ins => ins.Id == numberingSchemeId);
 
-			// If this entity does not have a numbering numberingScheme yet, create a default one
-			bool isNewScheme = false;
 			if (numberingScheme is null)
-			{
-				numberingScheme = InvoiceNumberScheme.CreateDefault(entityId);
-				isNewScheme = true;
-			}
-			string newInvoiceNumber = InvoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, generationDate, isNewScheme);
+				throw new ArgumentException($"Invoice Numbering Scheme with id {numberingSchemeId} not found");
 
-			// Update the numbering scheme with the new sequence number
-			numberingScheme.UpdateForNext();
-			if (isNewScheme)
-				await CreateAsync(numberingScheme);
-			else
-				await UpdateAsync(numberingScheme.Id, numberingScheme);
+			// Get the state
+			EntityInvoiceNumberSchemeState? state = await context.EntityInvoiceNumberSchemeStates
+				.FirstOrDefaultAsync(ins => ins.EntityId == entityId && ins.InvoiceNumberSchemeId == numberingSchemeId);
+
+			if (state is null)
+			{
+				// Create a new state if it doesn't exist
+				state = new EntityInvoiceNumberSchemeState
+				{
+					EntityId = entityId,
+					InvoiceNumberSchemeId = numberingSchemeId
+				};
+				await context.EntityInvoiceNumberSchemeStates.AddAsync(state);
+			}
+
+			// Generate the next invoice number
+			string newInvoiceNumber = InvoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, state, generationDate);
+			// Update the state and save changes
+			// TODO: should this be done here?
+			state.UpdateForNext();
+			await context.SaveChangesAsync();
+			// Return the new invoice number
 			return newInvoiceNumber;
+		}
+
+		public async Task<InvoiceNumberScheme> GetDefaultNumberScheme()
+		{
+			try
+			{
+				InvoiceNumberScheme? defaultScheme = await context.InvoiceNumberScheme
+					.AsNoTracking()
+					.FirstOrDefaultAsync(ins => ins.IsDefault);
+
+				if (defaultScheme is null)
+					throw new KeyNotFoundException("Default Invoice Numbering Scheme not found");
+
+				return defaultScheme;
+			}
+			catch (Exception)
+			{
+				throw;
+			}
 		}
 	}
 }

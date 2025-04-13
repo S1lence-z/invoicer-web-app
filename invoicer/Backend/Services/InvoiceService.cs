@@ -57,6 +57,7 @@ namespace Backend.Services
 
 			newInvoice.Seller = seller;
 			newInvoice.Buyer = buyer;
+			newInvoice.InvoiceNumberSchemeId = seller.InvoiceNumberSchemeId;
 
 			// Generate invoice number
 			string newInvoiceNumber = await numberingService.GetNextInvoiceNumberAsync(seller.Id, DateTime.Now);

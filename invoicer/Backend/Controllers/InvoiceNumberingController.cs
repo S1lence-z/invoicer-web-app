@@ -37,11 +37,13 @@ namespace Backend.Controllers
 		{
 			InvoiceNumberScheme? scheme = await numberingService.GetByIdAsync(id);
 			if (scheme is null)
+			{
 				return NotFound($"Invoice Numbering Scheme with id {id} not found");
+			}
 			bool wasDeleted = await numberingService.DeleteAsync(id);
 			if (!wasDeleted)
 				return BadRequest($"Invoice Numbering Scheme with id {id} could not be deleted");
-			return Ok($"Numbering scheme with id {scheme.Id} for entity {scheme.Entity?.Name} deleted");
+			return Ok($"Invoice Numbering Scheme with id {id} deleted");
 		}
 	}
 }

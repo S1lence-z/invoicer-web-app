@@ -5,7 +5,7 @@ namespace Backend.Utils
 {
 	public static class InvoiceNumberGenerator
 	{
-		public static string GenerateInvoiceNumber(InvoiceNumberScheme scheme, DateTime generationDate, bool isNewScheme)
+		public static string GenerateInvoiceNumber(InvoiceNumberScheme scheme, EntityInvoiceNumberSchemeState state, DateTime generationDate)
 		{
 			string prefix = scheme.Prefix;
 			string yearPart = GetYearPart(generationDate, scheme.InvoiceNumberYearFormat);
@@ -18,7 +18,7 @@ namespace Backend.Utils
 			}
 
 			// Step 3: Handle the sequence number
-			string sequenceNumber = GenerateSequenceNumber(scheme, generationDate, isNewScheme);
+			string sequenceNumber = GenerateSequenceNumber(scheme, state, generationDate);
 
 			// Step 4: Format the invoice number
 			string invoiceNumber = FormatInvoiceNumber(scheme, prefix, yearPart, monthPart, sequenceNumber);
@@ -42,19 +42,12 @@ namespace Backend.Utils
 			return generationDate.ToString("MM");
 		}
 
-		private static string GenerateSequenceNumber(InvoiceNumberScheme scheme, DateTime generationDate, bool isNewScheme)
+		private static string GenerateSequenceNumber(InvoiceNumberScheme scheme, EntityInvoiceNumberSchemeState state, DateTime generationDate)
 		{
-			// Retrieve the last sequence number and handle reset logic
-			int sequence = isNewScheme ? 1 : scheme.LastSequenceNumber + 1;
-
-			// Check for reset conditions based on the reset frequency
-			if (scheme.ShouldResetSequence(generationDate))
-			{
-				sequence = 1;
-			}
-
+			// Check if the sequence number should be reset based on the scheme's reset frequency
+			int sequenceNumber = ShouldResetSequenceNumber(scheme, state, generationDate) ? 1 : state.LastSequenceNumber + 1;
 			// Format the sequence number with padding
-			return sequence.ToString($"D{scheme.SequencePadding}");
+			return sequenceNumber.ToString($"D{scheme.SequencePadding}");
 		}
 
 		private static string FormatInvoiceNumber(InvoiceNumberScheme scheme, string prefix, string yearPart, string monthPart, string sequenceNumber)
@@ -65,6 +58,16 @@ namespace Backend.Utils
 				InvoiceNumberSequencePosition.Start => $"{prefix}{sequenceNumber}{seperator}{yearPart}{seperator}{monthPart}",
 				InvoiceNumberSequencePosition.End => $"{prefix}{yearPart}{seperator}{monthPart}{seperator}{sequenceNumber}",
 				_ => throw new InvalidOperationException("Invalid sequence position."),
+			};
+		}
+
+		private static bool ShouldResetSequenceNumber(InvoiceNumberScheme scheme, EntityInvoiceNumberSchemeState state, DateTime generationDate)
+		{
+			return scheme.ResetFrequency switch
+			{
+				InvoiceNumberResetFrequency.Yearly => generationDate.Year != state.LastGenerationYear,
+				InvoiceNumberResetFrequency.Monthly => generationDate.Year != state.LastGenerationYear || generationDate.Month != state.LastGenerationMonth,
+				_ => false,
 			};
 		}
 	}

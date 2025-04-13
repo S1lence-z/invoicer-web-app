@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
-	public class EntityService(ApplicationDbContext context) : IEntityService
+	public class EntityService(ApplicationDbContext context, IInvoiceNumberingService numberingService) : IEntityService
 	{
 		public async Task<Entity?> GetByIdAsync(int id)
 		{
@@ -37,6 +37,7 @@ namespace Backend.Services
 
 			newEntity.Address = address;
 			newEntity.BankAccount = bankAccount;
+			newEntity.InvoiceNumberSchemeId = numberingService.GetDefaultNumberScheme().Id;
 
 			context.Entity.Add(newEntity);
 			await context.SaveChangesAsync();
