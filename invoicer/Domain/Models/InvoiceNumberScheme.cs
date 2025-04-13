@@ -15,7 +15,7 @@ namespace Domain.Models
 		public InvoiceNumberYearFormat InvoiceNumberYearFormat { get; set; } = InvoiceNumberYearFormat.FourDigit;
 		public bool IncludeMonth { get; set; } = true;
 		public InvoiceNumberResetFrequency ResetFrequency { get; set; } = InvoiceNumberResetFrequency.Yearly;
-		public bool IsDefault { get; init; } = false;
+		public bool IsDefault { get; set; } = false;
 
 		// Navigation properties
 		public virtual ICollection<Entity> EntitiesUsingScheme { get; set; } = [];
@@ -27,6 +27,7 @@ namespace Domain.Models
 		{
 			return new InvoiceNumberScheme
 			{
+				Id = 1,
 				Prefix = "INV",
 				UseSeperator = true,
 				Seperator = "-",
