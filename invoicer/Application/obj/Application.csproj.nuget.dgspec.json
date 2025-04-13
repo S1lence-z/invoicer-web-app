@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jirka\\source\\repos\\invoicer-web-app\\invoicer\\Application\\Application.csproj": {}
+    "C:\\Users\\jirka\\Source\\Repos\\invoicer-web-app\\invoicer\\Application\\Application.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jirka\\source\\repos\\invoicer-web-app\\invoicer\\Application\\Application.csproj": {
+    "C:\\Users\\jirka\\Source\\Repos\\invoicer-web-app\\invoicer\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jirka\\source\\repos\\invoicer-web-app\\invoicer\\Application\\Application.csproj",
+        "projectUniqueName": "C:\\Users\\jirka\\Source\\Repos\\invoicer-web-app\\invoicer\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "C:\\Users\\jirka\\source\\repos\\invoicer-web-app\\invoicer\\Application\\Application.csproj",
+        "projectPath": "C:\\Users\\jirka\\Source\\Repos\\invoicer-web-app\\invoicer\\Application\\Application.csproj",
         "packagesPath": "C:\\Users\\jirka\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\jirka\\source\\repos\\invoicer-web-app\\invoicer\\Application\\obj\\",
         "projectStyle": "PackageReference",
@@ -32,8 +32,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\jirka\\source\\repos\\invoicer-web-app\\invoicer\\Domain\\Domain.csproj": {
-                "projectPath": "C:\\Users\\jirka\\source\\repos\\invoicer-web-app\\invoicer\\Domain\\Domain.csproj"
+              "C:\\Users\\jirka\\Source\\Repos\\invoicer-web-app\\invoicer\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\Users\\jirka\\Source\\Repos\\invoicer-web-app\\invoicer\\Domain\\Domain.csproj"
               }
             }
           }
