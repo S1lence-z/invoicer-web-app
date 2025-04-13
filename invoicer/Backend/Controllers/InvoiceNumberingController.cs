@@ -51,10 +51,6 @@ namespace Backend.Controllers
 		[ProducesResponseType(400)]
 		public async Task<IActionResult> Post([FromBody] InvoiceNumberScheme scheme)
 		{
-			if (scheme.EntityId <= 0)
-			{
-				return BadRequest("Entity ID must be greater than 0");
-			}
 			InvoiceNumberScheme? createdScheme;
 			try
 			{
@@ -73,9 +69,6 @@ namespace Backend.Controllers
 		[ProducesResponseType(400)]
 		public async Task<IActionResult> Put(int id, [FromBody] InvoiceNumberScheme scheme)
 		{
-			if (scheme.EntityId <= 0)
-				return BadRequest("Entity ID must be greater than 0");
-
 			InvoiceNumberScheme? existingScheme = await numberingService.GetByIdAsync(id);
 			if (existingScheme is null)
 				return NotFound($"Invoice Numbering Scheme with id {id} not found");
