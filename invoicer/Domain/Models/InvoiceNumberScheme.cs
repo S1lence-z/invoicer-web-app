@@ -6,70 +6,36 @@ namespace Domain.Models
 	{
 		public int Id { get; set; }
 
-		// Entity ID
-		public int EntityId { get; set; }
-		public virtual Entity? Entity { get; set; }
-
-		// Prefix
+		// Settings
 		public string Prefix { get; set; } = string.Empty;
-
-		// Seperator
 		public bool UseSeperator { get; set; } = true;
 		public string Seperator { get; set; } = "-";
-
-		// Sequence number
 		public InvoiceNumberSequencePosition SequencePosition { get; set; } = InvoiceNumberSequencePosition.Start;
 		public int SequencePadding { get; set; } = 3;
-
-		// Year and month
 		public InvoiceNumberYearFormat InvoiceNumberYearFormat { get; set; } = InvoiceNumberYearFormat.FourDigit;
 		public bool IncludeMonth { get; set; } = true;
 		public InvoiceNumberResetFrequency ResetFrequency { get; set; } = InvoiceNumberResetFrequency.Yearly;
+		public bool IsDefault { get; init; } = false;
 
-		// Current state
-		public int LastSequenceNumber { get; set; } = 0;
-		public int LastGenerationYear { get; set; } = 0;
-		public int LastGenerationMonth { get; set; } = 0;
+		// Navigation properties
+		public virtual ICollection<Entity> EntitiesUsingScheme { get; set; } = [];
+		public virtual ICollection<Invoice> InvoicesGeneratedWithScheme { get; set; } = [];
+		public virtual ICollection<EntityInvoiceNumberSchemeState> EntityInvoiceNumberSchemeStates { get; set; } = [];
 
 		// Define default numbering scheme
-		public static InvoiceNumberScheme CreateDefault(int entityId)
+		public static InvoiceNumberScheme CreateDefault()
 		{
-			// Output will be: FAK001-2021-01
 			return new InvoiceNumberScheme
 			{
-				EntityId = entityId,
-				Prefix = "FAK",
+				Prefix = "INV",
 				UseSeperator = true,
 				Seperator = "-",
 				SequencePosition = InvoiceNumberSequencePosition.Start,
 				SequencePadding = 3,
 				InvoiceNumberYearFormat = InvoiceNumberYearFormat.FourDigit,
 				IncludeMonth = true,
-				LastSequenceNumber = 0,
-				LastGenerationYear = 0,
-				LastGenerationMonth = 0
+				IsDefault = true,
 			};
-		}
-
-		public InvoiceNumberScheme UpdateForNext()
-		{
-			LastSequenceNumber++;
-			LastGenerationYear = DateTime.Now.Year;
-			LastGenerationMonth = DateTime.Now.Month;
-			return this;
-		}
-
-		public bool ShouldResetSequence(DateTime currentDate)
-		{
-			if (ResetFrequency == InvoiceNumberResetFrequency.Yearly && LastGenerationYear != currentDate.Year)
-			{
-				return true;
-			}
-			if (ResetFrequency == InvoiceNumberResetFrequency.Monthly && LastGenerationMonth != currentDate.Month)
-			{
-				return true;
-			}
-			return false;
 		}
 	}
 }
