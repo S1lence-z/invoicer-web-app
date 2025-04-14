@@ -1,6 +1,6 @@
 ﻿using Domain.Interfaces;
 
-namespace Domain.ServiceInterfaces
+namespace Application.ServiceInterfaces
 {
 	public interface IAresApiService
 	{
