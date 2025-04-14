@@ -1,13 +1,12 @@
-﻿using Domain.Enums;
-
-namespace Domain.Models
+﻿namespace Domain.Models
 {
 	public class EntityInvoiceNumberSchemeState
 	{
 		public int EntityId { get; set; }
-		public virtual Entity Entity { get; set; } = null!;
-
 		public int InvoiceNumberSchemeId { get; set; }
+
+		// Navigation properties
+		public virtual Entity Entity { get; set; } = null!;
 		public virtual InvoiceNumberScheme InvoiceNumberScheme { get; set; } = null!;
 
 		// Current state
