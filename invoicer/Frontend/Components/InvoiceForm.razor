@@ -1,9 +1,9 @@
-﻿@using Domain.Enums;
+﻿@using Application.ServiceInterfaces;
+@using Application.DTOs;
+@using Domain.Enums;
 @using Domain.Interfaces;
-@using Domain.Models;
-@using Domain.ServiceInterfaces;
 @using Frontend.Models.FormModels;
-@using Frontend.Utils
+@using Frontend.Utils;
 @inject IInvoiceService invoiceService;
 @inject IEntityService entityService;
 
@@ -147,12 +147,12 @@
 @code {
     // Parameters
     [Parameter] public EventCallback SubmitCallback { get; set; }
-    [Parameter] public Invoice? InvoiceInstance { get; set; } = null;
+    [Parameter] public InvoiceDto? InvoiceInstance { get; set; } = null;
     [Parameter, EditorRequired] public bool isActive { get; set; }
 
     // Form Models
     private InvoiceFormModel invoiceFormModel { get; set; } = new();
-    private IList<Entity> allEntities = new List<Entity>();
+    private IList<EntityDto> allEntities = new List<EntityDto>();
 
     // Methods
     protected override void OnParametersSet()
@@ -192,7 +192,7 @@
 
     private async Task SubmitNewInvoice() 
     {
-        Invoice newInvoice = new Invoice
+        InvoiceDto newInvoice = new InvoiceDto
             {
                 InvoiceNumber = invoiceFormModel.InvoiceNumber,
                 IssueDate = invoiceFormModel.IssueDate,
@@ -207,7 +207,7 @@
                 Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
 
             };
-        Invoice? createdInvoice = await invoiceService.CreateAsync(newInvoice);
+        InvoiceDto? createdInvoice = await invoiceService.CreateAsync(newInvoice);
         if (createdInvoice is null) {
             Console.WriteLine("Failed to create invoice");
             return;
@@ -217,7 +217,7 @@
 
     private async Task SubmitEditInvoice()
     {
-        Invoice editedInvoice = new Invoice
+        InvoiceDto editedInvoice = new InvoiceDto
             {
                 Id = invoiceFormModel.Id,
                 InvoiceNumber = invoiceFormModel.InvoiceNumber,
@@ -232,7 +232,7 @@
                 DeliveryMethod = invoiceFormModel.DeliveryMethod,
                 Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
             };
-        Invoice? updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
+        InvoiceDto? updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
         if (updatedInvoice is null)
         {
             Console.WriteLine("Failed to update invoice");

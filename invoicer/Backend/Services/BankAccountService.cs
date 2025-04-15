@@ -1,31 +1,37 @@
-﻿using Backend.Database;
+﻿using Application.ServiceInterfaces;
+using Application.DTOs;
+using Application.Mappers;
+using Backend.Database;
 using Domain.Models;
-using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
 	public class BankAccountService(ApplicationDbContext context) : IBankAccountService
 	{
-		public async Task<BankAccount?> GetByIdAsync(int id)
+		public async Task<BankAccountDto?> GetByIdAsync(int id)
 		{
-			return await context.BankAccount.FindAsync(id);
+			BankAccount? foundBankAcc = await context.BankAccount.FindAsync(id);
+			if (foundBankAcc is null)
+				throw new KeyNotFoundException($"Bank account with id {id} not found");
+			return BankAccountMapper.MapToDto(foundBankAcc);
 		}
 
-		public async Task<IList<BankAccount>> GetAllAsync()
+		public async Task<IList<BankAccountDto>> GetAllAsync()
 		{
-			return await context.BankAccount.ToListAsync();
+			List<BankAccount> allBankAccs = await context.BankAccount.ToListAsync();
+			return allBankAccs.Select(BankAccountMapper.MapToDto).ToList();
 		}
 
-		public async Task<BankAccount?> CreateAsync(BankAccount newBankAcc)
+		public async Task<BankAccountDto?> CreateAsync(BankAccountDto newBankAcc)
 		{
-			// TODO: Add db exception handling
-			await context.BankAccount.AddAsync(newBankAcc);
+			BankAccount bankAcc = BankAccountMapper.MapToDomain(newBankAcc);
+			await context.BankAccount.AddAsync(bankAcc);
 			await context.SaveChangesAsync();
-			return newBankAcc;
+			return BankAccountMapper.MapToDto(bankAcc);
 		}
 
-		public async Task<BankAccount?> UpdateAsync(int id, BankAccount updatedBankAcc)
+		public async Task<BankAccountDto?> UpdateAsync(int id, BankAccountDto updatedBankAcc)
 		{
 			BankAccount? bankAcc = await context.BankAccount.FindAsync(id);
 			if (bankAcc is null)
@@ -37,7 +43,8 @@ namespace Backend.Services
 			bankAcc.IBAN = updatedBankAcc.IBAN;
 
 			await context.SaveChangesAsync();
-			return bankAcc;
+
+			return BankAccountMapper.MapToDto(bankAcc);
 		}
 
 		public async Task<bool> DeleteAsync(int id)

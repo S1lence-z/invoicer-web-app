@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@using Frontend.Utils
+@inject LoadingService LoadingService
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -10,7 +13,32 @@
         </div>
 
         <article class="content px-4">
+            @if (LoadingService.IsLoading)
+            {
+                <div class="spinner-overlay">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
             @Body
         </article>
     </main>
 </div>
+
+@code {
+    private void LoadingStateChanged(object? sender, EventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        LoadingService.OnLoadingStateChanged += LoadingStateChanged;
+    }
+
+    public void Dispose()
+    {
+        LoadingService.OnLoadingStateChanged -= LoadingStateChanged;
+    }
+}

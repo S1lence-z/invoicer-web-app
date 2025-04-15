@@ -4,7 +4,7 @@ using Frontend.Utils;
 using Frontend.Api;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Domain.ServiceInterfaces;
+using Application.ServiceInterfaces;
 
 namespace Frontend
 {
@@ -36,6 +36,9 @@ namespace Frontend
 			builder.Services.AddScoped<IAddressService, AddressService>();
 			builder.Services.AddScoped<IBankAccountService, BankAccountService>();
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+
+			// Register other services
+			builder.Services.AddScoped<LoadingService>();
 
 			// Build and run the app
 			await builder.Build().RunAsync();

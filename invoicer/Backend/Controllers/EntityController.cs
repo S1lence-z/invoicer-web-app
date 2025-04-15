@@ -1,5 +1,5 @@
-﻿using Domain.Models;
-using Domain.ServiceInterfaces;
+﻿using Application.DTOs;
+using Application.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -13,67 +13,73 @@ namespace Backend.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> GetById(int id)
 		{
-			Entity? entity = await entityService.GetByIdAsync(id);
-			if (entity is null)
+			try
 			{
-				return NotFound($"Entity with id {id} not found");
+				EntityDto? entity = await entityService.GetByIdAsync(id);
+				return Ok(entity);
 			}
-			return Ok(entity);
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(e.Message);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpGet(Name = "GetAllEntities")]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAll()
 		{
-			IList<Entity> entityList = await entityService.GetAllAsync();
-			return Ok(entityList);
+			try
+			{
+				IList<EntityDto> entityList = await entityService.GetAllAsync();
+				return Ok(entityList);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpPost(Name = "PostEntity")]
 		[ProducesResponseType(201)]
 		[ProducesResponseType(400)]
-		public async Task<IActionResult> Post([FromBody] Entity entity)
+		public async Task<IActionResult> Post([FromBody] EntityDto entity)
 		{
-			if (entity is null)
-			{
-				return BadRequest("Entity is null");
-			}
-			Entity? newEntity;
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
 			try
 			{
-				newEntity = await entityService.CreateAsync(entity);
+				EntityDto? newEntity = await entityService.CreateAsync(entity);
+				return CreatedAtRoute("GetEntityById", new { id = newEntity!.Id }, newEntity);
 			}
-			catch (ArgumentException e)
+			catch (Exception e)
 			{
-				return BadRequest(e.Message);
+				return StatusCode(500, e.Message);
 			}
-			return CreatedAtRoute("GetEntityById", new { id = newEntity!.Id }, newEntity);
 		}
 
 		[HttpPut("{id:int}", Name = "PutEntity")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		public async Task<IActionResult> Put(int id, [FromBody] Entity entity)
+		public async Task<IActionResult> Put(int id, [FromBody] EntityDto entity)
 		{
-			if (entity is null)
-			{
-				return BadRequest("New entity is null");
-			}
-			Entity? existingEntity = await entityService.GetByIdAsync(id);	
-			if (existingEntity is null)
-			{
-				return NotFound($"Entity with id {id} not found");
-			}
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
 			try
 			{
-				await entityService.UpdateAsync(id, entity);
+				EntityDto? updatedEntity = await entityService.UpdateAsync(id, entity);
+				return Ok(updatedEntity);
 			}
-			catch (ArgumentException e)
+			catch (Exception e)
 			{
-				return BadRequest(e.Message);
+				return StatusCode(500, e.Message);
 			}
-			return Ok(existingEntity);
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteEntity")]
@@ -81,12 +87,17 @@ namespace Backend.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete(int id)
 		{
-			bool wasDeleted = await entityService.DeleteAsync(id);
-			if (!wasDeleted)
+			try
 			{
-				return NotFound($"Entity with id {id} not found");
+				bool wasDeleted = await entityService.DeleteAsync(id);
+				if (!wasDeleted)
+					return NotFound($"Entity with ID {id} not found.");
+				return Ok($"Entity with ID {id} was deleted.");
 			}
-			return Ok($"Entity with id {id} deleted");
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 	}
 }

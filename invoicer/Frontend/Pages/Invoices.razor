@@ -1,9 +1,9 @@
 ﻿@page "/invoices";
-@using Domain.Interfaces
-@using Domain.Models
-@using Domain.ServiceInterfaces
-@using Frontend.Components
-@using System.Collections.ObjectModel
+@using System.Collections.ObjectModel;
+@using Application.ServiceInterfaces;
+@using Application.DTOs;
+@using Domain.Interfaces;
+@using Frontend.Components;
 @inject IInvoiceService invoiceService;
 @inject IJSRuntime jsRuntime;
 
@@ -86,10 +86,10 @@
 </Modal>
 
 @code {
-    private IList<Invoice> allInvoices = new List<Invoice>();
-    private IList<Invoice> shownInvoices = new List<Invoice>();
-    private Invoice? invoiceToEdit = null;
-    private Invoice? invoiceToPreview = null;
+    private IList<InvoiceDto> allInvoices = new List<InvoiceDto>();
+    private IList<InvoiceDto> shownInvoices = new List<InvoiceDto>();
+    private InvoiceDto? invoiceToEdit = null;
+    private InvoiceDto? invoiceToPreview = null;
     private string searchTerm = string.Empty;
     private SearchType searchType = SearchType.InvoiceNumber;
     // Modal related
@@ -121,7 +121,7 @@
         }
     }
 
-    private async void populateShownInvoices(IList<Invoice> newInvoices)
+    private async void populateShownInvoices(IList<InvoiceDto> newInvoices)
     {
         shownInvoices.Clear();
         foreach (var inv in newInvoices)
@@ -155,20 +155,20 @@
         }
     }
 
-    private void ShowInvoicePreview(Invoice invToShow)
+    private void ShowInvoicePreview(InvoiceDto invToShow)
     {
         invoiceToPreview = invToShow;
         ShowInvoicePreviewModal();
     }
 
-    private async Task EditInvoice(Invoice invToEdit) 
+    private async Task EditInvoice(InvoiceDto invToEdit)
     {
         invoiceToEdit = invToEdit;
         await ShowEditInvoiceModal();
         StateHasChanged();
     }
 
-    private async Task DeleteInvoice(Invoice invToDelete) 
+    private async Task DeleteInvoice(InvoiceDto invToDelete)
     {
         var status = await invoiceService.DeleteAsync(invToDelete.Id);
         if (status) {
@@ -177,7 +177,7 @@
         }
     }
 
-    private async Task ExportInvoice(Invoice invToExport) 
+    private async Task ExportInvoice(InvoiceDto invToExport)
     {
         IPdfGenerationResult response = await invoiceService.ExportInvoicePdf(invToExport.Id);
         if (!response.IsSuccess)

@@ -1,33 +1,38 @@
-﻿using Backend.Database;
+﻿using Application.ServiceInterfaces;
+using Application.DTOs;
+using Application.Mappers;
+using Backend.Database;
 using Domain.Models;
-using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
-	public class EntityService(ApplicationDbContext context) : IEntityService
+	public class EntityService(ApplicationDbContext context, IInvoiceNumberingService numberingService) : IEntityService
 	{
-		public async Task<Entity?> GetByIdAsync(int id)
+		public async Task<EntityDto?> GetByIdAsync(int id)
 		{
-
-			return await context.Entity
+			Entity? foundEntity = await context.Entity
 				.Include(e => e.BankAccount)
 				.Include(e => e.Address)
 				.FirstOrDefaultAsync(e => e.Id == id);
+			if (foundEntity is null)
+				throw new KeyNotFoundException($"Entity with id {id} not found");
+			return EntityMapper.MapToDto(foundEntity);
 		}
 
-		public async Task<IList<Entity>> GetAllAsync()
+		public async Task<IList<EntityDto>> GetAllAsync()
 		{
-			return await context.Entity
+			List<Entity> allEntities = await context.Entity
 				.Include(e => e.BankAccount)
 				.Include(e => e.Address)
 				.ToListAsync();
+			return allEntities.Select(EntityMapper.MapToDto).ToList();
 		}
 
-		public async Task<Entity?> CreateAsync(Entity newEntity)
+		public async Task<EntityDto?> CreateAsync(EntityDto newEntity)
 		{
-			Address? address = await context.Address.FindAsync(newEntity.AddressId);
-			BankAccount? bankAccount = await context.BankAccount.FindAsync(newEntity.BankAccountId);
+			Address? address = await context.Address.AsNoTracking().FirstOrDefaultAsync(a => a.Id == newEntity.AddressId);
+			BankAccount? bankAccount = await context.BankAccount.AsNoTracking().FirstOrDefaultAsync(ba => ba.Id == newEntity.BankAccountId);
 
 			if (address is null)
 				throw new ArgumentException($"Address with id {newEntity.AddressId} not found.");
@@ -35,15 +40,26 @@ namespace Backend.Services
 			if (bankAccount is null)
 				throw new ArgumentException($"Bank account with id {newEntity.BankAccountId} not found.");
 
-			newEntity.Address = address;
-			newEntity.BankAccount = bankAccount;
+			InvoiceNumberSchemeDto? defaultScheme = await numberingService.GetDefaultNumberScheme();
+			newEntity.InvoiceNumberSchemeId = defaultScheme.Id;
+			Entity entity = EntityMapper.MapToDomain(newEntity);
 
-			context.Entity.Add(newEntity);
+			await context.Entity.AddAsync(entity);
 			await context.SaveChangesAsync();
-			return newEntity;
+
+			Entity? createdEntity = await context.Entity
+				.Include(e => e.BankAccount)
+				.Include(e => e.Address)
+				.AsNoTracking()
+				.FirstOrDefaultAsync(e => e.Id == entity.Id);
+
+			if (createdEntity is null)
+				throw new ArgumentException($"Failed to create entity with id {entity.Id}");
+
+			return EntityMapper.MapToDto(createdEntity);
 		}
 
-		public async Task<Entity?> UpdateAsync(int id, Entity newEntityData)
+		public async Task<EntityDto?> UpdateAsync(int id, EntityDto newEntityData)
 		{
 			Entity? existingEntity = await context.Entity.FindAsync(id);
 			if (existingEntity is null)
@@ -65,9 +81,17 @@ namespace Backend.Services
 			existingEntity.Ico = newEntityData.Ico;
 			existingEntity.Name = newEntityData.Name;
 			existingEntity.PhoneNumber = newEntityData.PhoneNumber;
+			existingEntity.InvoiceNumberSchemeId = newEntityData.InvoiceNumberSchemeId;
 
 			await context.SaveChangesAsync();
-			return existingEntity;
+
+			Entity? updatedEntity = await context.Entity
+				.Include(e => e.BankAccount)
+				.Include(e => e.Address)
+				.AsNoTracking()
+				.FirstOrDefaultAsync(e => e.Id == id);
+
+			return EntityMapper.MapToDto(updatedEntity!);
 		}
 
 		public async Task<bool> DeleteAsync(int id)

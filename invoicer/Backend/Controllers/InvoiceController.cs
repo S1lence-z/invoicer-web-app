@@ -1,7 +1,8 @@
-﻿using Domain.ServiceInterfaces;
-using Domain.Models;
+﻿using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Domain.Interfaces;
+using Application.ServiceInterfaces;
+using Application.DTOs;
 
 namespace Backend.Controllers
 {
@@ -14,62 +15,78 @@ namespace Backend.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> GetById(int id)
 		{
-			Invoice? invoice = await invoiceService.GetByIdAsync(id);
-			if (invoice is null)
-				return NotFound($"Entity with id {id} not found");
-			return Ok(invoice);
+			try
+			{
+				InvoiceDto? invoice = await invoiceService.GetByIdAsync(id);
+				return Ok(invoice);
+			}
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(e.Message);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpGet(Name = "GetAllInvoices")]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAll()
 		{
-			IList<Invoice> invoices = await invoiceService.GetAllAsync();
-			return Ok(invoices);
+			try
+			{
+				IList<InvoiceDto> invoiceList = await invoiceService.GetAllAsync();
+				return Ok(invoiceList);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpPost(Name = "PostInvoice")]
 		[ProducesResponseType(201)]
 		[ProducesResponseType(400)]
-		public async Task<IActionResult> Post([FromBody] Invoice invoice)
+		public async Task<IActionResult> Post([FromBody] InvoiceDto invoice)
 		{
 			if (invoice.Items is null || invoice.Items.Count == 0)
 			{
 				return BadRequest("Invoice must have at least one item");
 			}
 
-			Invoice? createdInvoice;
 			try
 			{
-				createdInvoice = await invoiceService.CreateAsync(invoice);
+				InvoiceDto? createdInvoice = await invoiceService.CreateAsync(invoice);
+				return CreatedAtRoute("GetInvoiceById", new { id = createdInvoice!.Id }, createdInvoice);
 			}
-			catch (ArgumentException e)
+			catch (Exception e)
 			{
-				return BadRequest(e.Message);
+				return StatusCode(500, e.Message);
 			}
-			return CreatedAtRoute("GetInvoiceById", new { id = createdInvoice!.Id }, createdInvoice);
 		}
 
 		[HttpPut("{id:int}", Name = "PutInvoice")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
-		public async Task<IActionResult> Put(int id, [FromBody] Invoice invoice)
+		public async Task<IActionResult> Put(int id, [FromBody] InvoiceDto invoice)
 		{
 			if (invoice.Items is null || invoice.Items.Count == 0)
-			{
 				return BadRequest("Invoice must have at least one item");
-			}
 
-			Invoice? updatedInvoice;
 			try
 			{
-				updatedInvoice = await invoiceService.UpdateAsync(id, invoice);
+				InvoiceDto? updatedInvoice = await invoiceService.UpdateAsync(id, invoice);
+				return Ok(updatedInvoice);
 			}
-			catch (ArgumentException e)
+			catch (KeyNotFoundException e)
 			{
-				return BadRequest(e.Message);
+				return NotFound(e.Message);
 			}
-			return Ok(updatedInvoice);
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteInvoice")]
@@ -77,10 +94,17 @@ namespace Backend.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete(int id)
 		{
-			bool wasDeleted = await invoiceService.DeleteAsync(id);
-			if (!wasDeleted)
-				return NotFound($"Invoice with id {id} not found");
-			return Ok($"Invoice with id {id} deleted");
+			try
+			{
+				bool wasDeleted = await invoiceService.DeleteAsync(id);
+				if (!wasDeleted)
+					return NotFound($"Invoice with id {id} not found");
+				return Ok($"Invoice with id {id} deleted");
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpGet("{id:int}/export-pdf", Name = "ExportInvoicePdf")]

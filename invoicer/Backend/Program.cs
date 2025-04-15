@@ -1,9 +1,7 @@
+using Application.ServiceInterfaces;
 using Backend.Database;
 using Backend.Services;
 using Backend.Services.AresApiService;
-using Backend.Utils;
-using Domain.Interfaces;
-using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend
@@ -15,8 +13,8 @@ namespace Backend
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
-			builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(
-				builder.Configuration.GetConnectionString("InvoicerDb"))
+			builder.Services.AddDbContext<ApplicationDbContext>(options => 
+				options.UseSqlite(builder.Configuration.GetConnectionString("InvoicerDb"))
 			);
 
 			// Add custom services
@@ -25,6 +23,7 @@ namespace Backend
 			builder.Services.AddScoped<IEntityService, EntityService>();
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 			builder.Services.AddScoped<IAresApiService, AresApiService>();
+			builder.Services.AddScoped<IInvoiceNumberingService, InvoiceNumberingService>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
@@ -38,7 +37,7 @@ namespace Backend
 			app.UseSwagger();
 			app.UseSwaggerUI();
 
-			//app.UseHttpsRedirection();
+			// app.UseHttpsRedirection();
 
 			// Enable CORS
 			EnableCors(app);

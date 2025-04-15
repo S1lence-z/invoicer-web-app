@@ -1,31 +1,38 @@
 ﻿using Backend.Database;
+using Application.ServiceInterfaces;
+using Application.DTOs;
+using Application.Mappers;
 using Domain.Models;
-using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
 	public class AddressService(ApplicationDbContext context) : IAddressService
 	{
-		public async Task<Address?> GetByIdAsync(int id)
+		public async Task<AddressDto?> GetByIdAsync(int id)
 		{
-			return await context.Address.FindAsync(id);
+			Address? foundAddress = await context.Address.FindAsync(id);
+			if (foundAddress is null)
+				throw new KeyNotFoundException($"Address with id {id} not found");
+
+			return AddressMapper.MapToDto(foundAddress);
+		}
+		 
+		public async Task<IList<AddressDto>> GetAllAsync()
+		{
+			List<Address> allAdresses = await context.Address.ToListAsync();
+			return allAdresses.Select(AddressMapper.MapToDto).ToList();
 		}
 
-		public async Task<IList<Address>> GetAllAsync()
+		public async Task<AddressDto?> CreateAsync(AddressDto newAddress)
 		{
-			return await context.Address.ToListAsync();
-		}
-
-		public async Task<Address?> CreateAsync(Address newAddress)
-		{
-			// TODO: Add db exception handling
-			await context.Address.AddAsync(newAddress);
+			Address address = AddressMapper.MapToDomain(newAddress);
+			await context.Address.AddAsync(address);
 			await context.SaveChangesAsync();
-			return newAddress;
+			return AddressMapper.MapToDto(address);
 		}
 
-		public async Task<Address?> UpdateAsync(int id, Address updatedAddress)
+		public async Task<AddressDto?> UpdateAsync(int id, AddressDto updatedAddress)
 		{
 			Address? existingAddress = await context.Address.FindAsync(id);
 			if (existingAddress is null)
@@ -37,7 +44,8 @@ namespace Backend.Services
 			existingAddress.ZipCode = updatedAddress.ZipCode;
 
 			await context.SaveChangesAsync();
-			return existingAddress;
+
+			return AddressMapper.MapToDto(existingAddress);
 		}
 
 		public async Task<bool> DeleteAsync(int id)

@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using Domain.Enums;
 
-namespace Domain.Extensions
+namespace Application.Extensions
 {
 	public static class CurrencyExtensions
 	{

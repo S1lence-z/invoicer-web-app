@@ -1,6 +1,6 @@
-﻿@using Domain.Models;
+﻿@using Application.DTOs;
 
-<div class="card border-1 shadow-sm @(IsSelected ? "border border-primary" : "")" style="max-width: 300px;">
+<div class="card border-2 shadow-sm @(IsSelected ? "border border-primary" : "")" style="max-width: 300px;">
     <div class="card-body" style="cursor: pointer;" @onclick="() => OnSelectEntity.InvokeAsync(Entity)">
         <h5 class="card-title mb-2">@Entity.Name</h5>
         
@@ -16,23 +16,23 @@
     </div>
 
     <div class="card-footer bg-white border-0 d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm" @onclick="() => OnEditEntity.InvokeAsync(Entity)">Edit</button>
-        <button class="btn btn-outline-danger btn-sm" @onclick="() => OnDeleteEntity.InvokeAsync(Entity)">Delete</button>
+       <button class="btn btn-outline-primary btn-sm flex-fill" @onclick="() => OnEditEntity.InvokeAsync(Entity)">Edit</button>
+       <button class="btn btn-outline-danger btn-sm flex-fill" @onclick="() => OnDeleteEntity.InvokeAsync(Entity)">Delete</button>
     </div>
 </div>
 
 @code {
     [Parameter, EditorRequired] 
-    public Entity Entity { get; set; } = null!;
+    public EntityDto Entity { get; set; } = null!;
 
     [Parameter] 
-    public EventCallback<Entity> OnSelectEntity { get; set; }
+    public EventCallback<EntityDto> OnSelectEntity { get; set; }
 
     [Parameter] 
-    public EventCallback<Entity> OnDeleteEntity { get; set; }
+    public EventCallback<EntityDto> OnDeleteEntity { get; set; }
 
     [Parameter] 
-    public EventCallback<Entity> OnEditEntity { get; set; }
+    public EventCallback<EntityDto> OnEditEntity { get; set; }
 
     [Parameter]
     public bool IsSelected { get; set; }

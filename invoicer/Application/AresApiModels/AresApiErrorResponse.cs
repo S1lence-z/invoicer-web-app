@@ -1,6 +1,6 @@
 ﻿using Domain.Interfaces;
 
-namespace Domain.AresApiModels
+namespace Application.AresApiModels
 {
 	public class AresApiErrorResponse : IAresApiResponse
 	{

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Domain.Models;
+using Application.DTOs;
 
 namespace Frontend.Models.FormModels
 {
@@ -53,7 +53,7 @@ namespace Frontend.Models.FormModels
 		[Required(ErrorMessage = "Country is required")]
 		public string Country { get; set; } = string.Empty;
 
-		public static EntityFormModel FromEntity(Entity entity)
+		public static EntityFormModel FromEntity(EntityDto entity)
 		{
 			return new EntityFormModel
 			{

@@ -2,13 +2,11 @@
 
 namespace Domain.Models
 {
-    public class Invoice
-    {
+	public class Invoice
+	{
 		public int Id { get; set; }
 		public int SellerId { get; set; }
-		public Entity? Seller { get; set; }
 		public int BuyerId { get; set; }
-		public Entity? Buyer { get; set; }
 		public string InvoiceNumber { get; set; } = string.Empty;
 		public DateTime IssueDate { get; set; } = DateTime.Now;
 		public DateTime DueDate { get; set; }
@@ -17,6 +15,12 @@ namespace Domain.Models
 		public PaymentMethod PaymentMethod { get; set; }
 		public DeliveryMethod DeliveryMethod { get; set; }
 		public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
-		public ICollection<InvoiceItem> Items { get; set; } = new List<InvoiceItem>();
+		public ICollection<InvoiceItem> Items { get; set; } = [];
+		public int InvoiceNumberSchemeId { get; set; }
+
+		// Navigation properties
+		public Entity? Seller { get; set; }
+		public Entity? Buyer { get; set; }
+		public virtual InvoiceNumberScheme? InvoiceNumberScheme { get; set; }
 	}
 }

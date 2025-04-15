@@ -1,5 +1,5 @@
 ﻿using Domain.Enums;
-using Domain.Extensions;
+using Application.Extensions;
 using Domain.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
