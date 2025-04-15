@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Domain.Interfaces;
-using Domain.ServiceInterfaces;
+using Application.ServiceInterfaces;
 
 namespace Backend.Controllers
 {

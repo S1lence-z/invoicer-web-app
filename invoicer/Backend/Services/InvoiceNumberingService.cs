@@ -1,92 +1,69 @@
-﻿using Backend.Database;
+﻿using Application.ServiceInterfaces;
+using Backend.Database;
 using Backend.Utils;
 using Domain.Models;
-using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
+using Application.DTOs;
+using Application.Mappers;
 
 namespace Backend.Services
 {
 	public class InvoiceNumberingService(ApplicationDbContext context) : IInvoiceNumberingService
 	{
-		public async Task<InvoiceNumberScheme?> GetByIdAsync(int id)
+		public async Task<InvoiceNumberSchemeDto?> GetByIdAsync(int id)
 		{
-			try
-			{
-				return await context.InvoiceNumberScheme
-					.AsNoTracking()
-					.FirstOrDefaultAsync(ins => ins.Id == id);
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+			InvoiceNumberScheme? foundScheme = await context.InvoiceNumberScheme
+				.AsNoTracking()
+				.FirstOrDefaultAsync(ins => ins.Id == id);
+			if (foundScheme is null)
+				throw new KeyNotFoundException($"Invoice Numbering Scheme with id {id} not found");
+			return InvoiceNumberSchemeMapper.MapToDto(foundScheme);
 		}
 
-		public async Task<IList<InvoiceNumberScheme>> GetAllAsync()
+		public async Task<IList<InvoiceNumberSchemeDto>> GetAllAsync()
 		{
-			try
-			{
-				return await context.InvoiceNumberScheme
-					.AsNoTracking()
-					.ToListAsync();
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+			List<InvoiceNumberScheme> allSchemes = await context.InvoiceNumberScheme
+				.AsNoTracking()
+				.ToListAsync();
+			return allSchemes.Select(InvoiceNumberSchemeMapper.MapToDto).ToList();
 		}
 
-		public async Task<InvoiceNumberScheme?> CreateAsync(InvoiceNumberScheme newInvoiceNumberScheme)
-		{
-			if (newInvoiceNumberScheme is null)
-				throw new ArgumentNullException(nameof(newInvoiceNumberScheme));
-
-			try
-			{
-				await context.InvoiceNumberScheme.AddAsync(newInvoiceNumberScheme);
-				await context.SaveChangesAsync();
-				return newInvoiceNumberScheme;
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+		public async Task<InvoiceNumberSchemeDto?> CreateAsync(InvoiceNumberSchemeDto newInvoiceNumberScheme)
+		{			
+			InvoiceNumberScheme scheme = InvoiceNumberSchemeMapper.MapToDomain(newInvoiceNumberScheme);
+			await context.InvoiceNumberScheme.AddAsync(scheme);
+			await context.SaveChangesAsync();
+			return InvoiceNumberSchemeMapper.MapToDto(scheme);
 		}
 
-		public async Task<InvoiceNumberScheme?> UpdateAsync(int id, InvoiceNumberScheme udpateScheme)
+		public async Task<InvoiceNumberSchemeDto?> UpdateAsync(int id, InvoiceNumberSchemeDto udpateScheme)
 		{
-			if (udpateScheme is null)
-				throw new ArgumentNullException(nameof(udpateScheme));
-
-			if (id != udpateScheme.Id)
-				throw new ArgumentException("Id mismatch", nameof(id));
-
 			InvoiceNumberScheme? existingScheme = await context.InvoiceNumberScheme
 				.FirstOrDefaultAsync(ins => ins.Id == id);
 
 			if (existingScheme is null)
-				throw new KeyNotFoundException($"InvoiceNumberScheme with id {id} not found");
+				throw new KeyNotFoundException($"Invoice Numbering Scheme with id {id} not found");
 
-			try
-			{
-				// Manually update the properties
-				existingScheme.Prefix = udpateScheme.Prefix;
-				existingScheme.UseSeperator = udpateScheme.UseSeperator;
-				existingScheme.Seperator = udpateScheme.Seperator;
-				existingScheme.SequencePosition = udpateScheme.SequencePosition;
-				existingScheme.SequencePadding = udpateScheme.SequencePadding;
-				existingScheme.InvoiceNumberYearFormat = udpateScheme.InvoiceNumberYearFormat;
-				existingScheme.IncludeMonth = udpateScheme.IncludeMonth;
-				existingScheme.ResetFrequency = udpateScheme.ResetFrequency;
+			existingScheme.Prefix = udpateScheme.Prefix;
+			existingScheme.UseSeperator = udpateScheme.UseSeperator;
+			existingScheme.Seperator = udpateScheme.Seperator;
+			existingScheme.SequencePosition = udpateScheme.SequencePosition;
+			existingScheme.SequencePadding = udpateScheme.SequencePadding;
+			existingScheme.InvoiceNumberYearFormat = udpateScheme.InvoiceNumberYearFormat;
+			existingScheme.IncludeMonth = udpateScheme.IncludeMonth;
+			existingScheme.ResetFrequency = udpateScheme.ResetFrequency;
+			existingScheme.IsDefault = udpateScheme.IsDefault;
 
-				// Save changes
-				await context.SaveChangesAsync();
-				return existingScheme;
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+			await context.SaveChangesAsync();
+
+			InvoiceNumberScheme? updatedScheme = await context.InvoiceNumberScheme
+				.AsNoTracking()
+				.FirstOrDefaultAsync(ins => ins.Id == id);
+
+			if (updatedScheme is null)
+				throw new KeyNotFoundException($"Invoice Numbering Scheme with id {id} not found after update");
+
+			return InvoiceNumberSchemeMapper.MapToDto(updatedScheme);
 		}
 
 		public async Task<bool> DeleteAsync(int id)
@@ -95,17 +72,9 @@ namespace Backend.Services
 				.FirstOrDefaultAsync(ins => ins.Id == id);
 			if (scheme is null)
 				return false;
-
-			try
-			{
-				context.InvoiceNumberScheme.Remove(scheme);
-				await context.SaveChangesAsync();
-				return true;
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+			context.InvoiceNumberScheme.Remove(scheme);
+			await context.SaveChangesAsync();
+			return true;
 		}
 
 		public async Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate)
@@ -152,23 +121,16 @@ namespace Backend.Services
 			return newInvoiceNumber;
 		}
 
-		public async Task<InvoiceNumberScheme> GetDefaultNumberScheme()
+		public async Task<InvoiceNumberSchemeDto> GetDefaultNumberScheme()
 		{
-			try
-			{
-				InvoiceNumberScheme? defaultScheme = await context.InvoiceNumberScheme
-					.AsNoTracking()
-					.FirstOrDefaultAsync(ins => ins.IsDefault);
+			InvoiceNumberScheme? defaultScheme = await context.InvoiceNumberScheme
+				.AsNoTracking()
+				.FirstOrDefaultAsync(ins => ins.IsDefault);
 
-				if (defaultScheme is null)
-					throw new KeyNotFoundException("Default Invoice Numbering Scheme not found");
+			if (defaultScheme is null)
+				throw new KeyNotFoundException("Default Invoice Numbering Scheme not found");
 
-				return defaultScheme;
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+			return InvoiceNumberSchemeMapper.MapToDto(defaultScheme);
 		}
 	}
 }

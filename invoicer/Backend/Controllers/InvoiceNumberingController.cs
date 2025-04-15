@@ -1,6 +1,6 @@
-﻿using Domain.ServiceInterfaces;
-using Domain.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Application.ServiceInterfaces;
+using Application.DTOs;
 
 namespace Backend.Controllers
 {
@@ -13,12 +13,21 @@ namespace Backend.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> GetById(int id)
 		{
-			InvoiceNumberScheme? scheme = await numberingService.GetByIdAsync(id);
-			if (scheme is null)
+			try
 			{
-				return NotFound($"Invoice Numbering Scheme with id {id} not found");
+				InvoiceNumberSchemeDto? scheme = await numberingService.GetByIdAsync(id);
+				if (scheme is null)
+					return NotFound($"Invoice Numbering Scheme with id {id} not found");
+				return Ok(scheme);
 			}
-			return Ok(scheme);
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(e.Message);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, $"Internal server error: {e.Message}");
+			}
 		}
 
 		[HttpGet(Name = "PostInvoiceNumberingScheme")]
@@ -26,8 +35,58 @@ namespace Backend.Controllers
 		[ProducesResponseType(400)]
 		public async Task<IActionResult> GetAll()
 		{
-			IList<InvoiceNumberScheme> schemes = await numberingService.GetAllAsync();
-			return Ok(schemes);
+			try
+			{
+				IList<InvoiceNumberSchemeDto> schemes = await numberingService.GetAllAsync();
+				return Ok(schemes);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, $"Internal server error: {e.Message}");
+			}
+		}
+
+		[HttpPost(Name = "PostInvoiceNumberingScheme")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
+		public async Task<IActionResult> Post([FromBody] InvoiceNumberSchemeDto scheme)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			try
+			{
+				InvoiceNumberSchemeDto? createdScheme = await numberingService.CreateAsync(scheme);
+				return CreatedAtRoute("GetInvoiceNumberingSchemeById", new { id = createdScheme!.Id }, createdScheme);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
+		}
+
+		[HttpPut("{id:int}", Name = "UpdateInvoiceNumberingScheme")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
+		[ProducesResponseType(400)]
+		public async Task<IActionResult> Put(int id, [FromBody] InvoiceNumberSchemeDto scheme)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			try
+			{
+				InvoiceNumberSchemeDto? existingScheme = await numberingService.UpdateAsync(id, scheme);
+				return Ok(existingScheme);
+			}
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(e.Message);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, $"Internal server error: {e.Message}");
+			}
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteInvoiceNumberingScheme")]
@@ -35,53 +94,17 @@ namespace Backend.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete(int id)
 		{
-			InvoiceNumberScheme? scheme = await numberingService.GetByIdAsync(id);
-			if (scheme is null)
-			{
-				return NotFound($"Invoice Numbering Scheme with id {id} not found");
-			}
-			bool wasDeleted = await numberingService.DeleteAsync(id);
-			if (!wasDeleted)
-				return BadRequest($"Invoice Numbering Scheme with id {id} could not be deleted");
-			return Ok($"Invoice Numbering Scheme with id {id} deleted");
-		}
-
-		[HttpPost(Name = "PostInvoiceNumberingScheme")]
-		[ProducesResponseType(201)]
-		[ProducesResponseType(400)]
-		public async Task<IActionResult> Post([FromBody] InvoiceNumberScheme scheme)
-		{
-			InvoiceNumberScheme? createdScheme;
 			try
 			{
-				createdScheme = await numberingService.CreateAsync(scheme);
+				bool wasDeleted = await numberingService.DeleteAsync(id);
+				if (!wasDeleted)
+					return NotFound($"Invoice Numbering Scheme with id {id} not found");
+				return Ok($"Invoice Numbering Scheme with id {id} deleted");
 			}
-			catch (ArgumentException e)
+			catch (Exception e)
 			{
-				return BadRequest(e.Message);
+				return StatusCode(500, $"Internal server error: {e.Message}");
 			}
-			return CreatedAtRoute("GetInvoiceNumberingSchemeById", new { id = createdScheme!.Id }, createdScheme);
-		}
-
-		[HttpPut("{id:int}", Name = "UpdateInvoiceNumberingScheme")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
-		[ProducesResponseType(400)]
-		public async Task<IActionResult> Put(int id, [FromBody] InvoiceNumberScheme scheme)
-		{
-			InvoiceNumberScheme? existingScheme = await numberingService.GetByIdAsync(id);
-			if (existingScheme is null)
-				return NotFound($"Invoice Numbering Scheme with id {id} not found");
-
-			try
-			{
-				existingScheme = await numberingService.UpdateAsync(id, existingScheme);
-			}
-			catch (ArgumentException e)
-			{
-				return BadRequest(e.Message);
-			}
-			return Ok(existingScheme);
 		}
 	}
 }

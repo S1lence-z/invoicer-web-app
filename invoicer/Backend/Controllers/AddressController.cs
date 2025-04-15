@@ -1,5 +1,6 @@
 ﻿using Domain.Models;
-using Domain.ServiceInterfaces;
+using Application.ServiceInterfaces;
+using Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -13,51 +14,77 @@ namespace Backend.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> GetById(int id)
 		{
-			Address? address = await addressService.GetByIdAsync(id);
-			if (address is null)
+			try
 			{
-				return NotFound($"Address with id {id} not found");
+				AddressDto? address = await addressService.GetByIdAsync(id);
+				return Ok(address);
 			}
-			return Ok(address);
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(e.Message);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpGet(Name = "GetAllAddresses")]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAll()
 		{
-			IList<Address> addressList = await addressService.GetAllAsync();
-			return Ok(addressList);
+			try
+			{
+				IList<AddressDto> addressList = await addressService.GetAllAsync();
+				return Ok(addressList);
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpPost(Name = "PostAddress")]
 		[ProducesResponseType(201)]
 		[ProducesResponseType(400)]
-		public async Task<IActionResult> Post([FromBody] Address address)
+		public async Task<IActionResult> Post([FromBody] AddressDto address)
 		{
-			if (address is null) {
-				return BadRequest("Address is null");
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			try
+			{
+				AddressDto? newAddres = await addressService.CreateAsync(address);
+				return CreatedAtRoute("GetAddressById", new { id = newAddres!.Id }, newAddres);
 			}
-			Address? newAddres = await addressService.CreateAsync(address);
-			return CreatedAtRoute("GetAddressById", new { id = newAddres!.Id }, newAddres);
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpPut("{id:int}", Name = "PutAddress")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		public async Task<IActionResult> Put(int id, [FromBody] Address address)
+		public async Task<IActionResult> Put(int id, [FromBody] AddressDto address)
 		{
-			if (address is null)
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			try
 			{
-				return BadRequest("New address is null");
+				AddressDto? existingAddress = await addressService.UpdateAsync(id, address);
+				return Ok(existingAddress);
 			}
-			Address? existingAddress = await addressService.GetByIdAsync(id);
-			if (existingAddress is null)
+			catch (KeyNotFoundException e)
 			{
-				return NotFound($"Address with id {id} not found");
+				return NotFound(e.Message);
 			}
-			await addressService.UpdateAsync(id, address);
-			return Ok(existingAddress);
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteAddress")]
@@ -65,12 +92,19 @@ namespace Backend.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete(int id)
 		{
-			bool wasDeleted = await addressService.DeleteAsync(id);
-			if (!wasDeleted)
+			try
 			{
-				return NotFound($"Address with id {id} not found");
+				bool wasDeleted = await addressService.DeleteAsync(id);
+				if (!wasDeleted)
+				{
+					return NotFound($"Address with id {id} not found");
+				}
+				return Ok($"Address with id {id} was deleted");
 			}
-			return Ok($"Address with id {id} was deleted");
+			catch (Exception e)
+			{
+				return StatusCode(500, e.Message);
+			}
 		}
 	}
 }

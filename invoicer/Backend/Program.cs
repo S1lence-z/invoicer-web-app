@@ -1,9 +1,7 @@
+using Application.ServiceInterfaces;
 using Backend.Database;
 using Backend.Services;
 using Backend.Services.AresApiService;
-using Backend.Utils;
-using Domain.Interfaces;
-using Domain.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend
