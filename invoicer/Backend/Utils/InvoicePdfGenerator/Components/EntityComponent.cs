@@ -2,7 +2,7 @@
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace Backend.Utils.InvoicePdfGenerator.Models
+namespace Backend.Utils.InvoicePdfGenerator.Components
 {
 	public class EntityComponent(Entity entityModel) : IComponent
 	{

@@ -3,6 +3,7 @@ using Application.ServiceInterfaces;
 using Application.DTOs;
 using Domain.Interfaces;
 using Frontend.Models;
+using Application.InvoicePdfGenerator;
 
 namespace Frontend.Api
 {

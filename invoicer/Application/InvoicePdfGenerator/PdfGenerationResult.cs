@@ -1,6 +1,6 @@
 ﻿using Domain.Interfaces;
 
-namespace Backend.Utils.InvoicePdfGenerator
+namespace Application.InvoicePdfGenerator
 {
     public class PdfGenerationResult : IPdfGenerationResult
 	{

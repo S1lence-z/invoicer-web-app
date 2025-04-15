@@ -1,6 +1,6 @@
 ﻿namespace Application.DTOs
 {
-	public class InvoiceItemDto
+	public record class InvoiceItemDto
 	{
 		public int Id { get; set; }
 		public int InvoiceId { get; set; }

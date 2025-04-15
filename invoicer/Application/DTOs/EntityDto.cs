@@ -1,6 +1,6 @@
 ﻿namespace Application.DTOs
 {
-	public class EntityDto
+	public record class EntityDto
 	{
 		public int Id { get; set; }
 		public string Ico { get; set; } = string.Empty;

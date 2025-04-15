@@ -1,6 +1,6 @@
 ﻿namespace Application.DTOs
 {
-	public class EntityInvoiceNumberSchemeStateDto
+	public record class EntityInvoiceNumberSchemeStateDto
 	{
 		public int EntityId { get; set; }
 		public int InvoiceNumberSchemeId { get; set; }
