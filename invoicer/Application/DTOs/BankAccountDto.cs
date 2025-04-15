@@ -1,6 +1,6 @@
 ﻿namespace Application.DTOs
 {
-	public class BankAccountDto
+	public record class BankAccountDto
 	{
 		public int Id { get; set; }
 		public string AccountNumber { get; set; } = string.Empty;
