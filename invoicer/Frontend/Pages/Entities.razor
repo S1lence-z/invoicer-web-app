@@ -1,6 +1,6 @@
 ﻿@page "/entities";
-@using Domain.Models
-@using Domain.ServiceInterfaces
+@using Application.ServiceInterfaces;
+@using Application.DTOs;
 @using Frontend.Components;
 @inject IEntityService entityService;
 
@@ -58,9 +58,9 @@
 
 
 @code {
-    private IList<Entity> allEntities = new List<Entity>();
-    private Entity? selectedEntity = null;
-    private Entity? entityToEdit = null;
+    private IList<EntityDto> allEntities = new List<EntityDto>();
+    private EntityDto? selectedEntity = null;
+    private EntityDto? entityToEdit = null;
     private bool isAddingNewEntity = false;
     private bool isEditingEntity = false;
 
@@ -68,7 +68,8 @@
         await LoadEntities();
     }
 
-    private bool IsEntitySelected(Entity entity) {
+    private bool IsEntitySelected(EntityDto entity)
+    {
         return selectedEntity != null && selectedEntity.Id == entity.Id;
     }
 
@@ -83,7 +84,7 @@
         }
     }
 
-    private void SelectEntity(Entity newSelectedEntity)
+    private void SelectEntity(EntityDto newSelectedEntity)
     {
         if (newSelectedEntity == selectedEntity)
         {
@@ -93,7 +94,7 @@
         selectedEntity = newSelectedEntity;
     }
 
-    private async void DeleteEntity(Entity entityToDelete)
+    private async void DeleteEntity(EntityDto entityToDelete)
     {
         var status = await entityService.DeleteAsync(entityToDelete.Id);
         if (status) {
@@ -103,7 +104,7 @@
         }
     }
 
-    private async Task EditEntity(Entity entityToEdit)
+    private async Task EditEntity(EntityDto entityToEdit)
     {
         this.entityToEdit = entityToEdit;
         await ShowEditEntityModal();

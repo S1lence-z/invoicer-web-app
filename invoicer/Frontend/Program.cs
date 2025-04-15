@@ -4,7 +4,7 @@ using Frontend.Utils;
 using Frontend.Api;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Domain.ServiceInterfaces;
+using Application.ServiceInterfaces;
 
 namespace Frontend
 {

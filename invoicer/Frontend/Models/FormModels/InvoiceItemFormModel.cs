@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Domain.Models;
+using Application.DTOs;
 
 namespace Frontend.Models.FormModels
 {
@@ -27,7 +27,7 @@ namespace Frontend.Models.FormModels
 		[Range(0.0, 1.0, ErrorMessage = "VAT rate must be between 0 and 1")]
 		public decimal VatRate { get; set; } = 0.21m;
 
-		public static InvoiceItemFormModel FromInvoiceItem(InvoiceItem item)
+		public static InvoiceItemFormModel FromInvoiceItem(InvoiceItemDto item)
 		{
 			return new InvoiceItemFormModel
 			{
@@ -41,9 +41,9 @@ namespace Frontend.Models.FormModels
 			};
 		}
 
-		public static InvoiceItem ToInvoiceItem(InvoiceItemFormModel invFormModel)
+		public static InvoiceItemDto ToInvoiceItem(InvoiceItemFormModel invFormModel)
 		{
-			return new InvoiceItem
+			return new InvoiceItemDto
 			{
 				Id = invFormModel.Id,
 				InvoiceId = invFormModel.InvoiceId,

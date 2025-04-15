@@ -1,7 +1,7 @@
-﻿@using Domain.Models
-@using Domain.Enums
-@using Application.Extensions
-@using Frontend.Utils
+﻿@using Domain.Enums;
+@using Application.Extensions;
+@using Application.DTOs;
+@using Frontend.Utils;
 
 <div class="container my-4">
     <div class="card border-0 shadow-sm">
@@ -97,5 +97,5 @@
 @code
 {
     [Parameter]
-    public Invoice Invoice { get; set; } = null!;
+    public InvoiceDto Invoice { get; set; } = null!;
 }

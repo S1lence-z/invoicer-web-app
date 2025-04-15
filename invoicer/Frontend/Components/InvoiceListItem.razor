@@ -1,5 +1,5 @@
-﻿@using Domain.Enums
-@using Domain.Models;
+﻿@using Domain.Enums;
+@using Application.DTOs;
 
 <div class="card border-1 shadow-sm">
     <div class="card-body row align-items-center" style="cursor: pointer;">
@@ -33,21 +33,21 @@
 
 @code {
     [Parameter, EditorRequired]
-    public Invoice Invoice { get; set; } = null!;
+    public InvoiceDto Invoice { get; set; } = null!;
 
     [Parameter]
-    public EventCallback<Invoice> OnDeleteInvoice { get; set; }
+    public EventCallback<InvoiceDto> OnDeleteInvoice { get; set; }
 
     [Parameter]
-    public EventCallback<Invoice> OnEditInvoice { get; set; }
+    public EventCallback<InvoiceDto> OnEditInvoice { get; set; }
 
     [Parameter]
-    public EventCallback<Invoice> OnExportInvoice { get; set; }
+    public EventCallback<InvoiceDto> OnExportInvoice { get; set; }
 
     [Parameter]
-    public EventCallback<Invoice> OnPreviewInvoice { get; set; }
+    public EventCallback<InvoiceDto> OnPreviewInvoice { get; set; }
 
-    private decimal CalculateInvoiceSum(Invoice invoice) 
+    private decimal CalculateInvoiceSum(InvoiceDto invoice)
     {
         decimal total = 0;
         foreach (var item in invoice.Items) 

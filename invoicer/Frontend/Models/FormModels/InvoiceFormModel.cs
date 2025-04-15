@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Domain.Enums;
-using Domain.Models;
 using Frontend.Validators;
+using Application.DTOs;
 
 namespace Frontend.Models.FormModels
 {
@@ -53,7 +53,7 @@ namespace Frontend.Models.FormModels
 		[MinItemsRequired(1, typeof(InvoiceItemFormModel), ErrorMessage = "At least one item is required")]
 		public IList<InvoiceItemFormModel> Items { get; set; } = [];
 
-		public static InvoiceFormModel FromInvoice(Invoice invoice)
+		public static InvoiceFormModel FromInvoice(InvoiceDto invoice)
 		{
 			return new InvoiceFormModel
 			{
