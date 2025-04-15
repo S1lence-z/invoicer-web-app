@@ -4,7 +4,7 @@ using Domain.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace Backend.Utils.InvoicePdfGenerator.Models
+namespace Backend.Utils.InvoicePdfGenerator.Components
 {
 	public class InvoiceItemsComponent(ICollection<InvoiceItem> items, Currency invoiceCurrency) : IComponent
 	{

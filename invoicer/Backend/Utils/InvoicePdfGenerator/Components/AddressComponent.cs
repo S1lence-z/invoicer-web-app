@@ -2,7 +2,7 @@
 using QuestPDF.Infrastructure;
 using QuestPDF.Fluent;
 
-namespace Backend.Utils.InvoicePdfGenerator.Models
+namespace Backend.Utils.InvoicePdfGenerator.Components
 {
 	public class AddressComponent(Address addressModel) : IComponent
 	{
