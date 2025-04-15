@@ -5,7 +5,7 @@
 @inject IEntityService entityService;
 
 @* PAGE CONTAINER *@
-<div class="d-flex flex-column border rounded-3">
+<div class="d-flex flex-column border rounded-3" style="height:90vh;">
     @* HEADER *@
     <div class="d-flex flex-row justify-content-between align-content-center px-4 pt-4">
         <h3>Economic Entites</h3>
@@ -15,19 +15,19 @@
     </div>
     <hr/>
     @* CONTENT *@
-    <div class="d-flex flex-row px-4 pb-4">
+    <div class="d-flex flex-row px-4 pb-4" style="height: calc(100% - 120px);">
         @if (allEntities is null) 
         {
             <p>Loading...</p>
         } 
         else if (allEntities.Count == 0) 
         {
-            <p>Not entities found</p>
+            <p>No entities found</p>
         } 
         else 
         {
-            @* ENTITIES LIST *@
-            <div class="d-flex flex-column overflow-auto gap-2" style="max-height: 800px;">
+            @* ENTITIES LIST*@
+            <div class="d-flex flex-column gap-2" style="overflow-y:auto;">
                 @foreach (var entity in allEntities)
                 {
                     <EntityListItem Entity="entity" OnSelectEntity="SelectEntity" OnDeleteEntity="DeleteEntity" OnEditEntity="EditEntity" IsSelected="IsEntitySelected(entity)" />
@@ -38,7 +38,7 @@
         <div class="d-flex flex-column border border-black rounded ms-2 flex-grow-1">
             @if (selectedEntity is null) 
             {
-                <p class="px-4 pt-4 text-black"> Select an entity... </p>
+                <p class="px-4 pt-4 text-black">Select an entity...</p>
             } 
             else 
             {
@@ -47,15 +47,15 @@
         </div>
     </div>
 </div>
+
 @* ADD NEW ENTITY MODAL *@
 <Modal Title="Add New Entity" IsVisible="isAddingNewEntity" OnClose="ShowNewEntityModal">
-    <EntityForm SubmitCallback="ShowNewEntityModal" isActive="isAddingNewEntity"/>
+    <EntityForm SubmitCallback="ShowNewEntityModal" isActive="isAddingNewEntity" />
 </Modal>
 @* EDIT ENTITY MODAL *@
 <Modal Title="Edit Entity" IsVisible="isEditingEntity" OnClose="ShowEditEntityModal">
     <EntityForm SubmitCallback="ShowEditEntityModal" EntityInstance="entityToEdit" isActive="isEditingEntity" />
 </Modal>
-
 
 @code {
     private IList<EntityDto> allEntities = new List<EntityDto>();

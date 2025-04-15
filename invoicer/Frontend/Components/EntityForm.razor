@@ -4,18 +4,20 @@
 @using Domain.Interfaces;
 @using Frontend.Models;
 @using Frontend.Models.FormModels;
+@using Frontend.Utils;
 @inject IAresApiService aresApiService;
 @inject IAddressService addressService;
 @inject IEntityService entityService;
 @inject IBankAccountService bankAccountService;
+@inject LoadingService LoadingService;
 
 <div>
     @* ARES API WINDOW *@
     <AresApiLookup UserInputIco="@userInputIco"
-        UserInputIcoChanged="@((string ico) => userInputIco = ico)"
-        AresApiService="aresApiService"
-        AresApiErrorMessage="@aresApiErrorMessage"
-        OnFillInAresData="FillInAresData" />
+    UserInputIcoChanged="@((string ico) => userInputIco = ico)"
+    AresApiService="aresApiService"
+    AresApiErrorMessage="@aresApiErrorMessage"
+    OnFillInAresData="FillInAresData" />
     @* ENTITY FORM *@
     <EditForm Model="@entityFormModel" OnValidSubmit="SubmitForm">
         <DataAnnotationsValidator />
@@ -95,7 +97,7 @@
                 <ValidationMessage For="@(() => entityFormModel.IBAN)" />
             </div>
         </div>
-        <button type="submit" class="btn btn-primary float-end mt-4">Submit</button>
+        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@LoadingService.IsLoading">Submit</button>
     </EditForm>
 </div>
 
@@ -123,6 +125,8 @@
 
     private async Task FillInAresData()
     {
+        LoadingService.IsLoading = true;
+        aresApiErrorMessage = string.Empty;
         try 
         {
             if (string.IsNullOrEmpty(userInputIco))
@@ -147,9 +151,9 @@
         {
             aresApiErrorMessage = e.Message;
         } 
-        finally 
+        finally
         {
-            StateHasChanged();
+            LoadingService.IsLoading = false;
         }
     }
 
@@ -169,9 +173,12 @@
     private void ClearForm()
     {
         entityFormModel = new EntityFormModel();
+        userInputIco = string.Empty;
     }
 
-    private async Task SubmitForm() {
+    private async Task SubmitForm() 
+    {
+        LoadingService.IsLoading = true;
         try 
         {
             if (EntityInstance is null)
@@ -187,57 +194,64 @@
         }
         finally
         {
+            LoadingService.IsLoading = false;
             await SubmitCallback.InvokeAsync();
             ClearForm();
-            StateHasChanged();
         }
     }
 
     private async Task SubmitNewEntity() {
-        var newAddress = new AddressDto
-            {
-                Street = entityFormModel.Street,
-                ZipCode = entityFormModel.ZipCode,
-                City = entityFormModel.City,
-                Country = entityFormModel.Country
-            };
+        try
+        {
+            var newAddress = new AddressDto
+                    {
+                        Street = entityFormModel.Street,
+                        ZipCode = entityFormModel.ZipCode,
+                        City = entityFormModel.City,
+                        Country = entityFormModel.Country
+                    };
 
-        // Create the address
-        AddressDto? newAddressResponse = await addressService.CreateAsync(newAddress);
-        if (newAddressResponse is null)
-        {
-            aresApiErrorMessage = "Address creation failed";
-            return;
-        }
-        // Create the bank account
-        var newBankAccount = new BankAccountDto
+            // Create the address
+            AddressDto? newAddressResponse = await addressService.CreateAsync(newAddress);
+            if (newAddressResponse is null)
             {
-                AccountNumber = entityFormModel.AccountNumber,
-                BankCode = entityFormModel.BankCode,
-                BankName = entityFormModel.BankName,
-                IBAN = entityFormModel.IBAN
-            };
-        BankAccountDto? newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
-        if (newBankAccountResponse is null)
-        {
-            aresApiErrorMessage = "Bank account creation failed";
-            return;
-        }
-        // Create the entity
-        var newEntity = new EntityDto
+                aresApiErrorMessage = "Address creation failed";
+                return;
+            }
+            // Create the bank account
+            var newBankAccount = new BankAccountDto
+                {
+                    AccountNumber = entityFormModel.AccountNumber,
+                    BankCode = entityFormModel.BankCode,
+                    BankName = entityFormModel.BankName,
+                    IBAN = entityFormModel.IBAN
+                };
+            BankAccountDto? newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
+            if (newBankAccountResponse is null)
             {
-                Ico = entityFormModel.Ico,
-                Name = entityFormModel.Name,
-                Email = entityFormModel.Email,
-                PhoneNumber = entityFormModel.PhoneNumber,
-                AddressId = newAddressResponse.Id,
-                BankAccountId = newBankAccountResponse.Id
-            };
-        EntityDto? newEntityResponse = await entityService.CreateAsync(newEntity);
-        if (newEntityResponse is null)
+                aresApiErrorMessage = "Bank account creation failed";
+                return;
+            }
+            // Create the entity
+            var newEntity = new EntityDto
+                {
+                    Ico = entityFormModel.Ico,
+                    Name = entityFormModel.Name,
+                    Email = entityFormModel.Email,
+                    PhoneNumber = entityFormModel.PhoneNumber,
+                    AddressId = newAddressResponse.Id,
+                    BankAccountId = newBankAccountResponse.Id
+                };
+            EntityDto? newEntityResponse = await entityService.CreateAsync(newEntity);
+            if (newEntityResponse is null)
+            {
+                aresApiErrorMessage = "Entity creation failed";
+                return;
+            }
+        } 
+        catch (Exception e)
         {
-            aresApiErrorMessage = "Entity creation failed";
-            return;
+            Console.WriteLine(e);
         }
     }
 
@@ -288,6 +302,7 @@
                 Name = entityFormModel.Name,
                 Email = entityFormModel.Email,
                 PhoneNumber = entityFormModel.PhoneNumber,
+                InvoiceNumberSchemeId = EntityInstance.InvoiceNumberSchemeId,
                 AddressId = editedAddressResponse.Id,
                 BankAccountId = editedBankAccountResponse.Id
             };
