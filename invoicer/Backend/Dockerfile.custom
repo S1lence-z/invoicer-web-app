@@ -7,6 +7,7 @@ WORKDIR /src
 # Copy the Backend and Domain projects to the container
 COPY ["Backend/Backend.csproj", "Backend/"]
 COPY ["Domain/Domain.csproj", "Domain/"]
+COPY ["Application/Application.csproj", "Application/"]
 
 # Restore dependencies for both projects
 RUN dotnet restore "Backend/Backend.csproj"
