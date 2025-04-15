@@ -27,7 +27,7 @@ namespace Backend.Utils.InvoicePdfGenerator.Components
 		{
 			container.Row(row =>
 			{
-				row.RelativeItem().Text($"Invoice").AlignCenter().FontSize(20).SemiBold().FontColor(Colors.Black);
+				row.RelativeItem().Text($"Invoice").AlignCenter().FontSize(20).Bold().FontColor(Colors.Black);
 			});
 		}
 
@@ -42,18 +42,53 @@ namespace Backend.Utils.InvoicePdfGenerator.Components
 					row.RelativeItem().Column(col =>
 					{
 						col.Spacing(5);
-						col.Item().Text($"Issue Date: {invoiceModel.IssueDate.FormatByCurrencyLocale(invoiceCurrency)}").SemiBold();
-						col.Item().Text($"Due Date: {invoiceModel.DueDate.FormatByCurrencyLocale(invoiceCurrency)}").SemiBold();
-						col.Item().Text($"VAT Date: {invoiceModel.VatDate.FormatByCurrencyLocale(invoiceCurrency)}").SemiBold();
+						col.Item().Text(text =>
+						{
+							text.Span("Issue Date: ");
+							text.Span(invoiceModel.IssueDate.FormatByCurrencyLocale(invoiceCurrency)).Bold();
+						});
+
+						col.Item().Text(text =>
+						{
+							text.Span("Due Date: ");
+							text.Span(invoiceModel.DueDate.FormatByCurrencyLocale(invoiceCurrency)).Bold();
+						});
+
+						col.Item().Text(text =>
+						{
+							text.Span("VAT Date: ");
+							text.Span(invoiceModel.VatDate.FormatByCurrencyLocale(invoiceCurrency)).Bold();
+						});
+
 					});
 
 					row.RelativeItem().AlignRight().Column(col =>
 					{
 						col.Spacing(5);
-						col.Item().Text($"Invoice Number: {invoiceModel.InvoiceNumber}").SemiBold();
-						col.Item().Text($"Variable Symbol: {invoiceModel.InvoiceNumber}").SemiBold();
-						col.Item().Text($"Payment Method: {invoiceModel.PaymentMethod}").SemiBold();
-						col.Item().Text($"Delivery Method: {invoiceModel.DeliveryMethod}").SemiBold();
+						col.Item().Text(text =>
+						{
+							text.Span("Invoice Number: ");
+							text.Span(invoiceModel.InvoiceNumber).Bold();
+						});
+
+						col.Item().Text(text =>
+						{
+							text.Span("Variable Symbol: ");
+							text.Span(invoiceModel.InvoiceNumber).Bold();
+						});
+
+						col.Item().Text(text =>
+						{
+							text.Span("Payment Method: ");
+							text.Span(invoiceModel.PaymentMethod.ToString().SeperateCamelCase()).Bold();
+						});
+
+						col.Item().Text(text =>
+						{
+							text.Span("Delivery Method: ");
+							text.Span(invoiceModel.DeliveryMethod.ToString().SeperateCamelCase()).Bold();
+						});
+
 					});
 				});
 				// Entities Data

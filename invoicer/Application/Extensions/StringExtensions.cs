@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Frontend.Utils
+namespace Application.Extensions
 {
-	public static class FrontendStringExtensions
+	public static class StringExtensions
 	{
 		public static string SeperateCamelCase(this string inputString)
 		{
