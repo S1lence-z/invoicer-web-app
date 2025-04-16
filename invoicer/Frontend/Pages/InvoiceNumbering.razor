@@ -1,9 +1,60 @@
 ﻿@page "/invoicenumbering"
+@using Application.DTOs
+@using Frontend.Api;
+@using Application.ServiceInterfaces;
+@using Frontend.Components;
+@inject IInvoiceNumberingService numberingService;
 
-<div>
-    <h3>Invoice Numbering</h3>
+@* PAGE CONTAINER *@
+<div class="d-flex flex-column border rounded-3">
+    @* HEADER *@
+    <div class="d-flex justify-content-between align-items-center px-4 pt-4">
+        <h3>Invoice Numbering</h3>
+        <button class="btn btn-primary">
+            Add Numbering Scheme
+        </button>
+    </div>
+    <hr />
+    @* CONTENT *@
+    <div class="d-flex flex-column pb-4">
+        @* NUMBERING SCHEMES LIST *@
+        <div class="d-flex flex-column overflow-auto px-4 gap-2">
+            @if (allNumberingSchemes is null)
+            {
+                <p>Loading...</p>
+            }
+            else if (allNumberingSchemes.Count == 0)
+            {
+                <p>No numbering schemes found</p>
+            }
+            else
+            {
+                foreach (var numberingScheme in allNumberingSchemes)
+                {
+                    <NumberingSchemeListItem NumberingScheme="numberingScheme" />
+                }
+            }
+        </div>
+    </div>
 </div>
 
 @code {
+    private IList<InvoiceNumberSchemeDto> allNumberingSchemes = new List<InvoiceNumberSchemeDto>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNumberingSchemes();
+    }
+
+    private async Task LoadNumberingSchemes()
+    {
+        try
+        {
+            allNumberingSchemes = (await numberingService.GetAllAsync()).ToList();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
 }

@@ -1,0 +1,50 @@
+﻿@using Domain.Enums;
+@using Application.DTOs;
+
+<div class="card border-1 shadow-sm">
+    <div class="card-body row align-items-center" style="cursor: pointer;">
+        <div class="col">
+            <span class="fw-bold">@ShowNumberingSchemePreview(NumberingScheme)</span>
+        </div>
+        <div class="col">
+            <span class="text-muted">Default: @(NumberingScheme.IsDefault ? "Yes" : "No")</span>
+        </div>
+    </div>
+    <div class="card-footer bg-white border-0 d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm w-25" @onclick="() => OnEditNumberingScheme.InvokeAsync(NumberingScheme)">Edit</button>
+        <button class="btn btn-outline-danger btn-sm w-25" @onclick="() => OnEditNumberingScheme.InvokeAsync(NumberingScheme)">Delete</button>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public InvoiceNumberSchemeDto NumberingScheme { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<InvoiceNumberSchemeDto> OnDeleteNumberingScheme { get; set; }
+
+    [Parameter]
+    public EventCallback<InvoiceNumberSchemeDto> OnEditNumberingScheme { get; set; }
+
+    private int GetLastNumber(int digitCount)
+    {
+        string biggestDigitString = new string('9', digitCount);
+        return int.Parse(biggestDigitString);
+    }
+
+    private string ShowNumberingSchemePreview(InvoiceNumberSchemeDto numberingScheme)
+    {
+        int previewNumbers = 2;
+        var previewNumbersList = new List<string>();
+        for (int i = 1; i <= previewNumbers; i++)
+        {
+            var previewNumber = InvoiceNumberSchemeDto.GetPreview(numberingScheme, i);
+            previewNumbersList.Add(previewNumber);
+        }
+        previewNumbersList.Add("...");
+        int lastSequenceNumber = GetLastNumber(numberingScheme.SequencePadding);
+        string lastNumber = InvoiceNumberSchemeDto.GetPreview(numberingScheme, lastSequenceNumber);
+        previewNumbersList.Add(lastNumber);
+        return string.Join(", ", previewNumbersList);
+    }
+}
