@@ -18,19 +18,15 @@ namespace Backend.Controllers
 			try
 			{
 				InvoiceNumberSchemeDto? scheme = await numberingService.GetByIdAsync(id);
-				if (scheme is null)
-					return NotFound(
-						ErrorApiResponse.Create($"Invoice Numbering Scheme not found", $"No scheme found with id {id}", 404)
-						);
 				return Ok(scheme);
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ErrorApiResponse.Create("Invoice numbering scheme not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, $"Internal server error: {e.Message}");
+				return StatusCode(500, ErrorApiResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
