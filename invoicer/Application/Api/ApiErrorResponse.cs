@@ -1,21 +1,21 @@
 ﻿namespace Application.Api
 {
-	public class ErrorApiResponse
+	public class ApiErrorResponse
 	{
 		public string Message { get; set; } = string.Empty;
 		public string Details { get; set; } = string.Empty;
 		public int StatusCode { get; set; }
 
-		private ErrorApiResponse(string message, string details, int statusCode)
+		private ApiErrorResponse(string message, string details, int statusCode)
 		{
 			Message = message;
 			Details = details;
 			StatusCode = statusCode;
 		}
 
-		public static ErrorApiResponse Create(string message, string details, int statusCode)
+		public static ApiErrorResponse Create(string message, string details, int statusCode)
 		{
-			return new ErrorApiResponse(message, details, statusCode);
+			return new ApiErrorResponse(message, details, statusCode);
 		}
 	}
 }

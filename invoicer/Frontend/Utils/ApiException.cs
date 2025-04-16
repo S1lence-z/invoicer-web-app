@@ -1,0 +1,9 @@
+﻿using Application.Api;
+
+namespace Frontend.Utils
+{
+	public class ApiException(ApiErrorResponse errorResponse) : Exception(errorResponse.Message)
+	{
+		public ApiErrorResponse Error { get; } = errorResponse;
+	}
+}
