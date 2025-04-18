@@ -3,6 +3,7 @@
 @using Frontend.Utils;
 @using Application.ServiceInterfaces;
 @using Domain.Enums;
+@using Application.Extensions;
 @inject LoadingService loadingService;
 @inject IInvoiceNumberingService numberingService;
 
@@ -73,7 +74,7 @@
                 <select id="year-format" class="form-select" @bind="SchemeFormModel.InvoiceNumberYearFormat">
                     @foreach (object value in Enum.GetValues(typeof(InvoiceNumberYearFormat)))
                     {
-                        <option value="@value">@value</option>
+                        <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                     }
                 </select>
                 <ValidationMessage For="@(() => SchemeFormModel.InvoiceNumberYearFormat)" />
