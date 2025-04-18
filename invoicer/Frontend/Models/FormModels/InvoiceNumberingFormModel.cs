@@ -31,5 +31,39 @@ namespace Frontend.Models.FormModels
 		public InvoiceNumberResetFrequency ResetFrequency { get; set; } = InvoiceNumberResetFrequency.Yearly;
 
 		public bool IsDefault { get; set; } = false;
+
+		public static InvoiceNumberingFormModel FromDto(InvoiceNumberSchemeDto dto)
+		{
+			return new InvoiceNumberingFormModel
+			{
+				Id = dto.Id,
+				Prefix = dto.Prefix,
+				UseSeperator = dto.UseSeperator,
+				Seperator = dto.Seperator,
+				SequencePosition = dto.SequencePosition,
+				SequencePadding = dto.SequencePadding,
+				InvoiceNumberYearFormat = dto.InvoiceNumberYearFormat,
+				IncludeMonth = dto.IncludeMonth,
+				ResetFrequency = dto.ResetFrequency,
+				IsDefault = dto.IsDefault
+			};
+		}
+
+		public InvoiceNumberSchemeDto ToDto()
+		{
+			return new InvoiceNumberSchemeDto
+			{
+				Id = Id,
+				Prefix = Prefix,
+				UseSeperator = UseSeperator,
+				Seperator = Seperator,
+				SequencePosition = SequencePosition,
+				SequencePadding = SequencePadding,
+				InvoiceNumberYearFormat = InvoiceNumberYearFormat,
+				IncludeMonth = IncludeMonth,
+				ResetFrequency = ResetFrequency,
+				IsDefault = IsDefault
+			};
+		}
 	}
 }
