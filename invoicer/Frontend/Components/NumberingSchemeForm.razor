@@ -72,7 +72,7 @@
             <div class="col">
                 <label for="year-format" class="font-weight-bold">Year Format</label>
                 <select id="year-format" class="form-select" @bind="SchemeFormModel.InvoiceNumberYearFormat">
-                    @foreach (object value in Enum.GetValues(typeof(InvoiceNumber
+                    @foreach (object value in Enum.GetValues(typeof(YearFormat)))
                     {
                         <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                     }
@@ -81,11 +81,11 @@
             </div>
 
             <div class="col">
-               <div class="form-check mt-4">
-                   <input id="include-month" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IncludeMonth" />
-                   <label class="form-check-label" for="include-month">Include Month</label>
-               </div>
-               <ValidationMessage For="@(() => SchemeFormModel.IncludeMonth)" />
+                <div class="form-check mt-4">
+                    <input id="include-month" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IncludeMonth" />
+                    <label class="form-check-label" for="include-month">Include Month</label>
+                </div>
+                <ValidationMessage For="@(() => SchemeFormModel.IncludeMonth)" />
             </div>
         </div>
 
@@ -95,7 +95,7 @@
 
 @code {
     [Parameter] public EventCallback SubmitCallback { get; set; }
-    [Parameter] public InvoiceNumberSchemeDto? NumberingSchemeInstanceNumbering} = null;
+    [Parameter] public NumberingSchemeDto? NumberingSchemeInstance { get; set; } = null!;
     [Parameter] public bool isActive { get; set; }
 
     // Form Model
@@ -143,8 +143,8 @@
     {
         try
         {
-            InvoiceNumberSchemeDto newScheme = SchemeFormMoNumbering
-            InvoiceNumberSchemeDto? createdScheme = await nNumberingce.CreateAsync(newScheme);
+            NumberingSchemeDto newScheme = SchemeFormModel.ToDto();
+            NumberingSchemeDto? createdScheme = await numberingService.CreateAsync(newScheme);
         }
         catch (Exception e)
         {
@@ -156,7 +156,7 @@
     {
         try
         {
-            InvoiceNumberSchemeDto updatedScheme = SchemeFoNumbering();
+            NumberingSchemeDto updatedScheme = SchemeFormModel.ToDto();
             updatedScheme.Id = NumberingSchemeInstance!.Id;
             await numberingService.UpdateAsync(updatedScheme.Id, updatedScheme);
         }
