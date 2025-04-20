@@ -11,17 +11,17 @@ INSERT INTO "BankAccount" ("Id","AccountNumber","BankCode","BankName","IBAN") VA
  (4,'1234000005','0770','Think Bank','');
 
 -- Entity
-INSERT INTO "Entity" ("Id","Ico","Name","Email","PhoneNumber","BankAccountId","AddressId","InvoiceNumberSchemeId") VALUES (1,'28915232','PERFECT SOUND GROUP s.r.o.','test@seznam.cz','777777778',1,1,1),
+INSERT INTO "Entity" ("Id","Ico","Name","Email","PhoneNumber","BankAccountId","AddressId","NumberingSchemeId") VALUES (1,'28915232','PERFECT SOUND GROUP s.r.o.','test@seznam.cz','777777778',1,1,1),
  (2,'09960676','Rohlik Group a.s.','rohlik@gmail.com','607493066',2,2,1),
  (3,'27082440','Alza.cz a.s.','alza@seznam.cz','604456123',3,3,1),
  (4,'26503808','WOOD & Company Financial Services, a.s.','wood@gmail.com','604896325',4,4,1);
 
 -- EntityInvoiceNumberSchemeStates
-INSERT INTO "EntityInvoiceNumberSchemeStates" ("EntityId","InvoiceNumberSchemeId","LastSequenceNumber","LastGenerationYear","LastGenerationMonth") VALUES (1,1,2,2025,4),
+INSERT INTO "EntityInvoiceNumberSchemeStates" ("EntityId","NumberingSchemeId","LastSequenceNumber","LastGenerationYear","LastGenerationMonth") VALUES (1,1,2,2025,4),
  (2,1,1,2025,4);
 
 -- Invoice
-INSERT INTO "Invoice" ("Id","SellerId","BuyerId","InvoiceNumber","IssueDate","DueDate","VatDate","Currency","PaymentMethod","DeliveryMethod","Status","InvoiceNumberSchemeId") VALUES (1,1,3,'INV001-2025-04','2025-04-15 12:14:00.831','2025-04-29 12:14:00.831','2025-04-15 12:14:00.831','CZK','BankTransfer','Courier','Paid',1),
+INSERT INTO "Invoice" ("Id","SellerId","BuyerId","InvoiceNumber","IssueDate","DueDate","VatDate","Currency","PaymentMethod","DeliveryMethod","Status","NumberingSchemeId") VALUES (1,1,3,'INV001-2025-04','2025-04-15 12:14:00.831','2025-04-29 12:14:00.831','2025-04-15 12:14:00.831','CZK','BankTransfer','Courier','Paid',1),
  (2,1,3,'INV002-2025-04','2025-04-15 12:18:21.55','2025-04-29 12:18:21.55','2025-04-15 12:18:21.55','CZK','BankTransfer','Courier','Pending',1),
  (3,2,1,'INV001-2025-04','2025-04-15 12:19:27.217','2025-04-29 12:19:27.217','2025-04-15 12:19:27.217','CZK','BankTransfer','Courier','Overdue',1);
 
