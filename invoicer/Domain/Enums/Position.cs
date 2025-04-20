@@ -3,7 +3,7 @@
 namespace Domain.Enums
 {
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	public enum InvoiceNumberSequencePosition
+	public enum Position
 	{
 		Start,
 		End

@@ -17,13 +17,13 @@ namespace Frontend.Api
 			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
 		}
 
-		public async Task<InvoiceNumberSchemeDto?> CreateAsync(InvoiceNumberSchemeDto obj)
+		public async Task<NumberingSchemeDto?> CreateAsync(NumberingSchemeDto obj)
 		{
 			try
 			{
 				var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadFromJsonAsync<InvoiceNumberSchemeDto>();
+					return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>();
 				else
 				{
 					var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -59,13 +59,13 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<IList<InvoiceNumberSchemeDto>> GetAllAsync()
+		public async Task<IList<NumberingSchemeDto>> GetAllAsync()
 		{
 			try
 			{
 				var response = await _httpClient.GetAsync(_urlPath);
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadFromJsonAsync<IList<InvoiceNumberSchemeDto>>() ?? [];
+					return await response.Content.ReadFromJsonAsync<IList<NumberingSchemeDto>>() ?? [];
 				else
 				{
 					var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -85,13 +85,13 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<InvoiceNumberSchemeDto?> GetByIdAsync(int id)
+		public async Task<NumberingSchemeDto?> GetByIdAsync(int id)
 		{
 			try
 			{
 				var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadFromJsonAsync<InvoiceNumberSchemeDto>();
+					return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>();
 				else
 				{
 					var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -111,13 +111,13 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<InvoiceNumberSchemeDto> GetDefaultNumberScheme()
+		public async Task<NumberingSchemeDto> GetDefaultNumberScheme()
 		{
 			try
 			{
 				var response = await _httpClient.GetAsync($"{_urlPath}/default");
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadFromJsonAsync<InvoiceNumberSchemeDto>() ?? throw new KeyNotFoundException("Default Invoice Numbering Scheme not found");
+					return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>() ?? throw new KeyNotFoundException("Default Invoice Numbering Scheme not found");
 				else
 				{
 					var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -137,13 +137,13 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<InvoiceNumberSchemeDto?> UpdateAsync(int id, InvoiceNumberSchemeDto obj)
+		public async Task<NumberingSchemeDto?> UpdateAsync(int id, NumberingSchemeDto obj)
 		{
 			try
 			{
 				var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadFromJsonAsync<InvoiceNumberSchemeDto>();
+					return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>();
 				else
 				{
 					var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();

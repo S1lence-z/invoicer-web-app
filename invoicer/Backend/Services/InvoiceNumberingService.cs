@@ -10,9 +10,9 @@ namespace Backend.Services
 {
 	public class InvoiceNumberingService(ApplicationDbContext context) : IInvoiceNumberingService
 	{
-		public async Task<InvoiceNumberSchemeDto?> GetByIdAsync(int id)
+		public async Task<NumberingSchemeDto?> GetByIdAsync(int id)
 		{
-			InvoiceNumberScheme? foundScheme = await context.InvoiceNumberScheme
+			NumberingScheme? foundScheme = await context.InvoiceNumberScheme
 				.AsNoTracking()
 				.FirstOrDefaultAsync(ins => ins.Id == id);
 			if (foundScheme is null)
@@ -20,25 +20,25 @@ namespace Backend.Services
 			return InvoiceNumberSchemeMapper.MapToDto(foundScheme);
 		}
 
-		public async Task<IList<InvoiceNumberSchemeDto>> GetAllAsync()
+		public async Task<IList<NumberingSchemeDto>> GetAllAsync()
 		{
-			List<InvoiceNumberScheme> allSchemes = await context.InvoiceNumberScheme
+			List<NumberingScheme> allSchemes = await context.InvoiceNumberScheme
 				.AsNoTracking()
 				.ToListAsync();
 			return allSchemes.Select(InvoiceNumberSchemeMapper.MapToDto).ToList();
 		}
 
-		public async Task<InvoiceNumberSchemeDto?> CreateAsync(InvoiceNumberSchemeDto newInvoiceNumberScheme)
+		public async Task<NumberingSchemeDto?> CreateAsync(NumberingSchemeDto newInvoiceNumberScheme)
 		{			
-			InvoiceNumberScheme scheme = InvoiceNumberSchemeMapper.MapToDomain(newInvoiceNumberScheme);
+			NumberingScheme scheme = InvoiceNumberSchemeMapper.MapToDomain(newInvoiceNumberScheme);
 			await context.InvoiceNumberScheme.AddAsync(scheme);
 			await context.SaveChangesAsync();
 			return InvoiceNumberSchemeMapper.MapToDto(scheme);
 		}
 
-		public async Task<InvoiceNumberSchemeDto?> UpdateAsync(int id, InvoiceNumberSchemeDto udpateScheme)
+		public async Task<NumberingSchemeDto?> UpdateAsync(int id, NumberingSchemeDto udpateScheme)
 		{
-			InvoiceNumberScheme? existingScheme = await context.InvoiceNumberScheme
+			NumberingScheme? existingScheme = await context.InvoiceNumberScheme
 				.FirstOrDefaultAsync(ins => ins.Id == id);
 
 			if (existingScheme is null)
@@ -49,14 +49,14 @@ namespace Backend.Services
 			existingScheme.Seperator = udpateScheme.Seperator;
 			existingScheme.SequencePosition = udpateScheme.SequencePosition;
 			existingScheme.SequencePadding = udpateScheme.SequencePadding;
-			existingScheme.InvoiceNumberYearFormat = udpateScheme.InvoiceNumberYearFormat;
+			existingScheme.InvoiceNumberYearFormat = udpateScheme.YearFormat;
 			existingScheme.IncludeMonth = udpateScheme.IncludeMonth;
 			existingScheme.ResetFrequency = udpateScheme.ResetFrequency;
 			existingScheme.IsDefault = udpateScheme.IsDefault;
 
 			await context.SaveChangesAsync();
 
-			InvoiceNumberScheme? updatedScheme = await context.InvoiceNumberScheme
+			NumberingScheme? updatedScheme = await context.InvoiceNumberScheme
 				.AsNoTracking()
 				.FirstOrDefaultAsync(ins => ins.Id == id);
 
@@ -68,7 +68,7 @@ namespace Backend.Services
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			InvoiceNumberScheme? scheme = await context.InvoiceNumberScheme
+			NumberingScheme? scheme = await context.InvoiceNumberScheme
 				.FirstOrDefaultAsync(ins => ins.Id == id);
 			if (scheme is null)
 				return false;
@@ -88,8 +88,8 @@ namespace Backend.Services
 				throw new ArgumentException($"Entity with id {entityId} not found");
 
 			// Get the numbering scheme
-			int numberingSchemeId = existingEntity.InvoiceNumberSchemeId;
-			InvoiceNumberScheme? numberingScheme = await context.InvoiceNumberScheme
+			int numberingSchemeId = existingEntity.NumberingSchemeId;
+			NumberingScheme? numberingScheme = await context.InvoiceNumberScheme
 				.AsNoTracking()
 				.FirstOrDefaultAsync(ins => ins.Id == numberingSchemeId);
 
@@ -97,16 +97,16 @@ namespace Backend.Services
 				throw new ArgumentException($"Invoice Numbering Scheme with id {numberingSchemeId} not found");
 
 			// Get the state
-			EntityInvoiceNumberSchemeState? state = await context.EntityInvoiceNumberSchemeStates
-				.FirstOrDefaultAsync(ins => ins.EntityId == entityId && ins.InvoiceNumberSchemeId == numberingSchemeId);
+			EntityInvoiceNumberingSchemeState? state = await context.EntityInvoiceNumberSchemeStates
+				.FirstOrDefaultAsync(ins => ins.EntityId == entityId && ins.NumberingSchemeId == numberingSchemeId);
 
 			if (state is null)
 			{
 				// Create a new state if it doesn't exist
-				state = new EntityInvoiceNumberSchemeState
+				state = new EntityInvoiceNumberingSchemeState
 				{
 					EntityId = entityId,
-					InvoiceNumberSchemeId = numberingSchemeId
+					NumberingSchemeId = numberingSchemeId
 				};
 				await context.EntityInvoiceNumberSchemeStates.AddAsync(state);
 			}
@@ -121,9 +121,9 @@ namespace Backend.Services
 			return newInvoiceNumber;
 		}
 
-		public async Task<InvoiceNumberSchemeDto> GetDefaultNumberScheme()
+		public async Task<NumberingSchemeDto> GetDefaultNumberScheme()
 		{
-			InvoiceNumberScheme? defaultScheme = await context.InvoiceNumberScheme
+			NumberingScheme? defaultScheme = await context.InvoiceNumberScheme
 				.AsNoTracking()
 				.FirstOrDefaultAsync(ins => ins.IsDefault);
 

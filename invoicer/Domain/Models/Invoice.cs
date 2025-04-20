@@ -16,11 +16,11 @@ namespace Domain.Models
 		public DeliveryMethod DeliveryMethod { get; set; }
 		public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
 		public ICollection<InvoiceItem> Items { get; set; } = [];
-		public int InvoiceNumberSchemeId { get; set; }
+		public int NumberingSchemeId { get; set; }
 
 		// Navigation properties
 		public Entity? Seller { get; set; }
 		public Entity? Buyer { get; set; }
-		public virtual InvoiceNumberScheme? InvoiceNumberScheme { get; set; }
+		public virtual NumberingScheme? InvoiceNumberingScheme { get; set; }
 	}
 }

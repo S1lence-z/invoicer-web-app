@@ -8,7 +8,7 @@ namespace Backend.Utils
 	/// </summary>
 	public static class InvoiceNumberGenerator
 	{
-		public static string GenerateInvoiceNumber(InvoiceNumberScheme scheme, EntityInvoiceNumberSchemeState state, DateTime generationDate)
+		public static string GenerateInvoiceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime generationDate)
 		{
 			string prefix = scheme.Prefix;
 			string yearPart = GetYearPart(generationDate, scheme.InvoiceNumberYearFormat);
@@ -36,13 +36,13 @@ namespace Backend.Utils
 		/// <param name="yearFormat">The format to apply to the year.</param>
 		/// <returns>A string representing the year formatted as specified.</returns>
 		/// <exception cref="InvalidOperationException">Thrown if an invalid year format is provided.</exception>
-		private static string GetYearPart(DateTime generationDate, InvoiceNumberYearFormat yearFormat)
+		private static string GetYearPart(DateTime generationDate, YearFormat yearFormat)
 		{
 			return yearFormat switch
 			{
-				InvoiceNumberYearFormat.None => string.Empty,
-				InvoiceNumberYearFormat.TwoDigit => generationDate.ToString("yy"),
-				InvoiceNumberYearFormat.FourDigit => generationDate.ToString("yyyy"),
+				YearFormat.None => string.Empty,
+				YearFormat.TwoDigit => generationDate.ToString("yy"),
+				YearFormat.FourDigit => generationDate.ToString("yyyy"),
 				_ => throw new InvalidOperationException("Invalid year format."),
 			};
 		}
@@ -57,7 +57,7 @@ namespace Backend.Utils
 			return generationDate.ToString("MM");
 		}
 
-		private static string GenerateSequenceNumber(InvoiceNumberScheme scheme, EntityInvoiceNumberSchemeState state, DateTime generationDate)
+		private static string GenerateSequenceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime generationDate)
 		{
 			// Check if the sequence number should be reset based on the scheme's reset frequency
 			int sequenceNumber = ShouldResetSequenceNumber(scheme, state, generationDate) ? 1 : state.LastSequenceNumber + 1;
@@ -75,23 +75,23 @@ namespace Backend.Utils
 		/// <param name="sequenceNumber">The formatted sequence number.</param>
 		/// <returns>A combined string representing the complete invoice number.</returns>
 		/// <exception cref="InvalidOperationException">Thrown if an invalid sequence position is specified in the scheme.</exception>
-		private static string FormatInvoiceNumber(InvoiceNumberScheme scheme, string prefix, string yearPart, string monthPart, string sequenceNumber)
+		private static string FormatInvoiceNumber(NumberingScheme scheme, string prefix, string yearPart, string monthPart, string sequenceNumber)
 		{
 			string seperator = scheme.UseSeperator ? scheme.Seperator : string.Empty;
 			return scheme.SequencePosition switch
 			{
-				InvoiceNumberSequencePosition.Start => $"{prefix}{sequenceNumber}{seperator}{yearPart}{seperator}{monthPart}",
-				InvoiceNumberSequencePosition.End => $"{prefix}{yearPart}{seperator}{monthPart}{seperator}{sequenceNumber}",
+				Position.Start => $"{prefix}{sequenceNumber}{seperator}{yearPart}{seperator}{monthPart}",
+				Position.End => $"{prefix}{yearPart}{seperator}{monthPart}{seperator}{sequenceNumber}",
 				_ => throw new InvalidOperationException("Invalid sequence position."),
 			};
 		}
 
-		private static bool ShouldResetSequenceNumber(InvoiceNumberScheme scheme, EntityInvoiceNumberSchemeState state, DateTime generationDate)
+		private static bool ShouldResetSequenceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime generationDate)
 		{
 			return scheme.ResetFrequency switch
 			{
-				InvoiceNumberResetFrequency.Yearly => generationDate.Year != state.LastGenerationYear,
-				InvoiceNumberResetFrequency.Monthly => generationDate.Year != state.LastGenerationYear || generationDate.Month != state.LastGenerationMonth,
+				ResetFrequency.Yearly => generationDate.Year != state.LastGenerationYear,
+				ResetFrequency.Monthly => generationDate.Year != state.LastGenerationYear || generationDate.Month != state.LastGenerationMonth,
 				_ => false,
 			};
 		}

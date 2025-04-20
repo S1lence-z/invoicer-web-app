@@ -5,9 +5,9 @@ namespace Application.Mappers
 {
 	public class InvoiceNumberSchemeMapper
 	{
-		public static InvoiceNumberSchemeDto MapToDto(InvoiceNumberScheme scheme)
+		public static NumberingSchemeDto MapToDto(NumberingScheme scheme)
 		{
-			return new InvoiceNumberSchemeDto
+			return new NumberingSchemeDto
 			{
 				Id = scheme.Id,
 				Prefix = scheme.Prefix,
@@ -15,16 +15,16 @@ namespace Application.Mappers
 				Seperator = scheme.Seperator,
 				SequencePosition = scheme.SequencePosition,
 				SequencePadding = scheme.SequencePadding,
-				InvoiceNumberYearFormat = scheme.InvoiceNumberYearFormat,
+				YearFormat = scheme.InvoiceNumberYearFormat,
 				IncludeMonth = scheme.IncludeMonth,
 				ResetFrequency = scheme.ResetFrequency,
 				IsDefault = scheme.IsDefault
 			};
 		}
 
-		public static InvoiceNumberScheme MapToDomain(InvoiceNumberSchemeDto schemeDto)
+		public static NumberingScheme MapToDomain(NumberingSchemeDto schemeDto)
 		{
-			return new InvoiceNumberScheme
+			return new NumberingScheme
 			{
 				Id = schemeDto.Id,
 				Prefix = schemeDto.Prefix,
@@ -32,7 +32,7 @@ namespace Application.Mappers
 				Seperator = schemeDto.Seperator,
 				SequencePosition = schemeDto.SequencePosition,
 				SequencePadding = schemeDto.SequencePadding,
-				InvoiceNumberYearFormat = schemeDto.InvoiceNumberYearFormat,
+				InvoiceNumberYearFormat = schemeDto.YearFormat,
 				IncludeMonth = schemeDto.IncludeMonth,
 				ResetFrequency = schemeDto.ResetFrequency,
 				IsDefault = schemeDto.IsDefault

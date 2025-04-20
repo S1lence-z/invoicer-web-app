@@ -10,14 +10,14 @@ namespace Backend.Controllers
 	public class InvoiceNumberingController(IInvoiceNumberingService numberingService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetInvoiceNumberingSchemeById")]
-		[ProducesResponseType(typeof(InvoiceNumberSchemeDto), 200)]
+		[ProducesResponseType(typeof(NumberingSchemeDto), 200)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			try
 			{
-				InvoiceNumberSchemeDto? scheme = await numberingService.GetByIdAsync(id);
+				NumberingSchemeDto? scheme = await numberingService.GetByIdAsync(id);
 				return Ok(scheme);
 			}
 			catch (KeyNotFoundException e)
@@ -31,13 +31,13 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet(Name = "GetAllInvoiceNumberingSchemes")]
-		[ProducesResponseType(typeof(IList<InvoiceNumberSchemeDto>), 200)]
+		[ProducesResponseType(typeof(IList<NumberingSchemeDto>), 200)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetAll()
 		{
 			try
 			{
-				IList<InvoiceNumberSchemeDto> schemes = await numberingService.GetAllAsync();
+				IList<NumberingSchemeDto> schemes = await numberingService.GetAllAsync();
 				return Ok(schemes);
 			}
 			catch (Exception e)
@@ -47,17 +47,17 @@ namespace Backend.Controllers
 		}
 
 		[HttpPost(Name = "PostInvoiceNumberingScheme")]
-		[ProducesResponseType(typeof(InvoiceNumberSchemeDto), 201)]
+		[ProducesResponseType(typeof(NumberingSchemeDto), 201)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
-		public async Task<IActionResult> Post([FromBody] InvoiceNumberSchemeDto scheme)
+		public async Task<IActionResult> Post([FromBody] NumberingSchemeDto scheme)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
 			try
 			{
-				InvoiceNumberSchemeDto? createdScheme = await numberingService.CreateAsync(scheme);
+				NumberingSchemeDto? createdScheme = await numberingService.CreateAsync(scheme);
 				return CreatedAtRoute("GetInvoiceNumberingSchemeById", new { id = createdScheme!.Id }, createdScheme);
 			}
 			catch (Exception e)
@@ -67,18 +67,18 @@ namespace Backend.Controllers
 		}
 
 		[HttpPut("{id:int}", Name = "UpdateInvoiceNumberingScheme")]
-		[ProducesResponseType(typeof(InvoiceNumberSchemeDto), 200)]
+		[ProducesResponseType(typeof(NumberingSchemeDto), 200)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
-		public async Task<IActionResult> Put(int id, [FromBody] InvoiceNumberSchemeDto scheme)
+		public async Task<IActionResult> Put(int id, [FromBody] NumberingSchemeDto scheme)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
 			try
 			{
-				InvoiceNumberSchemeDto? existingScheme = await numberingService.UpdateAsync(id, scheme);
+				NumberingSchemeDto? existingScheme = await numberingService.UpdateAsync(id, scheme);
 				return Ok(existingScheme);
 			}
 			catch (KeyNotFoundException e)

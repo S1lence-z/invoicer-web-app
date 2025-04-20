@@ -3,7 +3,7 @@
 namespace Domain.Enums
 {
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	public enum InvoiceNumberResetFrequency
+	public enum ResetFrequency
 	{
 		Yearly,
 		Monthly

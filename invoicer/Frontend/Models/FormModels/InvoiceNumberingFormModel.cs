@@ -16,23 +16,23 @@ namespace Frontend.Models.FormModels
 		[RegularExpression(@"^.*$", ErrorMessage = "Invalid input format")]
 		public string Seperator { get; set; } = "-";
 
-		[EnumDataType(typeof(InvoiceNumberSequencePosition), ErrorMessage = "Invalid sequence position")]
-		public InvoiceNumberSequencePosition SequencePosition { get; set; } = InvoiceNumberSequencePosition.Start;
+		[EnumDataType(typeof(Position), ErrorMessage = "Invalid sequence position")]
+		public Position SequencePosition { get; set; } = Position.Start;
 
 		[Range(1, 10, ErrorMessage = "Sequence padding must be between 1 and 10")]
 		public int SequencePadding { get; set; } = 3;
 
-		[EnumDataType(typeof(InvoiceNumberYearFormat), ErrorMessage = "Invalid year format")]
-		public InvoiceNumberYearFormat InvoiceNumberYearFormat { get; set; } = InvoiceNumberYearFormat.FourDigit;
+		[EnumDataType(typeof(YearFormat), ErrorMessage = "Invalid year format")]
+		public YearFormat InvoiceNumberYearFormat { get; set; } = YearFormat.FourDigit;
 
 		public bool IncludeMonth { get; set; } = true;
 
-		[EnumDataType(typeof(InvoiceNumberResetFrequency), ErrorMessage = "Invalid reset frequency")]
-		public InvoiceNumberResetFrequency ResetFrequency { get; set; } = InvoiceNumberResetFrequency.Yearly;
+		[EnumDataType(typeof(ResetFrequency), ErrorMessage = "Invalid reset frequency")]
+		public ResetFrequency ResetFrequency { get; set; } = ResetFrequency.Yearly;
 
 		public bool IsDefault { get; set; } = false;
 
-		public static InvoiceNumberingFormModel FromDto(InvoiceNumberSchemeDto dto)
+		public static InvoiceNumberingFormModel FromDto(NumberingSchemeDto dto)
 		{
 			return new InvoiceNumberingFormModel
 			{
@@ -42,16 +42,16 @@ namespace Frontend.Models.FormModels
 				Seperator = dto.Seperator,
 				SequencePosition = dto.SequencePosition,
 				SequencePadding = dto.SequencePadding,
-				InvoiceNumberYearFormat = dto.InvoiceNumberYearFormat,
+				InvoiceNumberYearFormat = dto.YearFormat,
 				IncludeMonth = dto.IncludeMonth,
 				ResetFrequency = dto.ResetFrequency,
 				IsDefault = dto.IsDefault
 			};
 		}
 
-		public InvoiceNumberSchemeDto ToDto()
+		public NumberingSchemeDto ToDto()
 		{
-			return new InvoiceNumberSchemeDto
+			return new NumberingSchemeDto
 			{
 				Id = Id,
 				Prefix = Prefix,
@@ -59,7 +59,7 @@ namespace Frontend.Models.FormModels
 				Seperator = Seperator,
 				SequencePosition = SequencePosition,
 				SequencePadding = SequencePadding,
-				InvoiceNumberYearFormat = InvoiceNumberYearFormat,
+				YearFormat = InvoiceNumberYearFormat,
 				IncludeMonth = IncludeMonth,
 				ResetFrequency = ResetFrequency,
 				IsDefault = IsDefault

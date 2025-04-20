@@ -67,7 +67,7 @@ namespace Backend.Services
 				throw new ArgumentException($"Buyer entity with id {newInvoice.BuyerId} not found");
 
 			// Assign the seller numbering scheme, the one who is generating the invoice
-			newInvoice.InvoiceNumberSchemeId = seller.InvoiceNumberSchemeId;
+			newInvoice.NumberingSchemeId = seller.NumberingSchemeId;
 
 			// Generate invoice number
 			string newInvoiceNumber = await numberingService.GetNextInvoiceNumberAsync(seller.Id, DateTime.Now);

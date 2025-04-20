@@ -49,8 +49,8 @@
 </Modal>
 
 @code {
-    private IList<InvoiceNumberSchemeDto> allNumberingSchemes = new List<InvoiceNumberSchemeDto>();
-    private InvoiceNumberSchemeDto? numberingSchemeToEdit = null;
+    private IList<NumberingSchemeDto> allNumberingSchemes = new List<NumberingSchemeDto>();
+    private NumberingSchemeDto? numberingSchemeToEdit = null;
     private bool isAddingNewNumberingScheme = false;
     private bool isEditingNumberingScheme = false;
 
@@ -71,7 +71,7 @@
         }
     }
 
-    private async Task DeleteScheme(InvoiceNumberSchemeDto schemeToDelete)
+    private async Task DeleteScheme(NumberingSchemeDto schemeToDelete)
     {
         try
         {
@@ -87,7 +87,7 @@
         }
     }
 
-    private async Task EditScheme(InvoiceNumberSchemeDto schemeToEdit)
+    private async Task EditScheme(NumberingSchemeDto schemeToEdit)
     {
         try
         {

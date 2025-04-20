@@ -18,13 +18,13 @@
 
 @code {
     [Parameter, EditorRequired]
-    public InvoiceNumberSchemeDto NumberingScheme { get; set; } = null!;
+    public NumberingSchemeDto NumberingScheme { get; set; } = null!;
 
     [Parameter]
-    public EventCallback<InvoiceNumberSchemeDto> OnDeleteNumberingScheme { get; set; }
+    public EventCallback<NumberingSchemeDto> OnDeleteNumberingScheme { get; set; }
 
     [Parameter]
-    public EventCallback<InvoiceNumberSchemeDto> OnEditNumberingScheme { get; set; }
+    public EventCallback<NumberingSchemeDto> OnEditNumberingScheme { get; set; }
 
     private int GetLastNumber(int digitCount)
     {
@@ -32,18 +32,18 @@
         return int.Parse(biggestDigitString);
     }
 
-    private string ShowNumberingSchemePreview(InvoiceNumberSchemeDto numberingScheme)
+    private string ShowNumberingSchemePreview(NumberingSchemeDto numberingScheme)
     {
         int previewNumbers = 2;
         var previewNumbersList = new List<string>();
         for (int i = 1; i <= previewNumbers; i++)
         {
-            var previewNumber = InvoiceNumberSchemeDto.GetPreview(numberingScheme, i);
+            var previewNumber = NumberingSchemeDto.GetPreview(numberingScheme, i);
             previewNumbersList.Add(previewNumber);
         }
         previewNumbersList.Add("...");
         int lastSequenceNumber = GetLastNumber(numberingScheme.SequencePadding);
-        string lastNumber = InvoiceNumberSchemeDto.GetPreview(numberingScheme, lastSequenceNumber);
+        string lastNumber = NumberingSchemeDto.GetPreview(numberingScheme, lastSequenceNumber);
         previewNumbersList.Add(lastNumber);
         return string.Join(", ", previewNumbersList);
     }
