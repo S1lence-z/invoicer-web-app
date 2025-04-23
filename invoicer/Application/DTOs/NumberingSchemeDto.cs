@@ -14,30 +14,5 @@ namespace Application.DTOs
 		public bool IncludeMonth { get; set; } = true;
 		public ResetFrequency ResetFrequency { get; set; } = ResetFrequency.Yearly;
 		public bool IsDefault { get; set; } = false;
-
-		public static string GetPreview(NumberingSchemeDto numberingScheme, int sequenceNumber)
-		{
-			var yearFormat = numberingScheme.YearFormat switch
-			{
-				YearFormat.FourDigit => DateTime.Now.ToString("yyyy"),
-				YearFormat.TwoDigit => DateTime.Now.ToString("yy"),
-				_ => string.Empty
-			};
-
-			var seperator = numberingScheme.UseSeperator ? numberingScheme.Seperator : string.Empty;
-
-			var monthFormat = numberingScheme.IncludeMonth ? DateTime.Now.ToString("MM") : string.Empty;
-
-			var sequenceFormat = numberingScheme.SequencePadding > 0
-				? sequenceNumber.ToString($"D{numberingScheme.SequencePadding}")
-			: sequenceNumber.ToString();
-
-			return numberingScheme.SequencePosition switch
-			{
-				Position.Start => $"{numberingScheme.Prefix}{sequenceFormat}{seperator}{yearFormat}{seperator}{monthFormat}",
-				Position.End => $"{numberingScheme.Prefix}{yearFormat}{seperator}{monthFormat}{seperator}{sequenceFormat}",
-				_ => throw new InvalidOperationException("Invalid sequence position.")
-			};
-		}
 	}
 }

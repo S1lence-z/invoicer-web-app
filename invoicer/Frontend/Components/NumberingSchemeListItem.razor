@@ -1,10 +1,11 @@
 ﻿@using Domain.Enums;
 @using Application.DTOs;
+@using Application.Extensions;
 
 <div class="card border-1 shadow-sm">
     <div class="card-body row align-items-center" style="cursor: pointer;">
         <div class="col">
-            <span class="fw-bold">@ShowNumberingSchemePreview(NumberingScheme)</span>
+            <span class="fw-bold">@NumberingScheme.ShowNumberingSchemePreview()</span>
         </div>
         <div class="col">
             <span class="text-muted">Default: @(NumberingScheme.IsDefault ? "Yes" : "No")</span>
@@ -25,26 +26,4 @@
 
     [Parameter]
     public EventCallback<NumberingSchemeDto> OnEditNumberingScheme { get; set; }
-
-    private int GetLastNumber(int digitCount)
-    {
-        string biggestDigitString = new string('9', digitCount);
-        return int.Parse(biggestDigitString);
-    }
-
-    private string ShowNumberingSchemePreview(NumberingSchemeDto numberingScheme)
-    {
-        int previewNumbers = 2;
-        var previewNumbersList = new List<string>();
-        for (int i = 1; i <= previewNumbers; i++)
-        {
-            var previewNumber = NumberingSchemeDto.GetPreview(numberingScheme, i);
-            previewNumbersList.Add(previewNumber);
-        }
-        previewNumbersList.Add("...");
-        int lastSequenceNumber = GetLastNumber(numberingScheme.SequencePadding);
-        string lastNumber = NumberingSchemeDto.GetPreview(numberingScheme, lastSequenceNumber);
-        previewNumbersList.Add(lastNumber);
-        return string.Join(", ", previewNumbersList);
-    }
 }
