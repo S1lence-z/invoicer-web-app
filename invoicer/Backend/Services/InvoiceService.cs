@@ -1,15 +1,14 @@
 ﻿using Backend.Database;
 using Microsoft.EntityFrameworkCore;
-using Backend.Utils.InvoicePdfGenerator;
-using Domain.Interfaces;
 using Application.DTOs;
 using Application.ServiceInterfaces;
 using Application.Mappers;
 using Domain.Models;
+using Application.PdfGenerator; 
 
 namespace Backend.Services
 {
-	public class InvoiceService(ApplicationDbContext context, IInvoiceNumberingService numberingService) : IInvoiceService
+	public class InvoiceService(ApplicationDbContext context, IInvoiceNumberingService numberingService, IInvoicePdfGenerator invoicePdfGenerator) : IInvoiceService
 	{
 		public async Task<InvoiceDto?> GetByIdAsync(int id)
 		{
@@ -184,7 +183,7 @@ namespace Backend.Services
 			if (invoiceToExport is null)
 				throw new ArgumentException($"Invoice with id {id} not found");
 
-			IPdfGenerationResult pdfFile = await InvoicePdfGenerator.ExportInvoicePdf(invoiceToExport);
+			IPdfGenerationResult pdfFile = invoicePdfGenerator.ExportInvoicePdf(invoiceToExport);
 
 			return pdfFile;
 		}

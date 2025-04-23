@@ -4,7 +4,7 @@ using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Application.DTOs;
 using Application.Mappers;
-using Domain.Services;
+using Domain.Interfaces;
 
 namespace Backend.Services
 {

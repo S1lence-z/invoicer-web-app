@@ -1,8 +1,8 @@
 ﻿using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Domain.Interfaces;
 using Application.ServiceInterfaces;
 using Application.DTOs;
+using Application.PdfGenerator;
 
 namespace Backend.Controllers
 {

@@ -1,4 +1,4 @@
-﻿using Domain.Interfaces;
+﻿using Application.PdfGenerator;
 
 namespace Application.InvoicePdfGenerator
 {
