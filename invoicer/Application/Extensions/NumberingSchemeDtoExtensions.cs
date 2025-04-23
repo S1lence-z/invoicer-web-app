@@ -1,4 +1,5 @@
-﻿using Application.DTOs;
+﻿using System.Text;
+using Application.DTOs;
 using Domain.Enums;
 
 namespace Application.Extensions
@@ -14,7 +15,7 @@ namespace Application.Extensions
 		public static string ShowNumberingSchemePreview(this NumberingSchemeDto numberingScheme)
 		{
 			int previewNumbers = 2;
-			var previewNumbersList = new List<string>();
+			List<string> previewNumbersList = [];
 			for (int i = 1; i <= previewNumbers; i++)
 			{
 				var previewNumber = numberingScheme.GetPreview(i);
@@ -29,27 +30,42 @@ namespace Application.Extensions
 
 		public static string GetPreview(this NumberingSchemeDto numberingScheme, int sequenceNumber)
 		{
-			var yearFormat = numberingScheme.YearFormat switch
+			string yearFormat = numberingScheme.YearFormat switch
 			{
 				YearFormat.FourDigit => DateTime.Now.ToString("yyyy"),
 				YearFormat.TwoDigit => DateTime.Now.ToString("yy"),
 				_ => string.Empty
 			};
 
-			var seperator = numberingScheme.UseSeperator ? numberingScheme.Seperator : string.Empty;
-
-			var monthFormat = numberingScheme.IncludeMonth ? DateTime.Now.ToString("MM") : string.Empty;
-
-			var sequenceFormat = numberingScheme.SequencePadding > 0
+			string separator = numberingScheme.UseSeperator ? numberingScheme.Seperator : string.Empty;
+			string monthFormat = numberingScheme.IncludeMonth ? DateTime.Now.ToString("MM") : string.Empty;
+			string formattedSequenceNumber = numberingScheme.SequencePadding > 0
 				? sequenceNumber.ToString($"D{numberingScheme.SequencePadding}")
-			: sequenceNumber.ToString();
+				: sequenceNumber.ToString();
 
-			return numberingScheme.SequencePosition switch
+			List<string> parts = [];
+
+			if (numberingScheme.SequencePosition == Position.Start)
 			{
-				Position.Start => $"{numberingScheme.Prefix}{sequenceFormat}{seperator}{yearFormat}{seperator}{monthFormat}",
-				Position.End => $"{numberingScheme.Prefix}{yearFormat}{seperator}{monthFormat}{seperator}{sequenceFormat}",
-				_ => throw new InvalidOperationException("Invalid sequence position.")
-			};
+				parts.Add(formattedSequenceNumber);
+				if (numberingScheme.YearFormat != YearFormat.None)
+					parts.Add(yearFormat);
+				if (numberingScheme.IncludeMonth)
+					parts.Add(monthFormat);
+			}
+			else if (numberingScheme.SequencePosition == Position.End)
+			{
+				if (numberingScheme.YearFormat != YearFormat.None)
+					parts.Add(yearFormat);
+				if (numberingScheme.IncludeMonth)
+					parts.Add(monthFormat);
+				parts.Add(formattedSequenceNumber);
+			}
+			else
+			{
+				throw new InvalidOperationException($"Invalid sequence position: {numberingScheme.SequencePosition}");
+			}
+			return numberingScheme.Prefix + string.Join(separator, parts.Where(p => !string.IsNullOrEmpty(p)));
 		}
 	}
 }

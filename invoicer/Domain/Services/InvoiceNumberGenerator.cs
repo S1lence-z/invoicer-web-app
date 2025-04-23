@@ -8,23 +8,41 @@ namespace Domain.Services
 	{
 		public string GenerateInvoiceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime generationDate)
 		{
-			string prefix = scheme.Prefix;
-			string yearPart = GetYearPart(generationDate, scheme.InvoiceNumberYearFormat);
+			int sequenceNumber = ShouldResetSequenceNumber(scheme, state, generationDate) ? 1 : state.LastSequenceNumber + 1;
 
-			// Handle month, if applicable
-			string monthPart = string.Empty;
-			if (scheme.IncludeMonth)
+			// Format the sequence number with padding
+			string formattedSequenceNumber = scheme.SequencePadding > 0
+				? sequenceNumber.ToString($"D{scheme.SequencePadding}")
+				: sequenceNumber.ToString();
+
+			string yearPart = GetYearPart(generationDate, scheme.InvoiceNumberYearFormat);
+			string monthPart = scheme.IncludeMonth ? GetMonthPart(generationDate) : string.Empty;
+			string separator = scheme.UseSeperator ? scheme.Seperator : string.Empty;
+
+			List<string> parts = [];
+
+			if (scheme.SequencePosition == Position.Start)
 			{
-				monthPart = GetMonthPart(generationDate);
+				parts.Add(formattedSequenceNumber);
+				if (scheme.InvoiceNumberYearFormat != YearFormat.None)
+					parts.Add(yearPart);
+				if (scheme.IncludeMonth)
+					parts.Add(monthPart);
+			}
+			else if (scheme.SequencePosition == Position.End)
+			{
+				if (scheme.InvoiceNumberYearFormat != YearFormat.None)
+					parts.Add(yearPart);
+				if (scheme.IncludeMonth)
+					parts.Add(monthPart);
+				parts.Add(formattedSequenceNumber);
+			}
+			else
+			{
+				throw new InvalidOperationException($"Invalid sequence position: {scheme.SequencePosition}");
 			}
 
-			// Step 3: Handle the sequence number
-			string sequenceNumber = GenerateSequenceNumber(scheme, state, generationDate);
-
-			// Format the invoice number
-			string invoiceNumber = FormatInvoiceNumber(scheme, prefix, yearPart, monthPart, sequenceNumber);
-
-			return invoiceNumber;
+			return scheme.Prefix + string.Join(separator, parts.Where(p => !string.IsNullOrEmpty(p)));
 		}
 
 		private static string GetYearPart(DateTime generationDate, YearFormat yearFormat)
@@ -41,25 +59,6 @@ namespace Domain.Services
 		private static string GetMonthPart(DateTime generationDate)
 		{
 			return generationDate.ToString("MM");
-		}
-
-		private static string GenerateSequenceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime generationDate)
-		{
-			// Check if the sequence number should be reset based on the scheme's reset frequency
-			int sequenceNumber = ShouldResetSequenceNumber(scheme, state, generationDate) ? 1 : state.LastSequenceNumber + 1;
-			// Format the sequence number with padding
-			return sequenceNumber.ToString($"D{scheme.SequencePadding}");
-		}
-
-		private static string FormatInvoiceNumber(NumberingScheme scheme, string prefix, string yearPart, string monthPart, string sequenceNumber)
-		{
-			string seperator = scheme.UseSeperator ? scheme.Seperator : string.Empty;
-			return scheme.SequencePosition switch
-			{
-				Position.Start => $"{prefix}{sequenceNumber}{seperator}{yearPart}{seperator}{monthPart}",
-				Position.End => $"{prefix}{yearPart}{seperator}{monthPart}{seperator}{sequenceNumber}",
-				_ => throw new InvalidOperationException("Invalid sequence position."),
-			};
 		}
 
 		private static bool ShouldResetSequenceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime generationDate)
