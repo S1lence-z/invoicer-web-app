@@ -1,14 +1,14 @@
 ﻿using Application.ServiceInterfaces;
 using Backend.Database;
-using Backend.Utils;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Application.DTOs;
 using Application.Mappers;
+using Domain.Services;
 
 namespace Backend.Services
 {
-	public class InvoiceNumberingService(ApplicationDbContext context) : IInvoiceNumberingService
+	public class InvoiceNumberingService(ApplicationDbContext context, IInvoiceNumberGenerator invoiceNumberGenerator) : IInvoiceNumberingService
 	{
 		public async Task<NumberingSchemeDto?> GetByIdAsync(int id)
 		{
@@ -112,7 +112,7 @@ namespace Backend.Services
 			}
 
 			// Generate the next invoice number
-			string newInvoiceNumber = InvoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, state, generationDate);
+			string newInvoiceNumber = invoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, state, generationDate);
 			// Update the state and save changes
 			// TODO: should this be done here?
 			state.UpdateForNext();

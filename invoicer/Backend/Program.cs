@@ -2,6 +2,7 @@ using Application.ServiceInterfaces;
 using Backend.Database;
 using Backend.Services;
 using Backend.Services.AresApiService;
+using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend
@@ -24,6 +25,7 @@ namespace Backend
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 			builder.Services.AddScoped<IAresApiService, AresApiService>();
 			builder.Services.AddScoped<IInvoiceNumberingService, InvoiceNumberingService>();
+			builder.Services.AddSingleton<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
