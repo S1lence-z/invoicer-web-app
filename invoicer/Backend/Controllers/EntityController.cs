@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Application.ServiceInterfaces;
+using Application.Api;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -9,8 +10,9 @@ namespace Backend.Controllers
 	public class EntityController(IEntityService entityService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetEntityById")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(EntityDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			try
@@ -20,16 +22,17 @@ namespace Backend.Controllers
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Entity not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpGet(Name = "GetAllEntities")]
-		[ProducesResponseType(200)]
+		[ProducesResponseType(typeof(IList<EntityDto>), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetAll()
 		{
 			try
@@ -39,17 +42,18 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPost(Name = "PostEntity")]
-		[ProducesResponseType(201)]
-		[ProducesResponseType(400)]
+		[ProducesResponseType(typeof(EntityDto), 201)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Post([FromBody] EntityDto entity)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return BadRequest(ApiErrorResponse.Create("Invalid model state", ModelState.ToString()!, 400));
 
 			try
 			{
@@ -58,18 +62,18 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPut("{id:int}", Name = "PutEntity")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(EntityDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Put(int id, [FromBody] EntityDto entity)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return BadRequest(ApiErrorResponse.Create("Invalid model state", ModelState.ToString()!, 400));
 
 			try
 			{
@@ -78,25 +82,28 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteEntity")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(string), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			try
 			{
 				bool wasDeleted = await entityService.DeleteAsync(id);
 				if (!wasDeleted)
-					return NotFound($"Entity with ID {id} not found.");
+				{
+					return NotFound(ApiErrorResponse.Create("Entity not found", $"Entity with ID {id} not found.", 404));
+				}
 				return Ok($"Entity with ID {id} was deleted.");
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 	}
