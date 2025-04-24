@@ -1,6 +1,6 @@
-﻿using Domain.Models;
-using Application.ServiceInterfaces;
+﻿using Application.ServiceInterfaces;
 using Application.DTOs;
+using Application.Api;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -10,8 +10,9 @@ namespace Backend.Controllers
 	public class AddressController(IAddressService addressService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetAddressById")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(AddressDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			try
@@ -21,16 +22,17 @@ namespace Backend.Controllers
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Address not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpGet(Name = "GetAllAddresses")]
-		[ProducesResponseType(200)]
+		[ProducesResponseType(typeof(IList<AddressDto>), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetAll()
 		{
 			try
@@ -40,17 +42,18 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPost(Name = "PostAddress")]
-		[ProducesResponseType(201)]
-		[ProducesResponseType(400)]
+		[ProducesResponseType(typeof(AddressDto), 201)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Post([FromBody] AddressDto address)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return BadRequest(ApiErrorResponse.Create("Invalid model state", ModelState.ToString()!, 400));
 
 			try
 			{
@@ -59,18 +62,19 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPut("{id:int}", Name = "PutAddress")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(AddressDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Put(int id, [FromBody] AddressDto address)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return BadRequest(ApiErrorResponse.Create("Invalid model state", ModelState.ToString()!, 400));
 
 			try
 			{
@@ -79,17 +83,18 @@ namespace Backend.Controllers
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Address not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteAddress")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(string), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			try
@@ -103,7 +108,7 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 	}
