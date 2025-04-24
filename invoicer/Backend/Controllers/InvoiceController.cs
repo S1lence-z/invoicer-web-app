@@ -1,8 +1,8 @@
-﻿using Domain.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Application.ServiceInterfaces;
 using Application.DTOs;
 using Application.PdfGenerator;
+using Application.Api;
 
 namespace Backend.Controllers
 {
@@ -11,8 +11,9 @@ namespace Backend.Controllers
 	public class InvoiceController(IInvoiceService invoiceService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetInvoiceById")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(InvoiceDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			try
@@ -22,16 +23,17 @@ namespace Backend.Controllers
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpGet(Name = "GetAllInvoices")]
-		[ProducesResponseType(200)]
+		[ProducesResponseType(typeof(IList<InvoiceDto>), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetAll()
 		{
 			try
@@ -41,18 +43,19 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPost(Name = "PostInvoice")]
-		[ProducesResponseType(201)]
-		[ProducesResponseType(400)]
+		[ProducesResponseType(typeof(InvoiceDto), 201)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Post([FromBody] InvoiceDto invoice)
 		{
 			if (invoice.Items is null || invoice.Items.Count == 0)
 			{
-				return BadRequest("Invoice must have at least one item");
+				return BadRequest(ApiErrorResponse.Create("The invoice must contain at least one item", "Bad Request", 400));
 			}
 
 			try
@@ -62,17 +65,21 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPut("{id:int}", Name = "PutInvoice")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(400)]
+		[ProducesResponseType(typeof(InvoiceDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Put(int id, [FromBody] InvoiceDto invoice)
 		{
 			if (invoice.Items is null || invoice.Items.Count == 0)
-				return BadRequest("Invoice must have at least one item");
+			{
+				return BadRequest(ApiErrorResponse.Create("The invoice must contain at least one item", "Bad Request", 400));
+			}
 
 			try
 			{
@@ -81,37 +88,40 @@ namespace Backend.Controllers
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteInvoice")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(string), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			try
 			{
 				bool wasDeleted = await invoiceService.DeleteAsync(id);
 				if (!wasDeleted)
-					return NotFound($"Invoice with id {id} not found");
+				{
+					return NotFound(ApiErrorResponse.Create("Invoice not found", "Not Found", 404));
+				}
 				return Ok($"Invoice with id {id} deleted");
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpGet("{id:int}/export-pdf", Name = "ExportInvoicePdf")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		[ProducesResponseType(500)]
+		[ProducesResponseType(typeof(byte[]), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> ExportPdf(int id)
 		{
 			try
@@ -119,22 +129,22 @@ namespace Backend.Controllers
 				IPdfGenerationResult invoiceResult = await invoiceService.ExportInvoicePdf(id);
 				if (!invoiceResult.IsSuccess)
 				{
-					return StatusCode(invoiceResult.StatusCode, invoiceResult.ErrorMessage);
+					return StatusCode(500, ApiErrorResponse.Create("An error occurred while exporting the invoice to PDF", invoiceResult.ErrorMessage!, invoiceResult.StatusCode));
 				}
 				byte[] pdfFile = invoiceResult.Data!;
 				return File(pdfFile, "application/pdf", $"invoice_{id}.pdf");
 			}
 			catch (ArgumentException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
 			}
 			catch (InvalidOperationException e)
 			{
-				return BadRequest(e.Message);
+				return BadRequest(ApiErrorResponse.Create("Invalid operation", e.Message, 400));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 	}
