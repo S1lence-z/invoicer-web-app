@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Domain.Interfaces;
 using Application.ServiceInterfaces;
+using Application.AresApiModels;
 
 namespace Backend.Controllers
 {
@@ -9,8 +10,8 @@ namespace Backend.Controllers
 	public class AresController(IAresApiService aresApiService) : ControllerBase
 	{
 		[HttpGet("{ico:int}", Name = "GetEntityInformationByIco")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(500)]
+		[ProducesResponseType(typeof(SubjectInformation), 200)]
+		[ProducesResponseType(typeof(AresApiErrorResponse), 400)]
 
 		public async Task<IActionResult> GetEntityInformationByIco(string ico)
 		{

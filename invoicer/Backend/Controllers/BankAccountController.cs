@@ -1,5 +1,6 @@
 ﻿using Application.ServiceInterfaces;
 using Application.DTOs;
+using Application.Api;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -9,8 +10,9 @@ namespace Backend.Controllers
 	public class BankAccountController(IBankAccountService bankAccountService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetBankAccountById")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(BankAccountDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			try
@@ -20,16 +22,17 @@ namespace Backend.Controllers
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Bank account not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpGet(Name = "GetAllBankAccounts")]
-		[ProducesResponseType(200)]
+		[ProducesResponseType(typeof(IList<BankAccountDto>), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetAll()
 		{
 			try
@@ -39,17 +42,18 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPost(Name = "PostBankAccount")]
-		[ProducesResponseType(201)]
-		[ProducesResponseType(400)]
+		[ProducesResponseType(typeof(BankAccountDto), 201)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Post([FromBody] BankAccountDto bankAccount)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return BadRequest(ApiErrorResponse.Create("Invalid model state", ModelState.ToString()!, 400));
 
 			try
 			{
@@ -58,18 +62,19 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return BadRequest(e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPut("{id:int}", Name = "PutBankAccount")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(BankAccountDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Put(int id, [FromBody] BankAccountDto bankAccount)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return BadRequest(ApiErrorResponse.Create("Invalid model state", ModelState.ToString()!, 400));
 
 			try
 			{
@@ -78,29 +83,32 @@ namespace Backend.Controllers
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Bank account not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return BadRequest(e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteBankAccount")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(string), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			try
 			{
 				bool wasDeleted = await bankAccountService.DeleteAsync(id);
 				if (!wasDeleted)
-					return NotFound($"Bank account with id {id} not found");
+				{
+					return NotFound(ApiErrorResponse.Create("Bank account not found", $"Bank account with id {id} not found", 404));
+				}
 				return Ok($"Bank account with id {id} deleted");
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 	}
