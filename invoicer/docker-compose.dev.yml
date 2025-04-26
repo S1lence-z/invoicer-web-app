@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend-dev
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile.dev
+    ports:
+      # Map a host port (e.g., 8080) to the container's port (8080)
+      - "8080:8080"
+    volumes:
+      # Mount the entire solution directory into /src in the container
+      # This enables live code syncing / hot reload
+      - .:/src
+      # Mount the local database directory into the expected path inside the container
+      - ./Backend/Database:/src/Backend/Database # Sync the dev database
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+    # Command to run the backend with hot reload
+    command: sh -c "cd Backend && dotnet watch run --non-interactive --no-launch-profile"
+
+  frontend:
+    container_name: frontend-dev
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile.dev
+    ports:
+      - "5100:5000"
+    volumes:
+      # Mount the entire solution directory into /src in the container
+      - .:/src
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+    # Command to run the frontend Blazor dev server with hot reload
+    command: sh -c "cd Frontend && dotnet clean && dotnet watch run --non-interactive --no-launch-profile"
+    depends_on:
+      - backend # Ensure backend starts first

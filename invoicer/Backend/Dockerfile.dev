@@ -1,0 +1,16 @@
+# Backend/Dockerfile.dev
+ARG DOTNET_VERSION=8.0
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+
+WORKDIR /src
+
+# Expose the port(s) the backend will listen on (e.g., 8080 for HTTP)
+EXPOSE 8080
+
+# Set environment variables for development
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+ENV ASPNETCORE_URLS=http://+:8080
+ENV NUGET_XMLDOC_MODE=skip
+
+# Keep the container alive
+CMD ["tail", "-f", "/dev/null"]
