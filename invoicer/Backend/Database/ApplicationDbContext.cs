@@ -11,8 +11,8 @@ namespace Backend.Database
 		public DbSet<Entity> Entity { get; set; }
 		public DbSet<Invoice> Invoice { get; set; }
 		public DbSet<InvoiceItem> InvoiceItem { get; set; }
-		public DbSet<NumberingScheme> InvoiceNumberScheme { get; set; }
-		public DbSet<EntityInvoiceNumberingSchemeState> EntityInvoiceNumberSchemeStates { get; set; }
+		public DbSet<NumberingScheme> NumberingScheme { get; set; }
+		public DbSet<EntityInvoiceNumberingSchemeState> EntityInvoiceNumberingSchemeState { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -21,8 +21,8 @@ namespace Backend.Database
 			SetUpEntity(modelBuilder);
 			SetUpInvoice(modelBuilder);
 			SetUpInvoiceItem(modelBuilder);
-			SetUpInvoiceNumberScheme(modelBuilder);
-			SetupEntityInvoiceNumberSchemeState(modelBuilder);
+			SetUpNumberingScheme(modelBuilder);
+			SetupEntityInvoiceNumberingSchemeState(modelBuilder);
 
 			modelBuilder.Entity<NumberingScheme>().HasData(
 				Domain.Models.NumberingScheme.CreateDefault()
@@ -128,7 +128,7 @@ namespace Backend.Database
 			});
 		}
 
-		private static void SetUpInvoiceNumberScheme(ModelBuilder modelBuilder)
+		private static void SetUpNumberingScheme(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<NumberingScheme>(invoiceNumberScheme =>
 			{
@@ -151,7 +151,7 @@ namespace Backend.Database
 			});
 		}
 
-		private static void SetupEntityInvoiceNumberSchemeState(ModelBuilder modelBuilder)
+		private static void SetupEntityInvoiceNumberingSchemeState(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<EntityInvoiceNumberingSchemeState>(entityInvoiceNumberSchemeState =>
 			{
