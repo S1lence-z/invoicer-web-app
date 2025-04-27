@@ -10,16 +10,38 @@ Here you can see the specification of the Invoicer application in both [czech](.
 *TBD*
 
 ## Installation
-### Docker Containers
+### Individual Docker Containers
 #### Backend
  1. Build the backend image
 ```bash
-docker build -f ./Backend/Dockerfile.custom -t invoicer-backend .
+docker build -f ./Backend/Dockerfile.build -t invoicer-backend .
 ```
  2. Run the backend container
 ```bash
 docker run -d -p 8080:8080 -p 8081:8081 --name invoicer-backend invoicer-backend
 ```
+#### Frontend
+ 1. Build the frontend image
+```bash
+docker build -f ./Frontend/Dockerfile.build -t invoicer-frontend .
+```
+ 2. Run the frontend container
+```bash
+docker run -d -p 5100:80 --name invoicer-frontend invoicer-frontend
+```
+
+### Docker Compose
+#### Development
+1. Run the following command to run the application in development mode:
+```bash
+docker-compose -f docker-compose.dev.yml up -d --build
+```
+#### Production (_TBD_)
+1. Run the following command to run the application in production mode:
+```bash
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+
 
 #### Frontend
 *TBD*
