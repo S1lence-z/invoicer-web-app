@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
 # Set working directory BEFORE copying anything if mapping the whole context later
 WORKDIR /src
 
-# Expose the port the dev server will run on (choose one, e.g., 5000 for frontend)
+# Expose the port the dev server will run on
 EXPOSE 5000
 
 # Set environment variables for development

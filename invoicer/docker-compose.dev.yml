@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     container_name: backend-dev
@@ -7,20 +5,31 @@ services:
       context: .
       dockerfile: Backend/Dockerfile.dev
     ports:
-      # Map a host port (e.g., 8080) to the container's port (8080)
       - "8080:8080"
     volumes:
-      # Mount the entire solution directory into /src in the container
-      # This enables live code syncing / hot reload
-      - .:/src
-      # Mount the local database directory into the expected path inside the container
-      - ./Backend/Database:/src/Backend/Database # Sync the dev database
+      # 1. Mount project source directories from host to container
+      - ./Backend:/src/Backend           # Sync Backend source
+      - ./Application:/src/Application   # Sync Application source
+      - ./Domain:/src/Domain             # Sync Domain source
+
+      # 2. Use named volumes to isolate build artifacts inside the container
+      #    These override the corresponding subdirectories from the host mounts above.
+      - backend_obj:/src/Backend/obj     # Isolate Backend/obj
+      - backend_bin:/src/Backend/bin     # Isolate Backend/bin
+      # Note: We generally only need to isolate bin/obj for the *entry point* project (Backend).
+      # The build process inside the container should handle outputs for Application/Domain correctly.
+
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - DOTNET_USE_POLLING_FILE_WATCHER=true
-    # Command to run the backend with hot reload
     command: sh -c "cd Backend && dotnet watch run --non-interactive --no-launch-profile"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   frontend:
     container_name: frontend-dev
@@ -30,13 +39,28 @@ services:
     ports:
       - "5100:5000"
     volumes:
-      # Mount the entire solution directory into /src in the container
-      - .:/src
+      # 1. Mount project source directories from host to container
+      - ./Frontend:/src/Frontend         # Sync Frontend source (incl. wwwroot)
+      - ./Application:/src/Application   # Sync Application source
+      - ./Domain:/src/Domain             # Sync Domain source
+
+      # 2. Use named volumes to isolate build artifacts inside the container
+      - frontend_obj:/src/Frontend/obj   # Isolate Frontend/obj
+      - frontend_bin:/src/Frontend/bin   # Isolate Frontend/bin
+
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
       - DOTNET_USE_POLLING_FILE_WATCHER=true
-    # Command to run the frontend Blazor dev server with hot reload
-    command: sh -c "cd Frontend && dotnet clean && dotnet watch run --non-interactive --no-launch-profile"
+      - BackendApiUrl=http://backend:8080
+    command: sh -c "cd Frontend && dotnet watch run --non-interactive --no-launch-profile --no-hot-reload"
     depends_on:
-      - backend # Ensure backend starts first
+      backend:
+          condition: service_healthy # Wait for backend to be ready
+
+# Define the named volumes used above
+volumes:
+  backend_obj:    # Stores /src/Backend/obj inside the backend container
+  backend_bin:    # Stores /src/Backend/bin inside the backend container
+  frontend_obj:   # Stores /src/Frontend/obj inside the frontend container
+  frontend_bin:   # Stores /src/Frontend/bin inside the frontend container

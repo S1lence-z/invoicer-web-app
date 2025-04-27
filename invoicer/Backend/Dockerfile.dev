@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
 
 WORKDIR /src
 
-# Expose the port(s) the backend will listen on (e.g., 8080 for HTTP)
+# Expose the port(s) the backend will listen on
 EXPOSE 8080
 
 # Set environment variables for development
