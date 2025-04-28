@@ -30,6 +30,7 @@ namespace Backend
 			builder.Services.AddScoped<IInvoiceNumberingService, InvoiceNumberingService>();
 			builder.Services.AddSingleton<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
 			builder.Services.AddScoped<IInvoicePdfGenerator, InvoicePdfGenerator>();
+			builder.Services.AddScoped<IEntityInvoiceNumberingSchemeState, EntityInvoiceNumberingSchemeStateService>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
