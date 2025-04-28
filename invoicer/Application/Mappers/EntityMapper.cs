@@ -15,7 +15,7 @@ namespace Application.Mappers
 				PhoneNumber = entityDto.PhoneNumber,
 				BankAccountId = entityDto.BankAccountId,
 				AddressId = entityDto.AddressId,
-				NumberingSchemeId = entityDto.NumberingSchemeId
+				CurrentNumberingSchemeId = entityDto.CurrentNumberingSchemeId
 			};
 		}
 
@@ -32,7 +32,7 @@ namespace Application.Mappers
 				AddressId = entity.AddressId,
 				BankAccount = BankAccountMapper.MapToDto(entity.BankAccount!),
 				Address = AddressMapper.MapToDto(entity.Address!),
-				NumberingSchemeId = entity.NumberingSchemeId,
+				CurrentNumberingSchemeId = entity.CurrentNumberingSchemeId,
 			};
 		}
 	}

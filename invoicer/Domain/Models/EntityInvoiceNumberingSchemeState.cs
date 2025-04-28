@@ -2,8 +2,8 @@
 {
 	public class EntityInvoiceNumberingSchemeState
 	{
+		// Primary key
 		public int EntityId { get; set; }
-		public int NumberingSchemeId { get; set; }
 
 		// Navigation properties
 		public virtual Entity Entity { get; set; } = null!;
@@ -17,8 +17,10 @@
 		public EntityInvoiceNumberingSchemeState UpdateForNext()
 		{
 			LastSequenceNumber++;
-			LastGenerationYear = DateTime.Now.Year;
-			LastGenerationMonth = DateTime.Now.Month;
+			int currentYear = DateTime.Now.Year;
+			int currentMonth = DateTime.Now.Month;
+			if (currentYear != LastGenerationYear) LastGenerationYear = currentYear;
+			if (currentMonth != LastGenerationMonth) LastGenerationMonth = currentMonth;
 			return this;
 		}
 	}

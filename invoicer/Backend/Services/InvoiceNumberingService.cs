@@ -88,7 +88,7 @@ namespace Backend.Services
 				throw new ArgumentException($"Entity with id {entityId} not found");
 
 			// Get the numbering scheme
-			int numberingSchemeId = existingEntity.NumberingSchemeId;
+			int numberingSchemeId = existingEntity.CurrentNumberingSchemeId;
 			NumberingScheme? numberingScheme = await context.NumberingScheme
 				.AsNoTracking()
 				.FirstOrDefaultAsync(ins => ins.Id == numberingSchemeId);
@@ -98,15 +98,14 @@ namespace Backend.Services
 
 			// Get the state
 			EntityInvoiceNumberingSchemeState? state = await context.EntityInvoiceNumberingSchemeState
-				.FirstOrDefaultAsync(ins => ins.EntityId == entityId && ins.NumberingSchemeId == numberingSchemeId);
+				.FirstOrDefaultAsync(ins => ins.EntityId == entityId);
 
 			if (state is null)
 			{
 				// Create a new state if it doesn't exist
 				state = new EntityInvoiceNumberingSchemeState
 				{
-					EntityId = entityId,
-					NumberingSchemeId = numberingSchemeId
+					EntityId = entityId
 				};
 				await context.EntityInvoiceNumberingSchemeState.AddAsync(state);
 			}
