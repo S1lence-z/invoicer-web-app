@@ -111,5 +111,26 @@ namespace Backend.Controllers
 				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
+
+		[HttpGet("PeekNextInvoiceNumber/{entityId:int}", Name = "PeekNextInvoiceNumber")]
+		[ProducesResponseType(typeof(string), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
+		public async Task<IActionResult> PeekNextInvoiceNumber(int entityId)
+		{
+			try
+			{
+				string nextInvoiceNumber = await numberingService.PeekNextInvoiceNumberAsync(entityId, DateTime.Now);
+				return Ok(nextInvoiceNumber);
+			}
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(ApiErrorResponse.Create("Invoice numbering scheme not found", e.Message, 404));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+			}
+		}
 	}
 }

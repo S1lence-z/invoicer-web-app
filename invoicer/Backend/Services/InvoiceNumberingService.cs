@@ -131,5 +131,34 @@ namespace Backend.Services
 
 			return InvoiceNumberSchemeMapper.MapToDto(defaultScheme);
 		}
+
+		public async Task<string> PeekNextInvoiceNumberAsync(int entityId, DateTime generationDate)
+		{
+			// Get the entity
+			Entity? existingEntity = await context.Entity
+				.AsNoTracking()
+				.FirstOrDefaultAsync(e => e.Id == entityId);
+			if (existingEntity is null)
+				throw new ArgumentException($"Entity with id {entityId} not found");
+
+			// Get the numbering scheme
+			int numberingSchemeId = existingEntity.CurrentNumberingSchemeId;
+			NumberingScheme? numberingScheme = await context.NumberingScheme
+				.AsNoTracking()
+				.FirstOrDefaultAsync(ins => ins.Id == numberingSchemeId);
+			if (numberingScheme is null)
+				throw new ArgumentException($"Invoice Numbering Scheme with id {numberingSchemeId} not found");
+
+			// Get current state
+			EntityInvoiceNumberingSchemeState? state = await context.EntityInvoiceNumberingSchemeState
+				.AsNoTracking()
+				.FirstOrDefaultAsync(ins => ins.EntityId == entityId);
+			if (state is null)
+				throw new ArgumentException($"Entity Invoice Numbering Scheme State with entity id {entityId} not found");
+
+			// Generate the next invoice number
+			string newInvoiceNumber = invoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, state, generationDate);
+			return newInvoiceNumber;
+		}
 	}
 }

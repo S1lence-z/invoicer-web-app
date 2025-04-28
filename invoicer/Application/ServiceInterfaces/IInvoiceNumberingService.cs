@@ -7,6 +7,8 @@ namespace Application.ServiceInterfaces
 	{
 		Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate);
 
+		Task<string> PeekNextInvoiceNumberAsync(int entityId, DateTime generationDate);
+
 		Task<NumberingSchemeDto> GetDefaultNumberScheme();
 	}
 }
