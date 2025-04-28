@@ -2,9 +2,9 @@
 using Domain.Enums;
 using Application.DTOs;
 
-namespace Frontend.Models.FormModels
+namespace Frontend.Models
 {
-	public class InvoiceNumberingFormModel
+	public class NumberingSchemeFormModel
 	{
 		public int Id { get; set; }
 
@@ -23,7 +23,7 @@ namespace Frontend.Models.FormModels
 		public int SequencePadding { get; set; } = 3;
 
 		[EnumDataType(typeof(YearFormat), ErrorMessage = "Invalid year format")]
-		public YearFormat InvoiceNumberYearFormat { get; set; } = YearFormat.FourDigit;
+		public YearFormat YearFormat { get; set; } = YearFormat.FourDigit;
 
 		public bool IncludeMonth { get; set; } = true;
 
@@ -32,9 +32,9 @@ namespace Frontend.Models.FormModels
 
 		public bool IsDefault { get; set; } = false;
 
-		public static InvoiceNumberingFormModel FromDto(NumberingSchemeDto dto)
+		public static NumberingSchemeFormModel FromDto(NumberingSchemeDto dto)
 		{
-			return new InvoiceNumberingFormModel
+			return new NumberingSchemeFormModel
 			{
 				Id = dto.Id,
 				Prefix = dto.Prefix,
@@ -42,7 +42,7 @@ namespace Frontend.Models.FormModels
 				Seperator = dto.Seperator,
 				SequencePosition = dto.SequencePosition,
 				SequencePadding = dto.SequencePadding,
-				InvoiceNumberYearFormat = dto.YearFormat,
+				YearFormat = dto.YearFormat,
 				IncludeMonth = dto.IncludeMonth,
 				ResetFrequency = dto.ResetFrequency,
 				IsDefault = dto.IsDefault
@@ -59,7 +59,7 @@ namespace Frontend.Models.FormModels
 				Seperator = Seperator,
 				SequencePosition = SequencePosition,
 				SequencePadding = SequencePadding,
-				YearFormat = InvoiceNumberYearFormat,
+				YearFormat = YearFormat,
 				IncludeMonth = IncludeMonth,
 				ResetFrequency = ResetFrequency,
 				IsDefault = IsDefault

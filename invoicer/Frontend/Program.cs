@@ -1,5 +1,4 @@
 using System.Net.Http.Json;
-using Frontend.Models;
 using Frontend.Utils;
 using Frontend.Api;
 using Microsoft.AspNetCore.Components.Web;
@@ -22,7 +21,7 @@ namespace Frontend
 
 			// Load config files
 			var envConfig = await httpClient.GetFromJsonAsync<EnvironmentConfig>("./Data/env.json");
-			var navMenuItemsList = await httpClient.GetFromJsonAsync<List<NavLinkItem>>("./Data/NavMenuContent.json");
+			var navMenuItemsList = await httpClient.GetFromJsonAsync<IEnumerable<NavLinkItem>>("./Data/NavMenuContent.json");
 
 			// Register config files
 			builder.Services.AddScoped(sp => httpClient);

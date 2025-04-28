@@ -1,9 +1,7 @@
-﻿using Frontend.Models;
-
-namespace Frontend.Utils
+﻿namespace Frontend.Utils
 {
-	public class NavMenuItemsProvider(IList<NavLinkItem> items)
+	public class NavMenuItemsProvider(IEnumerable<NavLinkItem> items)
 	{
-		public IList<NavLinkItem> Items { get; private init; } = items;
+		public IEnumerable<NavLinkItem> Items { get; private init; } = items;
 	}
 }

@@ -2,7 +2,7 @@
 using Application.AresApiModels;
 using Application.ServiceInterfaces;
 using Domain.Interfaces;
-using Frontend.Models;
+using Frontend.Utils;
 
 namespace Frontend.Api
 {

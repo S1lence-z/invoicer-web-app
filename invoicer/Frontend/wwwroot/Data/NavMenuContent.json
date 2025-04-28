@@ -16,6 +16,11 @@
 	},
 	{
 		"Label": "Invoice Numbering",
+		"UrlPath": "/entitynumberingscheme",
+		"IconClass": "bi bi-plus-square-fill-nav-menu"
+	},
+	{
+		"Label": "Numbering Schemes",
 		"UrlPath": "/invoicenumbering",
 		"IconClass": "bi bi-plus-square-fill-nav-menu"
 	}

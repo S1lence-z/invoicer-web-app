@@ -2,7 +2,6 @@
 using Application.DTOs;
 using Application.ServiceInterfaces;
 using Frontend.Utils;
-using Frontend.Models;
 using Application.Api;
 
 namespace Frontend.Api
