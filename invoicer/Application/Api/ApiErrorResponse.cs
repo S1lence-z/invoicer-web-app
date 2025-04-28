@@ -1,21 +1,19 @@
 ﻿namespace Application.Api
 {
-	public class ApiErrorResponse
+	public class ApiErrorResponse(string message, string details, int statusCode)
 	{
-		public string Message { get; set; } = string.Empty;
-		public string Details { get; set; } = string.Empty;
-		public int StatusCode { get; set; }
-
-		private ApiErrorResponse(string message, string details, int statusCode)
-		{
-			Message = message;
-			Details = details;
-			StatusCode = statusCode;
-		}
+		public string Message { get; set; } = message;
+		public string Details { get; set; } = details;
+		public int StatusCode { get; set; } = statusCode;
 
 		public static ApiErrorResponse Create(string message, string details, int statusCode)
 		{
 			return new ApiErrorResponse(message, details, statusCode);
+		}
+
+		public override string ToString()
+		{
+			return $"API Error: {Message}, Details: {Details}, StatusCode: {StatusCode}";
 		}
 	}
 }
