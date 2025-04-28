@@ -11,11 +11,11 @@ namespace Frontend.Models.FormModels
 
 		// Seller
 		[Required(ErrorMessage = "Seller is required")]
-		public int? SellerId { get; set; } = null;
+		public int SellerId { get; set; }
 
 		// Buyer
 		[Required(ErrorMessage = "Buyer is required")]
-		public int? BuyerId { get; set; } = null;
+		public int BuyerId { get; set; }
 
 		// Invoice attributes
 

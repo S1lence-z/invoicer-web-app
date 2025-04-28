@@ -167,5 +167,31 @@ namespace Frontend.Api
 		{
 			throw new NotImplementedException("GetNextInvoiceNumberAsync method is not implemented.");
 		}
+
+		public async Task<string> PeekNextInvoiceNumberAsync(int entityId, DateTime generationDate)
+		{
+			try
+			{
+				var response = await _httpClient.GetAsync($"{_urlPath}/PeekNextInvoiceNumber/{entityId}");
+				if (response.IsSuccessStatusCode)
+					return await response.Content.ReadAsStringAsync();
+				else
+				{
+					var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+					if (errorResponse is not null)
+						throw new ApiException(errorResponse);
+					else
+						throw new Exception($"Failed to peek next Invoice Number: {response.ReasonPhrase}");
+				}
+			}
+			catch (ApiException)
+			{
+				throw;
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
 	}
 }

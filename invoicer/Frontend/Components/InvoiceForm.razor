@@ -4,7 +4,9 @@
 @using Domain.Interfaces;
 @using Frontend.Models.FormModels;
 @using Application.Extensions;
+@using Frontend.Utils;
 @inject IInvoiceService invoiceService;
+@inject IInvoiceNumberingService invoiceNumberingService;
 @inject IEntityService entityService;
 
 <EditForm Model="@invoiceFormModel" OnValidSubmit="SubmitForm">
@@ -13,8 +15,8 @@
 
     <div class="row mb-4">
         <div class="col">
-            <label for="invoice-number" class="font-weight-bold">Invoice Number</label>
-            <input type="text" class="form-control" id="invoice-number" placeholder="Enter Invoice Number" @bind="invoiceFormModel.InvoiceNumber" />
+            <label for="invoice-number" class="font-weight-bold">Invoice Number</label>  
+            <div class="form-control" id="invoice-number">@invoiceFormModel.InvoiceNumber</div>
             <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
         </div>
     </div>
@@ -40,8 +42,8 @@
     <div class="row mb-4">
         <div class="col">
             <label for="seller" class="font-weight-bold">Seller</label>
-            <select class="form-control" id="seller" @bind="invoiceFormModel.SellerId">
-                <option value="">Select Seller</option>
+            <select class="form-control" id="seller" @onchange="ShowNewInvoiceNumber">
+                <option value="0">Select Seller</option>
                 @foreach (var entity in allEntities)
                 {
                     <option value="@entity.Id">@entity.Name</option>
@@ -52,7 +54,7 @@
         <div class="col">
             <label for="buyer" class="font-weight-bold">Buyer</label>
             <select class="form-control" id="buyer" @bind="invoiceFormModel.BuyerId">
-                <option value="">Select Buyer</option>
+                <option value="0">Select Buyer</option>
                 @foreach (var entity in allEntities)
                 {
                     <option value="@entity.Id">@entity.Name</option>
@@ -199,8 +201,8 @@
                 DueDate = invoiceFormModel.DueDate,
                 VatDate = invoiceFormModel.VatDate,
                 Status = invoiceFormModel.Status,
-                SellerId = invoiceFormModel.SellerId ?? 0,
-                BuyerId = invoiceFormModel.BuyerId ?? 0,
+                SellerId = invoiceFormModel.SellerId,
+                BuyerId = invoiceFormModel.BuyerId,
                 Currency = invoiceFormModel.Currency,
                 PaymentMethod = invoiceFormModel.PaymentMethod,
                 DeliveryMethod = invoiceFormModel.DeliveryMethod,
@@ -225,8 +227,8 @@
                 DueDate = invoiceFormModel.DueDate,
                 VatDate = invoiceFormModel.VatDate,
                 Status = invoiceFormModel.Status,
-                SellerId = invoiceFormModel.SellerId ?? 0,
-                BuyerId = invoiceFormModel.BuyerId ?? 0,
+                SellerId = invoiceFormModel.SellerId,
+                BuyerId = invoiceFormModel.BuyerId,
                 Currency = invoiceFormModel.Currency,
                 PaymentMethod = invoiceFormModel.PaymentMethod,
                 DeliveryMethod = invoiceFormModel.DeliveryMethod,
@@ -256,5 +258,30 @@
     {
         invoiceFormModel.Items.Remove(item);
         StateHasChanged();
+    }
+
+    private async Task ShowNewInvoiceNumber(ChangeEventArgs args)
+    {
+        // If we are editing an invoice, we don't want to change the invoice number
+        if (InvoiceInstance is not null)
+            return;
+
+        try
+        {
+            int newSellerId = int.Parse(args.Value?.ToString() ?? "0");
+            string nextInvoiceNumber = await invoiceNumberingService.PeekNextInvoiceNumberAsync(newSellerId, DateTime.Now);
+            invoiceFormModel.SellerId = newSellerId;
+            invoiceFormModel.InvoiceNumber = nextInvoiceNumber;
+        }
+        catch (ApiException ex)
+        {
+            invoiceFormModel.InvoiceNumber = "Error fetching invoice number";
+            Console.WriteLine(ex);
+        }
+        catch (Exception ex)
+        {
+            invoiceFormModel.InvoiceNumber = "Error fetching invoice number";
+            Console.WriteLine(ex.Message);
+        }
     }
 }
