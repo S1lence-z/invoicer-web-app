@@ -9,8 +9,8 @@
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3">
     @* HEADER *@
-    <div class="d-flex justify-content-between align-items-center px-4 pt-4">
-        <h3>Select Invoice Numbering Scheme For Each Entity</h3>
+    <div class="d-flex justify-content-between align-items-center px-4 pt-4 pb-2">
+        <h3>Select Numbering Schemes For Entities</h3>
     </div>
     @* CONTENT *@
     <div class="d-flex flex-column pb-4">
@@ -29,13 +29,15 @@
                 foreach (EntityDto entity in allEntities)
                 {
                     <div class="card border-2 shadow-sm">
-                        <div class="card-body d-flex flex-row align-content-between gap-5">
-                            <div class="align-content-center">@entity.Name</div>
-                            <div class="text-end gap-1">
-                                <select class="p-2">
+                        <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3">
+                            <div class="fw-bold text-dark">@entity.Name</div>
+                            <div class="text-end">
+                                <select class="form-select" @onchange="(e) => OnNumberingSchemeChange(entity, int.Parse(e.Value!.ToString()!))">
                                     @foreach (NumberingSchemeDto numberingScheme in allNumberingSchemes)
                                     {
-                                        <option value="@numberingScheme.Id">@numberingScheme.GetPreview(1)</option>
+                                        <option value="@numberingScheme.Id" selected="@(entity.CurrentNumberingSchemeId == numberingScheme.Id)">
+                                            @numberingScheme.GetPreview(1)
+                                        </option>
                                     }
                                 </select>
                             </div>
@@ -81,8 +83,25 @@
         }
     }
 
-    private Task UpdateEntityNumberingScheme()
+    private async Task OnNumberingSchemeChange(EntityDto entity, int updatedNumberingSchemeId)
     {
-        return Task.CompletedTask;
+        EntityDto updatedEntity = entity with { CurrentNumberingSchemeId = updatedNumberingSchemeId };
+        await UpdateEntityNumberingScheme(updatedEntity.Id, updatedEntity);
+    }
+
+    private async Task UpdateEntityNumberingScheme(int entityId, EntityDto updatedEntity)
+    {
+        try
+        {
+            EntityDto? responseEntity = await entityService.UpdateAsync(entityId, updatedEntity);
+            if (responseEntity is null)
+                Console.WriteLine("Failed to update entity numbering scheme");
+            else
+                Console.WriteLine(responseEntity);
+        } 
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }
