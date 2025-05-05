@@ -5,7 +5,7 @@ namespace Application.DTOs
 	public record class InvoiceDto
 	{
 		public int Id { get; set; }
-		public int InvoiceNumberSchemeId { get; set; }
+		public int NumberingSchemeId { get; set; }
 		public int SellerId { get; set; }
 		public int BuyerId { get; set; }
 		public EntityDto? Seller { get; set; }

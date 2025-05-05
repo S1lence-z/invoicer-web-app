@@ -1,7 +1,7 @@
 ﻿using Application.ServiceInterfaces;
 using Application.DTOs;
-using Frontend.Models;
 using System.Net.Http.Json;
+using Frontend.Utils;
 
 namespace Frontend.Api
 {

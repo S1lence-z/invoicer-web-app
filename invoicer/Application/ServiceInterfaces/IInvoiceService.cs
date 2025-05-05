@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Application.PdfGenerator;
 using Domain.Interfaces;
 
 namespace Application.ServiceInterfaces

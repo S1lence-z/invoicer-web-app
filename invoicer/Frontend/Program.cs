@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
-using Frontend.Models;
 using Frontend.Utils;
 using Frontend.Api;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Application.ServiceInterfaces;
+using Frontend.Services;
 
 namespace Frontend
 {
@@ -21,7 +21,7 @@ namespace Frontend
 
 			// Load config files
 			var envConfig = await httpClient.GetFromJsonAsync<EnvironmentConfig>("./Data/env.json");
-			var navMenuItemsList = await httpClient.GetFromJsonAsync<List<NavLinkItem>>("./Data/NavMenuContent.json");
+			var navMenuItemsList = await httpClient.GetFromJsonAsync<IEnumerable<NavLinkItem>>("./Data/NavMenuContent.json");
 
 			// Register config files
 			builder.Services.AddScoped(sp => httpClient);
@@ -36,6 +36,7 @@ namespace Frontend
 			builder.Services.AddScoped<IAddressService, AddressService>();
 			builder.Services.AddScoped<IBankAccountService, BankAccountService>();
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+			builder.Services.AddScoped<IInvoiceNumberingService, InvoiceNumberingService>();
 
 			// Register other services
 			builder.Services.AddScoped<LoadingService>();

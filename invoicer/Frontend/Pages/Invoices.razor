@@ -1,7 +1,8 @@
 ﻿@page "/invoices";
 @using System.Collections.ObjectModel;
-@using Application.ServiceInterfaces;
 @using Application.DTOs;
+@using Application.PdfGenerator
+@using Application.ServiceInterfaces;
 @using Domain.Interfaces;
 @using Frontend.Components;
 @inject IInvoiceService invoiceService;
@@ -113,7 +114,7 @@
         try
         {
             allInvoices = (await invoiceService.GetAllAsync()).ToList();
-            populateShownInvoices(allInvoices);
+            PopulateShownInvoices(allInvoices);
         }
         catch (Exception ex)
         {
@@ -121,7 +122,7 @@
         }
     }
 
-    private async void populateShownInvoices(IList<InvoiceDto> newInvoices)
+    private async void PopulateShownInvoices(IList<InvoiceDto> newInvoices)
     {
         shownInvoices.Clear();
         foreach (var inv in newInvoices)
@@ -136,19 +137,19 @@
         searchTerm = e.Value?.ToString() ?? string.Empty;
         if (string.IsNullOrEmpty(searchTerm)) 
         {
-            populateShownInvoices(allInvoices);
+            PopulateShownInvoices(allInvoices);
             return;
         }
         string search = searchTerm.ToLower();
         switch (searchType) {
             case SearchType.InvoiceNumber:
-                populateShownInvoices(allInvoices.Where(i => i.InvoiceNumber.Contains(search)).ToList());
+                PopulateShownInvoices(allInvoices.Where(i => i.InvoiceNumber.Contains(search)).ToList());
                 break;
             case SearchType.Buyer:
-                populateShownInvoices(allInvoices.Where(i => i.Buyer!.Name.ToLower().Contains(search)).ToList());
+                PopulateShownInvoices(allInvoices.Where(i => i.Buyer!.Name.ToLower().Contains(search)).ToList());
                 break;
             case SearchType.Seller:
-                populateShownInvoices(allInvoices.Where(i => i.Seller!.Name.ToLower().Contains(search)).ToList());
+                PopulateShownInvoices(allInvoices.Where(i => i.Seller!.Name.ToLower().Contains(search)).ToList());
                 break;
             default:
                 break;

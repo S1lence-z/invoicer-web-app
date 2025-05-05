@@ -1,4 +1,4 @@
-﻿namespace Frontend.Models
+﻿namespace Frontend.Utils
 {
 	public class NavLinkItem(string label, string urlPath, string iconClass)
 	{

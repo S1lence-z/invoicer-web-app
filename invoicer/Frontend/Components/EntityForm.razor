@@ -1,15 +1,15 @@
 ﻿@using Application.AresApiModels;
-@using Application.ServiceInterfaces;
 @using Application.DTOs;
+@using Application.ServiceInterfaces;
 @using Domain.Interfaces;
 @using Frontend.Models;
-@using Frontend.Models.FormModels;
+@using Frontend.Services
 @using Frontend.Utils;
 @inject IAresApiService aresApiService;
 @inject IAddressService addressService;
 @inject IEntityService entityService;
 @inject IBankAccountService bankAccountService;
-@inject LoadingService LoadingService;
+@inject LoadingService loadingService;
 
 <div>
     @* ARES API WINDOW *@
@@ -97,7 +97,7 @@
                 <ValidationMessage For="@(() => entityFormModel.IBAN)" />
             </div>
         </div>
-        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@LoadingService.IsLoading">Submit</button>
+        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">Submit</button>
     </EditForm>
 </div>
 
@@ -125,7 +125,7 @@
 
     private async Task FillInAresData()
     {
-        LoadingService.IsLoading = true;
+        loadingService.StartLoading();
         aresApiErrorMessage = string.Empty;
         try 
         {
@@ -153,7 +153,7 @@
         } 
         finally
         {
-            LoadingService.IsLoading = false;
+            loadingService.StopLoading();
         }
     }
 
@@ -178,7 +178,7 @@
 
     private async Task SubmitForm() 
     {
-        LoadingService.IsLoading = true;
+        loadingService.StartLoading();
         try 
         {
             if (EntityInstance is null)
@@ -194,7 +194,7 @@
         }
         finally
         {
-            LoadingService.IsLoading = false;
+            loadingService.StopLoading();
             await SubmitCallback.InvokeAsync();
             ClearForm();
         }
@@ -264,7 +264,7 @@
         }
         // Edit the address
         int addressId = EntityInstance.AddressId;
-        var editedAddress = new AddressDto
+        AddressDto editedAddress = new()
             {
                 Id = addressId,
                 Street = entityFormModel.Street,
@@ -280,7 +280,7 @@
         }
         // Edit the bank account
         int bankAccountId = EntityInstance.BankAccountId;
-        var editedBankAccount = new BankAccountDto
+        BankAccountDto editedBankAccount = new()
             {
                 Id = bankAccountId,
                 AccountNumber = entityFormModel.AccountNumber,
@@ -302,7 +302,7 @@
                 Name = entityFormModel.Name,
                 Email = entityFormModel.Email,
                 PhoneNumber = entityFormModel.PhoneNumber,
-                InvoiceNumberSchemeId = EntityInstance.InvoiceNumberSchemeId,
+                CurrentNumberingSchemeId = EntityInstance.CurrentNumberingSchemeId,
                 AddressId = editedAddressResponse.Id,
                 BankAccountId = editedBankAccountResponse.Id
             };

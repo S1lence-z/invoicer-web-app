@@ -1,0 +1,21 @@
+# Frontend/Dockerfile.dev
+ARG DOTNET_VERSION=8.0
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+
+# Set working directory BEFORE copying anything if mapping the whole context later
+WORKDIR /src
+
+# Expose the port the dev server will run on
+EXPOSE 5000
+
+# Set environment variables for development
+# Use polling file watcher for Docker volume mounts
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+# Ensure Kestrel listens on all interfaces inside the container on the chosen port
+ENV ASPNETCORE_URLS=http://+:5000
+# Skip extraction of XML documentation files (faster restores)
+ENV NUGET_XMLDOC_MODE=skip
+
+# The actual command (dotnet watch) will be run via docker-compose
+# Keep the container alive if compose doesn't override the command immediately
+CMD ["tail", "-f", "/dev/null"]

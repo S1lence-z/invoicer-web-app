@@ -1,0 +1,36 @@
+# Frontend/Dockerfile.prod
+ARG DOTNET_VERSION=8.0
+ARG NGINX_VERSION=stable-alpine # Use a specific stable tag
+
+# --- Build Stage ---
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
+WORKDIR /src
+
+# Copy only necessary project files first to optimize layer caching
+COPY ["Frontend/Frontend.csproj", "Frontend/"]
+COPY ["Application/Application.csproj", "Application/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
+
+# Restore dependencies specifically for the Frontend project
+RUN dotnet restore "Frontend/Frontend.csproj"
+
+COPY . .
+
+WORKDIR "/src/Frontend"
+RUN dotnet publish "Frontend.csproj" -c Release -o /app/publish --no-restore
+
+# --- Serve Stage ---
+# Use the official Nginx image to serve the static files
+FROM nginx:${NGINX_VERSION} AS final
+
+# Remove the default Nginx welcome page
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy the published output from the build to Nginx's web server root directory
+COPY --from=build /app/publish/wwwroot /usr/share/nginx/html/
+
+# Copy your custom Nginx configuration file
+COPY Frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80

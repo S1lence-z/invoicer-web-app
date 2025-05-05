@@ -2,7 +2,11 @@ using Application.ServiceInterfaces;
 using Backend.Database;
 using Backend.Services;
 using Backend.Services.AresApiService;
+using Domain.Interfaces;
+using Domain.Services;
+using Backend.Utils.InvoicePdfGenerator;
 using Microsoft.EntityFrameworkCore;
+using Application.PdfGenerator;
 
 namespace Backend
 {
@@ -24,6 +28,9 @@ namespace Backend
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 			builder.Services.AddScoped<IAresApiService, AresApiService>();
 			builder.Services.AddScoped<IInvoiceNumberingService, InvoiceNumberingService>();
+			builder.Services.AddSingleton<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
+			builder.Services.AddScoped<IInvoicePdfGenerator, InvoicePdfGenerator>();
+			builder.Services.AddScoped<IEntityInvoiceNumberingSchemeState, EntityInvoiceNumberingSchemeStateService>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();

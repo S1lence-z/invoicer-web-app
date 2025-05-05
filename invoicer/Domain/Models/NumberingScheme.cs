@@ -2,7 +2,7 @@
 
 namespace Domain.Models
 {
-	public class InvoiceNumberScheme
+	public class NumberingScheme
 	{
 		public int Id { get; set; }
 
@@ -10,30 +10,30 @@ namespace Domain.Models
 		public string Prefix { get; set; } = string.Empty;
 		public bool UseSeperator { get; set; } = true;
 		public string Seperator { get; set; } = "-";
-		public InvoiceNumberSequencePosition SequencePosition { get; set; } = InvoiceNumberSequencePosition.Start;
+		public Position SequencePosition { get; set; } = Position.Start;
 		public int SequencePadding { get; set; } = 3;
-		public InvoiceNumberYearFormat InvoiceNumberYearFormat { get; set; } = InvoiceNumberYearFormat.FourDigit;
+		public YearFormat InvoiceNumberYearFormat { get; set; } = YearFormat.FourDigit;
 		public bool IncludeMonth { get; set; } = true;
-		public InvoiceNumberResetFrequency ResetFrequency { get; set; } = InvoiceNumberResetFrequency.Yearly;
+		public ResetFrequency ResetFrequency { get; set; } = ResetFrequency.Yearly;
 		public bool IsDefault { get; set; } = false;
 
 		// Navigation properties
 		public virtual ICollection<Entity> EntitiesUsingScheme { get; set; } = [];
 		public virtual ICollection<Invoice> InvoicesGeneratedWithScheme { get; set; } = [];
-		public virtual ICollection<EntityInvoiceNumberSchemeState> EntityInvoiceNumberSchemeStates { get; set; } = [];
+		public virtual ICollection<EntityInvoiceNumberingSchemeState> EntityNumberingSchemeState { get; set; } = [];
 
 		// Define default numbering scheme
-		public static InvoiceNumberScheme CreateDefault()
+		public static NumberingScheme CreateDefault()
 		{
-			return new InvoiceNumberScheme
+			return new NumberingScheme
 			{
 				Id = 1,
 				Prefix = "INV",
 				UseSeperator = true,
 				Seperator = "-",
-				SequencePosition = InvoiceNumberSequencePosition.Start,
+				SequencePosition = Position.Start,
 				SequencePadding = 3,
-				InvoiceNumberYearFormat = InvoiceNumberYearFormat.FourDigit,
+				InvoiceNumberYearFormat = YearFormat.FourDigit,
 				IncludeMonth = true,
 				IsDefault = true,
 			};

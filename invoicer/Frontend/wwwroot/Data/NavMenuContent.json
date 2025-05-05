@@ -13,5 +13,15 @@
 		"Label": "Invoices",
 		"UrlPath": "/invoices",
 		"IconClass": "bi bi-plus-square-fill-nav-menu"
+	},
+	{
+		"Label": "Entity Invoice Numbering",
+		"UrlPath": "/entityinvoicenumbering",
+		"IconClass": "bi bi-plus-square-fill-nav-menu"
+	},
+	{
+		"Label": "Numbering Schemes",
+		"UrlPath": "/numberingschemes",
+		"IconClass": "bi bi-plus-square-fill-nav-menu"
 	}
 ]

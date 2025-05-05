@@ -3,7 +3,7 @@
 namespace Domain.Enums
 {
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	public enum InvoiceNumberYearFormat
+	public enum YearFormat
 	{
 		FourDigit,
 		TwoDigit,

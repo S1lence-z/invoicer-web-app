@@ -1,0 +1,114 @@
+﻿@page "/numberingschemes"
+@using Application.DTOs
+@using Frontend.Api;
+@using Application.ServiceInterfaces;
+@using Frontend.Components;
+@inject IInvoiceNumberingService numberingService;
+
+@* PAGE CONTAINER *@
+<div class="d-flex flex-column border rounded-3">
+    @* HEADER *@
+    <div class="d-flex justify-content-between align-items-center px-4 pt-4">
+        <h3>Invoice Numbering</h3>
+        <button class="btn btn-primary" @onclick="ShowNewNumberingSchemeModal">
+            Add Numbering Scheme
+        </button>
+    </div>
+    <hr />
+    @* CONTENT *@
+    <div class="d-flex flex-column pb-4">
+        @* NUMBERING SCHEMES LIST *@
+        <div class="d-flex flex-column overflow-auto px-4 gap-2">
+            @if (allNumberingSchemes is null)
+            {
+                <p>Loading...</p>
+            }
+            else if (allNumberingSchemes.Count == 0)
+            {
+                <p>No numbering schemes found</p>
+            }
+            else
+            {
+                foreach (var numberingScheme in allNumberingSchemes)
+                {
+                    <NumberingSchemeListItem NumberingScheme="numberingScheme" OnDeleteNumberingScheme="DeleteScheme" OnEditNumberingScheme="EditScheme" />
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@* ADD NEW NUMBERING SCHEME MODAL *@
+<Modal Title="Add New Numbering Scheme" IsVisible="isAddingNewNumberingScheme" OnClose="ShowNewNumberingSchemeModal">
+    <NumberingSchemeForm SubmitCallback="ShowNewNumberingSchemeModal" isActive="isAddingNewNumberingScheme" />
+</Modal>
+
+@* EDIT NUMBERING SCHEME MODAL *@
+<Modal Title="Edit Numbering Scheme" IsVisible="isEditingNumberingScheme" OnClose="ShowEditNumberingSchemeModal">
+    <NumberingSchemeForm SubmitCallback="ShowEditNumberingSchemeModal" NumberingSchemeInstance="numberingSchemeToEdit" isActive="isEditingNumberingScheme" />
+</Modal>
+
+@code {
+    private IList<NumberingSchemeDto> allNumberingSchemes = new List<NumberingSchemeDto>();
+    private NumberingSchemeDto? numberingSchemeToEdit = null;
+    private bool isAddingNewNumberingScheme = false;
+    private bool isEditingNumberingScheme = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNumberingSchemes();
+    }
+
+    private async Task LoadNumberingSchemes()
+    {
+        try
+        {
+            allNumberingSchemes = (await numberingService.GetAllAsync()).ToList();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    private async Task DeleteScheme(NumberingSchemeDto schemeToDelete)
+    {
+        try
+        {
+            bool status = await numberingService.DeleteAsync(schemeToDelete.Id);
+            if (status)
+            {
+                await LoadNumberingSchemes();
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    private async Task EditScheme(NumberingSchemeDto schemeToEdit)
+    {
+        try
+        {
+            numberingSchemeToEdit = schemeToEdit;
+            await ShowEditNumberingSchemeModal();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    private async Task ShowNewNumberingSchemeModal()
+    {
+        isAddingNewNumberingScheme = !isAddingNewNumberingScheme;
+        await LoadNumberingSchemes();
+    }
+
+    private async Task ShowEditNumberingSchemeModal()
+    {
+        isEditingNumberingScheme = !isEditingNumberingScheme;
+        await LoadNumberingSchemes();
+    }
+}

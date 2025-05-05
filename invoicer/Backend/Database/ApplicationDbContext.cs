@@ -11,8 +11,8 @@ namespace Backend.Database
 		public DbSet<Entity> Entity { get; set; }
 		public DbSet<Invoice> Invoice { get; set; }
 		public DbSet<InvoiceItem> InvoiceItem { get; set; }
-		public DbSet<InvoiceNumberScheme> InvoiceNumberScheme { get; set; }
-		public DbSet<EntityInvoiceNumberSchemeState> EntityInvoiceNumberSchemeStates { get; set; }
+		public DbSet<NumberingScheme> NumberingScheme { get; set; }
+		public DbSet<EntityInvoiceNumberingSchemeState> EntityInvoiceNumberingSchemeState { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -21,11 +21,11 @@ namespace Backend.Database
 			SetUpEntity(modelBuilder);
 			SetUpInvoice(modelBuilder);
 			SetUpInvoiceItem(modelBuilder);
-			SetUpInvoiceNumberScheme(modelBuilder);
-			SetupEntityInvoiceNumberSchemeState(modelBuilder);
+			SetUpNumberingScheme(modelBuilder);
+			SetupEntityInvoiceNumberingSchemeState(modelBuilder);
 
-			modelBuilder.Entity<InvoiceNumberScheme>().HasData(
-				Domain.Models.InvoiceNumberScheme.CreateDefault()
+			modelBuilder.Entity<NumberingScheme>().HasData(
+				Domain.Models.NumberingScheme.CreateDefault()
 			);
 		}
 
@@ -64,19 +64,29 @@ namespace Backend.Database
 				entity.Property(e => e.PhoneNumber).HasDefaultValue(string.Empty);
 				entity.HasOne(e => e.BankAccount).WithMany().HasForeignKey(e => e.BankAccountId);
 				entity.HasOne(e => e.Address).WithMany().HasForeignKey(e => e.AddressId);
-				entity.Property(e => e.InvoiceNumberSchemeId).IsRequired();
+				entity.Property(e => e.CurrentNumberingSchemeId).IsRequired();
 				// Invoice Number Scheme
-				entity.HasOne(e => e.InvoiceNumberScheme)
+				entity.HasOne(e => e.CurrentNumberingScheme)
 					.WithMany(ins => ins.EntitiesUsingScheme)
-					.HasForeignKey(e => e.InvoiceNumberSchemeId)
-					.OnDelete(DeleteBehavior.Restrict)
-					.IsRequired(false);
+					.HasForeignKey(e => e.CurrentNumberingSchemeId)
+					.OnDelete(DeleteBehavior.Restrict);
 
-				// Entity Invoice Number Scheme State
-				entity.HasMany(e => e.EntityInvoiceNumberSchemeStates)
-					.WithOne(eins => eins.Entity)
-					.HasForeignKey(e => e.EntityId)
+				// Numbering state
+				entity.HasOne(e => e.NumberingSchemeState)
+					.WithOne(s => s.Entity)
+					.HasForeignKey<EntityInvoiceNumberingSchemeState>(s => s.EntityId)
 					.OnDelete(DeleteBehavior.Cascade);
+
+				// Invoices
+				entity.HasMany(e => e.SoldInvoices)
+					.WithOne(i => i.Seller)
+					.HasForeignKey(i => i.SellerId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasMany(e => e.PurchasedInvoices)
+					.WithOne(i => i.Buyer)
+					.HasForeignKey(i => i.BuyerId)
+					.OnDelete(DeleteBehavior.Restrict);
 			});
 		}
 
@@ -106,10 +116,10 @@ namespace Backend.Database
 				invoice.HasMany(i => i.Items).WithOne().HasForeignKey(i => i.InvoiceId).OnDelete(DeleteBehavior.Cascade);
 
 				// Invoice Number Scheme
-				invoice.Property(i => i.InvoiceNumberSchemeId).IsRequired();
-				invoice.HasOne(i => i.InvoiceNumberScheme)
+				invoice.Property(i => i.NumberingSchemeId).IsRequired();
+				invoice.HasOne(i => i.InvoiceNumberingScheme)
 					.WithMany(ins => ins.InvoicesGeneratedWithScheme)
-					.HasForeignKey(i => i.InvoiceNumberSchemeId)
+					.HasForeignKey(i => i.NumberingSchemeId)
 					.OnDelete(DeleteBehavior.Restrict);
 			});
 		}
@@ -128,51 +138,42 @@ namespace Backend.Database
 			});
 		}
 
-		private static void SetUpInvoiceNumberScheme(ModelBuilder modelBuilder)
+		private static void SetUpNumberingScheme(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<InvoiceNumberScheme>(invoiceNumberScheme =>
+			modelBuilder.Entity<NumberingScheme>(invoiceNumberScheme =>
 			{
 				invoiceNumberScheme.HasKey(ins => ins.Id);
 				invoiceNumberScheme.Property(ins => ins.Prefix).HasConversion<string>().HasDefaultValue(string.Empty);
 				invoiceNumberScheme.Property(ins => ins.UseSeperator).HasDefaultValue(true);
 				invoiceNumberScheme.Property(ins => ins.Seperator).HasConversion<string>().HasDefaultValue("-");
-				invoiceNumberScheme.Property(ins => ins.SequencePosition).HasConversion<string>().HasDefaultValue(InvoiceNumberSequencePosition.Start);
+				invoiceNumberScheme.Property(ins => ins.SequencePosition).HasConversion<string>().HasDefaultValue(Position.Start);
 				invoiceNumberScheme.Property(ins => ins.SequencePadding).HasDefaultValue(3);
-				invoiceNumberScheme.Property(ins => ins.InvoiceNumberYearFormat).HasConversion<string>().HasDefaultValue(InvoiceNumberYearFormat.FourDigit);
+				invoiceNumberScheme.Property(ins => ins.InvoiceNumberYearFormat).HasConversion<string>().HasDefaultValue(YearFormat.FourDigit);
 				invoiceNumberScheme.Property(ins => ins.IncludeMonth).HasDefaultValue(true);
-				invoiceNumberScheme.Property(ins => ins.ResetFrequency).HasConversion<string>().HasDefaultValue(InvoiceNumberResetFrequency.Yearly);
+				invoiceNumberScheme.Property(ins => ins.ResetFrequency).HasConversion<string>().HasDefaultValue(ResetFrequency.Yearly);
 				invoiceNumberScheme.Property(ins => ins.IsDefault).HasDefaultValue(false);
 
 				// Invoices generated with this scheme
 				invoiceNumberScheme.HasMany(ins => ins.InvoicesGeneratedWithScheme)
-					.WithOne(e => e.InvoiceNumberScheme)
-					.HasForeignKey(i => i.InvoiceNumberSchemeId)
+					.WithOne(e => e.InvoiceNumberingScheme)
+					.HasForeignKey(i => i.NumberingSchemeId)
 					.OnDelete(DeleteBehavior.Restrict);
 			});
 		}
 
-		private static void SetupEntityInvoiceNumberSchemeState(ModelBuilder modelBuilder)
+		private static void SetupEntityInvoiceNumberingSchemeState(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<EntityInvoiceNumberSchemeState>(entityInvoiceNumberSchemeState =>
+			modelBuilder.Entity<EntityInvoiceNumberingSchemeState>(state =>
 			{
-				entityInvoiceNumberSchemeState.HasKey(eins => new { eins.EntityId, eins.InvoiceNumberSchemeId });
-				entityInvoiceNumberSchemeState.Property(eins => eins.EntityId).IsRequired();
-				entityInvoiceNumberSchemeState.Property(eins => eins.InvoiceNumberSchemeId).IsRequired();
-				entityInvoiceNumberSchemeState.Property(eins => eins.LastSequenceNumber);
-				entityInvoiceNumberSchemeState.Property(eins => eins.LastGenerationYear);
-				entityInvoiceNumberSchemeState.Property(eins => eins.LastGenerationMonth);
+				state.HasKey(eins => eins.EntityId);
+				state.Property(eins => eins.LastSequenceNumber);
+				state.Property(eins => eins.LastGenerationYear);
+				state.Property(eins => eins.LastGenerationMonth);
 
-				// Entity
-				entityInvoiceNumberSchemeState.HasOne(eins => eins.Entity)
-					.WithMany(e => e.EntityInvoiceNumberSchemeStates)
-					.HasForeignKey(eins => eins.EntityId)
+				state.HasOne(s => s.Entity)
+					.WithOne(e => e.NumberingSchemeState)
+					.HasForeignKey<EntityInvoiceNumberingSchemeState>(s => s.EntityId)
 					.OnDelete(DeleteBehavior.Cascade);
-
-				// Invoice Number Scheme
-				entityInvoiceNumberSchemeState.HasOne(eins => eins.InvoiceNumberScheme)
-					.WithMany(ins => ins.EntityInvoiceNumberSchemeStates)
-					.HasForeignKey(eins => eins.InvoiceNumberSchemeId)
-					.OnDelete(DeleteBehavior.Restrict);
 			});
 		}
 	}

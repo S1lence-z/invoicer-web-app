@@ -94,7 +94,7 @@
         selectedEntity = newSelectedEntity;
     }
 
-    private async void DeleteEntity(EntityDto entityToDelete)
+    private async Task DeleteEntity(EntityDto entityToDelete)
     {
         var status = await entityService.DeleteAsync(entityToDelete.Id);
         if (status) {

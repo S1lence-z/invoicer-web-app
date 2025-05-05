@@ -1,8 +1,6 @@
-﻿using Domain.Interfaces;
-
-namespace Domain.Models
+﻿namespace Domain.Models
 {
-    public class Address : IModel
+    public class Address
     {
         public int Id { get; set; }
 		public string Street { get; set; } = string.Empty;

@@ -1,0 +1,169 @@
+﻿@using Application.DTOs;
+@using Application.Extensions;
+@using Application.ServiceInterfaces;
+@using Domain.Enums;
+@using Frontend.Models;
+@using Frontend.Services
+@using Frontend.Utils;
+@inject LoadingService loadingService;
+@inject IInvoiceNumberingService numberingService;
+
+<div>
+    <EditForm Model="@SchemeFormModel" OnValidSubmit="SubmitForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row mb-4">
+            <div class="col">
+                <div class="form-check mt-4">
+                    <label class="form-check-label" for="use-seperator">Use Seperator</label>
+                    <input id="use-seperator" type="checkbox" class="form-check-input" @bind="SchemeFormModel.UseSeperator" />
+                </div>
+                <ValidationMessage For="@(() => SchemeFormModel.UseSeperator)" />
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col">
+                <label for="prefix" class="font-weight-bold">Prefix</label>
+                <input id="prefix" type="text" class="form-control" placeholder="Enter Prefix" @bind="SchemeFormModel.Prefix" />
+                <ValidationMessage For="@(() => SchemeFormModel.Prefix)" />
+            </div>
+            @if (SchemeFormModel.UseSeperator)
+            {
+                <div class="col">
+                    <label for="seperator" class="font-weight-bold">Seperator</label>
+                    <input id="seperator" type="text" class="form-control" placeholder="Enter Seperator" @bind="SchemeFormModel.Seperator" />
+                    <ValidationMessage For="@(() => SchemeFormModel.Seperator)" />
+                </div>
+            }
+        </div>
+
+        <div class="row mb-4">
+            <div class="col">
+                <label for="sequence-padding" class="font-weight-bold">Padding</label>
+                <input id="sequence-padding" type="number" class="form-control" placeholder="Enter Padding" @bind="SchemeFormModel.SequencePadding" />
+                <ValidationMessage For="@(() => SchemeFormModel.SequencePadding)" />
+            </div>
+
+            <div class="col">
+                <label for="sequence-pos" class="font-weight-bold">Sequence Number Position</label>
+                <select id="sequence-pos" class="form-select" @bind="SchemeFormModel.SequencePosition">
+                    @foreach (object value in Enum.GetValues(typeof(Position)))
+                    {
+                        <option value="@value">@value</option>
+                    }
+                </select>
+                <ValidationMessage For="@(() => SchemeFormModel.SequencePosition)" />
+            </div>
+
+            <div class="col">
+                <label for="reset-frequency" class="font-weight-bold">Reset Frequency</label>
+                <select id="reset-frequency" class="form-select" @bind="SchemeFormModel.ResetFrequency">
+                    @foreach (object value in Enum.GetValues(typeof(ResetFrequency)))
+                    {
+                        <option value="@value">@value</option>
+                    }
+                </select>
+                <ValidationMessage For="@(() => SchemeFormModel.ResetFrequency)" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label for="year-format" class="font-weight-bold">Year Format</label>
+                <select id="year-format" class="form-select" @bind="SchemeFormModel.InvoiceNumberYearFormat">
+                    @foreach (object value in Enum.GetValues(typeof(YearFormat)))
+                    {
+                        <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                    }
+                </select>
+                <ValidationMessage For="@(() => SchemeFormModel.InvoiceNumberYearFormat)" />
+            </div>
+
+            <div class="col">
+                <div class="form-check mt-4">
+                    <input id="include-month" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IncludeMonth" />
+                    <label class="form-check-label" for="include-month">Include Month</label>
+                </div>
+                <ValidationMessage For="@(() => SchemeFormModel.IncludeMonth)" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">Submit Scheme</button>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter] public EventCallback SubmitCallback { get; set; }
+    [Parameter] public NumberingSchemeDto? NumberingSchemeInstance { get; set; } = null!;
+    [Parameter] public bool isActive { get; set; }
+
+    // Form Model
+    private InvoiceNumberingFormModel SchemeFormModel { get; set; } = new InvoiceNumberingFormModel();
+
+    // Methods
+    protected override void OnParametersSet()
+    {
+        if (NumberingSchemeInstance is not null)
+            SchemeFormModel = InvoiceNumberingFormModel.FromDto(NumberingSchemeInstance);
+        if (!isActive)
+            ClearForm();
+    }
+
+    private void ClearForm()
+    {
+        SchemeFormModel = new InvoiceNumberingFormModel();
+    }
+
+    private async Task SubmitForm()
+    {
+        loadingService.StartLoading();
+        try
+        {
+            if (NumberingSchemeInstance is null)
+            {
+                await SubmitNewScheme();
+                return;
+            }
+            await SubmitEditScheme();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        finally
+        {
+            loadingService.StopLoading();
+            await SubmitCallback.InvokeAsync();
+            ClearForm();
+        }
+    }
+
+    private async Task SubmitNewScheme()
+    {
+        try
+        {
+            NumberingSchemeDto newScheme = SchemeFormModel.ToDto();
+            NumberingSchemeDto? createdScheme = await numberingService.CreateAsync(newScheme);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+    private async Task SubmitEditScheme()
+    {
+        try
+        {
+            NumberingSchemeDto updatedScheme = SchemeFormModel.ToDto();
+            updatedScheme.Id = NumberingSchemeInstance!.Id;
+            await numberingService.UpdateAsync(updatedScheme.Id, updatedScheme);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+}

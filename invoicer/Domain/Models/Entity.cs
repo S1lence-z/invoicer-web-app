@@ -9,13 +9,13 @@
 		public string PhoneNumber { get; set; } = string.Empty;
 		public int BankAccountId { get; set; }
 		public int AddressId { get; set; }
-		public int InvoiceNumberSchemeId { get; set; }
+		public int CurrentNumberingSchemeId { get; set; }
 
 		// Navigation properties
 		public BankAccount? BankAccount { get; set; }
 		public Address? Address { get; set; }
-		public virtual InvoiceNumberScheme? InvoiceNumberScheme { get; set; }
-		public virtual ICollection<EntityInvoiceNumberSchemeState> EntityInvoiceNumberSchemeStates { get; set; } = [];
+		public virtual NumberingScheme? CurrentNumberingScheme { get; set; }
+		public virtual EntityInvoiceNumberingSchemeState? NumberingSchemeState { get; set; }
 		public virtual ICollection<Invoice> SoldInvoices { get; set; } = [];
 		public virtual ICollection<Invoice> PurchasedInvoices { get; set; } = [];
 	}

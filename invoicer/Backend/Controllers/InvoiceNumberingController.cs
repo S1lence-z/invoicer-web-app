@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Application.ServiceInterfaces;
 using Application.DTOs;
+using Application.Api;
 
 namespace Backend.Controllers
 {
@@ -9,101 +10,126 @@ namespace Backend.Controllers
 	public class InvoiceNumberingController(IInvoiceNumberingService numberingService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetInvoiceNumberingSchemeById")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(NumberingSchemeDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			try
 			{
-				InvoiceNumberSchemeDto? scheme = await numberingService.GetByIdAsync(id);
-				if (scheme is null)
-					return NotFound($"Invoice Numbering Scheme with id {id} not found");
+				NumberingSchemeDto? scheme = await numberingService.GetByIdAsync(id);
 				return Ok(scheme);
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Invoice numbering scheme not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, $"Internal server error: {e.Message}");
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
-		[HttpGet(Name = "PostInvoiceNumberingScheme")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(400)]
+		[HttpGet(Name = "GetAllInvoiceNumberingSchemes")]
+		[ProducesResponseType(typeof(IList<NumberingSchemeDto>), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> GetAll()
 		{
 			try
 			{
-				IList<InvoiceNumberSchemeDto> schemes = await numberingService.GetAllAsync();
+				IList<NumberingSchemeDto> schemes = await numberingService.GetAllAsync();
 				return Ok(schemes);
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, $"Internal server error: {e.Message}");
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPost(Name = "PostInvoiceNumberingScheme")]
-		[ProducesResponseType(201)]
-		[ProducesResponseType(400)]
-		public async Task<IActionResult> Post([FromBody] InvoiceNumberSchemeDto scheme)
+		[ProducesResponseType(typeof(NumberingSchemeDto), 201)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
+		public async Task<IActionResult> Post([FromBody] NumberingSchemeDto scheme)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
 			try
 			{
-				InvoiceNumberSchemeDto? createdScheme = await numberingService.CreateAsync(scheme);
+				NumberingSchemeDto? createdScheme = await numberingService.CreateAsync(scheme);
 				return CreatedAtRoute("GetInvoiceNumberingSchemeById", new { id = createdScheme!.Id }, createdScheme);
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, e.Message);
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpPut("{id:int}", Name = "UpdateInvoiceNumberingScheme")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
-		[ProducesResponseType(400)]
-		public async Task<IActionResult> Put(int id, [FromBody] InvoiceNumberSchemeDto scheme)
+		[ProducesResponseType(typeof(NumberingSchemeDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
+		public async Task<IActionResult> Put(int id, [FromBody] NumberingSchemeDto scheme)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
 			try
 			{
-				InvoiceNumberSchemeDto? existingScheme = await numberingService.UpdateAsync(id, scheme);
+				NumberingSchemeDto? existingScheme = await numberingService.UpdateAsync(id, scheme);
 				return Ok(existingScheme);
 			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(e.Message);
+				return NotFound(ApiErrorResponse.Create("Invoice numbering scheme not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, $"Internal server error: {e.Message}");
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteInvoiceNumberingScheme")]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(404)]
+		[ProducesResponseType(typeof(string), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
 		public async Task<IActionResult> Delete(int id)
 		{
 			try
 			{
 				bool wasDeleted = await numberingService.DeleteAsync(id);
 				if (!wasDeleted)
-					return NotFound($"Invoice Numbering Scheme with id {id} not found");
+					return NotFound(
+						ApiErrorResponse.Create("Invoice numbering scheme not found", $"No scheme found with id {id}", 404)
+						);
 				return Ok($"Invoice Numbering Scheme with id {id} deleted");
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, $"Internal server error: {e.Message}");
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+			}
+		}
+
+		[HttpGet("PeekNextInvoiceNumber/{entityId:int}", Name = "PeekNextInvoiceNumber")]
+		[ProducesResponseType(typeof(string), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
+		public async Task<IActionResult> PeekNextInvoiceNumber(int entityId)
+		{
+			try
+			{
+				string nextInvoiceNumber = await numberingService.PeekNextInvoiceNumberAsync(entityId, DateTime.Now);
+				return Ok(nextInvoiceNumber);
+			}
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(ApiErrorResponse.Create("Invoice numbering scheme not found", e.Message, 404));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
 			}
 		}
 	}

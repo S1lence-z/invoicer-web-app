@@ -1,0 +1,107 @@
+﻿@page "/entityinvoicenumbering"
+@using Application.DTOs;
+@using Frontend.Api;
+@using Application.Extensions;
+@using Application.ServiceInterfaces;
+@inject IEntityService entityService;
+@inject IInvoiceNumberingService numberingService;
+
+@* PAGE CONTAINER *@
+<div class="d-flex flex-column border rounded-3">
+    @* HEADER *@
+    <div class="d-flex justify-content-between align-items-center px-4 pt-4 pb-2">
+        <h3>Select Numbering Schemes For Entities</h3>
+    </div>
+    @* CONTENT *@
+    <div class="d-flex flex-column pb-4">
+        @* NUMBERING SCHEMES LIST *@
+        <div class="d-flex flex-column overflow-auto px-4 gap-2">
+            @if (allEntities is null)
+            {
+                <p>Loading...</p>
+            }
+            else if (allEntities.Count == 0)
+            {
+                <p>No numbering schemes found</p>
+            }
+            else
+            {
+                foreach (EntityDto entity in allEntities)
+                {
+                    <div class="card border-2 shadow-sm">
+                        <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3">
+                            <div class="fw-bold text-dark">@entity.Name</div>
+                            <div class="text-end">
+                                <select class="form-select" @onchange="(e) => OnNumberingSchemeChange(entity, int.Parse(e.Value!.ToString()!))">
+                                    @foreach (NumberingSchemeDto numberingScheme in allNumberingSchemes)
+                                    {
+                                        <option value="@numberingScheme.Id" selected="@(entity.CurrentNumberingSchemeId == numberingScheme.Id)">
+                                            @numberingScheme.GetPreview(1)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private IList<EntityDto> allEntities = new List<EntityDto>();
+    private IList<NumberingSchemeDto> allNumberingSchemes = new List<NumberingSchemeDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEntities();
+        await LoadNumberingSchemes();
+    }
+
+    private async Task LoadEntities()
+    {
+        try
+        {
+            allEntities = (await entityService.GetAllAsync()).ToList();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    private async Task LoadNumberingSchemes()
+    {
+        try
+        {
+            allNumberingSchemes = (await numberingService.GetAllAsync()).ToList();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    private async Task OnNumberingSchemeChange(EntityDto entity, int updatedNumberingSchemeId)
+    {
+        EntityDto updatedEntity = entity with { CurrentNumberingSchemeId = updatedNumberingSchemeId };
+        await UpdateEntityNumberingScheme(updatedEntity.Id, updatedEntity);
+    }
+
+    private async Task UpdateEntityNumberingScheme(int entityId, EntityDto updatedEntity)
+    {
+        try
+        {
+            EntityDto? responseEntity = await entityService.UpdateAsync(entityId, updatedEntity);
+            if (responseEntity is null)
+                Console.WriteLine("Failed to update entity numbering scheme");
+            else
+                Console.WriteLine(responseEntity);
+        } 
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+}

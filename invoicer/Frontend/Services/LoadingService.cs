@@ -1,4 +1,4 @@
-﻿namespace Frontend.Utils
+﻿namespace Frontend.Services
 {
 	public class LoadingService
 	{

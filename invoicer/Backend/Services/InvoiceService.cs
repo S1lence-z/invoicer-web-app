@@ -1,15 +1,14 @@
 ﻿using Backend.Database;
 using Microsoft.EntityFrameworkCore;
-using Backend.Utils.InvoicePdfGenerator;
-using Domain.Interfaces;
 using Application.DTOs;
 using Application.ServiceInterfaces;
 using Application.Mappers;
 using Domain.Models;
+using Application.PdfGenerator; 
 
 namespace Backend.Services
 {
-	public class InvoiceService(ApplicationDbContext context, IInvoiceNumberingService numberingService) : IInvoiceService
+	public class InvoiceService(ApplicationDbContext context, IInvoiceNumberingService numberingService, IInvoicePdfGenerator invoicePdfGenerator) : IInvoiceService
 	{
 		public async Task<InvoiceDto?> GetByIdAsync(int id)
 		{
@@ -67,12 +66,14 @@ namespace Backend.Services
 				throw new ArgumentException($"Buyer entity with id {newInvoice.BuyerId} not found");
 
 			// Assign the seller numbering scheme, the one who is generating the invoice
-			newInvoice.InvoiceNumberSchemeId = seller.InvoiceNumberSchemeId;
+			newInvoice.NumberingSchemeId = seller.CurrentNumberingSchemeId;
 
 			// Generate invoice number
 			string newInvoiceNumber = await numberingService.GetNextInvoiceNumberAsync(seller.Id, DateTime.Now);
 			if (string.IsNullOrEmpty(newInvoiceNumber))
 				throw new ArgumentException($"Failed to generate invoice number for seller with id {seller.Id}");
+
+			// Set the generated invoice number to the new invoice
 			newInvoice.InvoiceNumber = newInvoiceNumber;
 			newInvoice.Seller = EntityMapper.MapToDto(seller);
 			newInvoice.Buyer = EntityMapper.MapToDto(buyer);
@@ -184,7 +185,7 @@ namespace Backend.Services
 			if (invoiceToExport is null)
 				throw new ArgumentException($"Invoice with id {id} not found");
 
-			IPdfGenerationResult pdfFile = await InvoicePdfGenerator.ExportInvoicePdf(invoiceToExport);
+			IPdfGenerationResult pdfFile = invoicePdfGenerator.ExportInvoicePdf(invoiceToExport);
 
 			return pdfFile;
 		}

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
 
-namespace Frontend.Models.FormModels
+namespace Frontend.Models
 {
 	public class InvoiceItemFormModel
 	{

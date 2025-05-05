@@ -1,0 +1,81 @@
+services:
+  backend:
+    container_name: backend-dev
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      # 1. Mount project source directories from host to container
+      - ./Backend:/src/Backend
+      - ./Application:/src/Application
+      - ./Domain:/src/Domain
+
+      # 2. Use named volumes to isolate ALL build artifacts inside the container
+      - backend_obj:/src/Backend/obj
+      - backend_bin:/src/Backend/bin
+      # Add isolation for shared libs specific to backend:
+      - backend_app_obj:/src/Application/obj
+      - backend_app_bin:/src/Application/bin
+      - backend_domain_obj:/src/Domain/obj
+      - backend_domain_bin:/src/Domain/bin
+
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+    command: sh -c "cd Backend && dotnet watch run --non-interactive --no-launch-profile"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    container_name: frontend-dev
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile.dev
+    ports:
+      - "5100:5000"
+    volumes:
+      # 1. Mount project source directories from host to container
+      - ./Frontend:/src/Frontend
+      - ./Application:/src/Application
+      - ./Domain:/src/Domain
+
+      # 2. Use named volumes to isolate ALL build artifacts inside the container
+      - frontend_obj:/src/Frontend/obj
+      - frontend_bin:/src/Frontend/bin
+      # Add isolation for shared libs specific to frontend:
+      - frontend_app_obj:/src/Application/obj
+      - frontend_app_bin:/src/Application/bin
+      - frontend_domain_obj:/src/Domain/obj
+      - frontend_domain_bin:/src/Domain/bin
+
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+      - BackendApiUrl=http://backend:8080
+    command: sh -c "cd Frontend && dotnet watch run --non-interactive --no-launch-profile --no-hot-reload"
+    depends_on:
+      backend:
+          condition: service_healthy # Wait for backend to be ready
+
+# Define the named volumes used above
+volumes:
+  backend_obj:
+  backend_bin:
+  frontend_obj:
+  frontend_bin:
+  backend_domain_obj:
+  backend_domain_bin:
+  backend_app_obj:
+  backend_app_bin:
+  frontend_domain_obj:
+  frontend_domain_bin:
+  frontend_app_obj:
+  frontend_app_bin:

@@ -1,0 +1,29 @@
+﻿@using Domain.Enums;
+@using Application.DTOs;
+@using Application.Extensions;
+
+<div class="card border-1 shadow-sm">
+    <div class="card-body row align-items-center" style="cursor: pointer;">
+        <div class="col">
+            <span class="fw-bold">@NumberingScheme.ShowNumberingSchemePreview()</span>
+        </div>
+        <div class="col">
+            <span class="text-muted">Default: @(NumberingScheme.IsDefault ? "Yes" : "No")</span>
+        </div>
+    </div>
+    <div class="card-footer bg-white border-0 d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm w-25" @onclick="() => OnEditNumberingScheme.InvokeAsync(NumberingScheme)">Edit</button>
+        <button class="btn btn-outline-danger btn-sm w-25" @onclick="() => OnDeleteNumberingScheme.InvokeAsync(NumberingScheme)">Delete</button>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public NumberingSchemeDto NumberingScheme { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<NumberingSchemeDto> OnDeleteNumberingScheme { get; set; }
+
+    [Parameter]
+    public EventCallback<NumberingSchemeDto> OnEditNumberingScheme { get; set; }
+}

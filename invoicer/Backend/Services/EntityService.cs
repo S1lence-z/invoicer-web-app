@@ -40,8 +40,8 @@ namespace Backend.Services
 			if (bankAccount is null)
 				throw new ArgumentException($"Bank account with id {newEntity.BankAccountId} not found.");
 
-			InvoiceNumberSchemeDto? defaultScheme = await numberingService.GetDefaultNumberScheme();
-			newEntity.InvoiceNumberSchemeId = defaultScheme.Id;
+			NumberingSchemeDto? defaultScheme = await numberingService.GetDefaultNumberScheme();
+			newEntity.CurrentNumberingSchemeId = defaultScheme.Id;
 			Entity entity = EntityMapper.MapToDomain(newEntity);
 
 			await context.Entity.AddAsync(entity);
@@ -81,7 +81,7 @@ namespace Backend.Services
 			existingEntity.Ico = newEntityData.Ico;
 			existingEntity.Name = newEntityData.Name;
 			existingEntity.PhoneNumber = newEntityData.PhoneNumber;
-			existingEntity.InvoiceNumberSchemeId = newEntityData.InvoiceNumberSchemeId;
+			existingEntity.CurrentNumberingSchemeId = newEntityData.CurrentNumberingSchemeId;
 
 			await context.SaveChangesAsync();
 

@@ -9,7 +9,7 @@
 		public string PhoneNumber { get; set; } = string.Empty;
 		public int BankAccountId { get; set; }
 		public int AddressId { get; set; }
-		public int InvoiceNumberSchemeId { get; set; }
+		public int CurrentNumberingSchemeId { get; set; }
 
 		// Navigation properties
 		public BankAccountDto? BankAccount { get; set; }
