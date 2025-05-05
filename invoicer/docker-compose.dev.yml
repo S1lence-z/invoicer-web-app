@@ -8,16 +8,18 @@ services:
       - "8080:8080"
     volumes:
       # 1. Mount project source directories from host to container
-      - ./Backend:/src/Backend           # Sync Backend source
-      - ./Application:/src/Application   # Sync Application source
-      - ./Domain:/src/Domain             # Sync Domain source
+      - ./Backend:/src/Backend
+      - ./Application:/src/Application
+      - ./Domain:/src/Domain
 
-      # 2. Use named volumes to isolate build artifacts inside the container
-      #    These override the corresponding subdirectories from the host mounts above.
-      - backend_obj:/src/Backend/obj     # Isolate Backend/obj
-      - backend_bin:/src/Backend/bin     # Isolate Backend/bin
-      # Note: We generally only need to isolate bin/obj for the *entry point* project (Backend).
-      # The build process inside the container should handle outputs for Application/Domain correctly.
+      # 2. Use named volumes to isolate ALL build artifacts inside the container
+      - backend_obj:/src/Backend/obj
+      - backend_bin:/src/Backend/bin
+      # Add isolation for shared libs specific to backend:
+      - backend_app_obj:/src/Application/obj
+      - backend_app_bin:/src/Application/bin
+      - backend_domain_obj:/src/Domain/obj
+      - backend_domain_bin:/src/Domain/bin
 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -40,13 +42,18 @@ services:
       - "5100:5000"
     volumes:
       # 1. Mount project source directories from host to container
-      - ./Frontend:/src/Frontend         # Sync Frontend source (incl. wwwroot)
-      - ./Application:/src/Application   # Sync Application source
-      - ./Domain:/src/Domain             # Sync Domain source
+      - ./Frontend:/src/Frontend
+      - ./Application:/src/Application
+      - ./Domain:/src/Domain
 
-      # 2. Use named volumes to isolate build artifacts inside the container
-      - frontend_obj:/src/Frontend/obj   # Isolate Frontend/obj
-      - frontend_bin:/src/Frontend/bin   # Isolate Frontend/bin
+      # 2. Use named volumes to isolate ALL build artifacts inside the container
+      - frontend_obj:/src/Frontend/obj
+      - frontend_bin:/src/Frontend/bin
+      # Add isolation for shared libs specific to frontend:
+      - frontend_app_obj:/src/Application/obj
+      - frontend_app_bin:/src/Application/bin
+      - frontend_domain_obj:/src/Domain/obj
+      - frontend_domain_bin:/src/Domain/bin
 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -60,7 +67,15 @@ services:
 
 # Define the named volumes used above
 volumes:
-  backend_obj:    # Stores /src/Backend/obj inside the backend container
-  backend_bin:    # Stores /src/Backend/bin inside the backend container
-  frontend_obj:   # Stores /src/Frontend/obj inside the frontend container
-  frontend_bin:   # Stores /src/Frontend/bin inside the frontend container
+  backend_obj:
+  backend_bin:
+  frontend_obj:
+  frontend_bin:
+  backend_domain_obj:
+  backend_domain_bin:
+  backend_app_obj:
+  backend_app_bin:
+  frontend_domain_obj:
+  frontend_domain_bin:
+  frontend_app_obj:
+  frontend_app_bin:
