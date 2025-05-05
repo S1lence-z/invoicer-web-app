@@ -12,12 +12,16 @@
 @inject LoadingService loadingService;
 
 <div>
-    @* ARES API WINDOW *@
-    <AresApiLookup UserInputIco="@userInputIco"
-    UserInputIcoChanged="@((string ico) => userInputIco = ico)"
-    AresApiService="aresApiService"
-    AresApiErrorMessage="@aresApiErrorMessage"
-    OnFillInAresData="FillInAresData" />
+    @if (EntityInstance is null)
+    {
+        @* ARES API WINDOW *@
+        <AresApiLookup UserInputIco="@userInputIco"
+            UserInputIcoChanged="@((string ico) => userInputIco = ico)"
+            AresApiService="aresApiService"
+            AresApiErrorMessage="@aresApiErrorMessage"
+            OnFillInAresData="FillInAresData" 
+            />
+    }
     @* ENTITY FORM *@
     <EditForm Model="@entityFormModel" OnValidSubmit="SubmitForm">
         <DataAnnotationsValidator />
@@ -174,6 +178,7 @@
     {
         entityFormModel = new EntityFormModel();
         userInputIco = string.Empty;
+        aresApiErrorMessage = string.Empty;
     }
 
     private async Task SubmitForm() 
