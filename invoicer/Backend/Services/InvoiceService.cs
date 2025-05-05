@@ -10,7 +10,7 @@ namespace Backend.Services
 {
 	public class InvoiceService(ApplicationDbContext context, IInvoiceNumberingService numberingService, IInvoicePdfGenerator invoicePdfGenerator) : IInvoiceService
 	{
-		public async Task<InvoiceDto?> GetByIdAsync(int id)
+		public async Task<InvoiceDto> GetByIdAsync(int id)
 		{
 			Invoice? invoice = await context.Invoice
 				.Include(i => i.Seller)
@@ -46,7 +46,7 @@ namespace Backend.Services
 			return allInvoices.Select(InvoiceMapper.MapToDto).ToList();
 		}
 
-		public async Task<InvoiceDto?> CreateAsync(InvoiceDto newInvoice)
+		public async Task<InvoiceDto> CreateAsync(InvoiceDto newInvoice)
 		{
 			Entity? seller = await context.Entity
 				.Include(e => e.BankAccount)
@@ -101,7 +101,7 @@ namespace Backend.Services
 			return InvoiceMapper.MapToDto(createdInvoice);
 		}
 
-		public async Task<InvoiceDto?> UpdateAsync(int id, InvoiceDto updatedInvoice)
+		public async Task<InvoiceDto> UpdateAsync(int id, InvoiceDto updatedInvoice)
 		{
 			Invoice? existingInvoice = await context.Invoice
 				.Include(i => i.Items)

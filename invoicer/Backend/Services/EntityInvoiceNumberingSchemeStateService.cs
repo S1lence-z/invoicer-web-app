@@ -7,7 +7,7 @@ namespace Backend.Services
 {
 	public class EntityInvoiceNumberingSchemeStateService(ApplicationDbContext context) : IEntityInvoiceNumberingSchemeState
 	{
-		public async Task<EntityInvoiceNumberingSchemeState?> CreateByEntityId(int entityId)
+		public async Task<EntityInvoiceNumberingSchemeState> CreateByEntityId(int entityId)
 		{
 			// Check if the entity exists
 			Entity? entity = await context.Entity

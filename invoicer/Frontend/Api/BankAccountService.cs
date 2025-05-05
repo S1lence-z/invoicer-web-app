@@ -16,11 +16,11 @@ namespace Frontend.Api
 			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
 		}
 
-		public async Task<BankAccountDto?> CreateAsync(BankAccountDto obj)
+		public async Task<BankAccountDto> CreateAsync(BankAccountDto obj)
 		{
 			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<BankAccountDto>();
+				return await response.Content.ReadFromJsonAsync<BankAccountDto>() ?? throw new Exception("Failed to deserialize BankAccountDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -61,11 +61,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<BankAccountDto?> GetByIdAsync(int id)
+		public async Task<BankAccountDto> GetByIdAsync(int id)
 		{
 			var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<BankAccountDto>();
+				return await response.Content.ReadFromJsonAsync<BankAccountDto>() ?? throw new Exception("Failed to deserialize BankAccountDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -76,11 +76,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<BankAccountDto?> UpdateAsync(int id, BankAccountDto obj)
+		public async Task<BankAccountDto> UpdateAsync(int id, BankAccountDto obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<BankAccountDto>();
+				return await response.Content.ReadFromJsonAsync<BankAccountDto>() ?? throw new Exception("Failed to deserialize BankAccountDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();

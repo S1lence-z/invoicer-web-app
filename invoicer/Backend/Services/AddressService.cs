@@ -9,7 +9,7 @@ namespace Backend.Services
 {
 	public class AddressService(ApplicationDbContext context) : IAddressService
 	{
-		public async Task<AddressDto?> GetByIdAsync(int id)
+		public async Task<AddressDto> GetByIdAsync(int id)
 		{
 			Address? foundAddress = await context.Address.FindAsync(id);
 			if (foundAddress is null)
@@ -24,7 +24,7 @@ namespace Backend.Services
 			return allAdresses.Select(AddressMapper.MapToDto).ToList();
 		}
 
-		public async Task<AddressDto?> CreateAsync(AddressDto newAddress)
+		public async Task<AddressDto> CreateAsync(AddressDto newAddress)
 		{
 			Address address = AddressMapper.MapToDomain(newAddress);
 			await context.Address.AddAsync(address);
@@ -32,7 +32,7 @@ namespace Backend.Services
 			return AddressMapper.MapToDto(address);
 		}
 
-		public async Task<AddressDto?> UpdateAsync(int id, AddressDto updatedAddress)
+		public async Task<AddressDto> UpdateAsync(int id, AddressDto updatedAddress)
 		{
 			Address? existingAddress = await context.Address.FindAsync(id);
 			if (existingAddress is null)

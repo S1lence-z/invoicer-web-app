@@ -18,11 +18,11 @@ namespace Frontend.Api
 			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
 		}
 
-		public async Task<InvoiceDto?> CreateAsync(InvoiceDto obj)
+		public async Task<InvoiceDto> CreateAsync(InvoiceDto obj)
 		{
 			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<InvoiceDto>();
+				return await response.Content.ReadFromJsonAsync<InvoiceDto>() ?? throw new Exception("Failed to deserialize InvoiceDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -75,11 +75,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<InvoiceDto?> GetByIdAsync(int id)
+		public async Task<InvoiceDto> GetByIdAsync(int id)
 		{
 			var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<InvoiceDto>();
+				return await response.Content.ReadFromJsonAsync<InvoiceDto>() ?? throw new Exception("Failed to deserialize InvoiceDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -90,11 +90,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<InvoiceDto?> UpdateAsync(int id, InvoiceDto obj)
+		public async Task<InvoiceDto> UpdateAsync(int id, InvoiceDto obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<InvoiceDto>();
+				return await response.Content.ReadFromJsonAsync<InvoiceDto>() ?? throw new Exception("Failed to deserialize InvoiceDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();

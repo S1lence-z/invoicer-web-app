@@ -9,7 +9,7 @@ namespace Backend.Services
 {
 	public class EntityService(ApplicationDbContext context, IInvoiceNumberingService numberingService) : IEntityService
 	{
-		public async Task<EntityDto?> GetByIdAsync(int id)
+		public async Task<EntityDto> GetByIdAsync(int id)
 		{
 			Entity? foundEntity = await context.Entity
 				.Include(e => e.BankAccount)
@@ -29,7 +29,7 @@ namespace Backend.Services
 			return allEntities.Select(EntityMapper.MapToDto).ToList();
 		}
 
-		public async Task<EntityDto?> CreateAsync(EntityDto newEntity)
+		public async Task<EntityDto> CreateAsync(EntityDto newEntity)
 		{
 			Address? address = await context.Address.AsNoTracking().FirstOrDefaultAsync(a => a.Id == newEntity.AddressId);
 			BankAccount? bankAccount = await context.BankAccount.AsNoTracking().FirstOrDefaultAsync(ba => ba.Id == newEntity.BankAccountId);
@@ -59,7 +59,7 @@ namespace Backend.Services
 			return EntityMapper.MapToDto(createdEntity);
 		}
 
-		public async Task<EntityDto?> UpdateAsync(int id, EntityDto newEntityData)
+		public async Task<EntityDto> UpdateAsync(int id, EntityDto newEntityData)
 		{
 			Entity? existingEntity = await context.Entity.FindAsync(id);
 			if (existingEntity is null)

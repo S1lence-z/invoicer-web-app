@@ -16,11 +16,11 @@ namespace Frontend.Api
 			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
 		}
 
-		public async Task<NumberingSchemeDto?> CreateAsync(NumberingSchemeDto obj)
+		public async Task<NumberingSchemeDto> CreateAsync(NumberingSchemeDto obj)
 		{
 			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>();
+				return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>() ?? throw new Exception("Failed to deserialize NumberingSchemeDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -61,11 +61,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<NumberingSchemeDto?> GetByIdAsync(int id)
+		public async Task<NumberingSchemeDto> GetByIdAsync(int id)
 		{
 			var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>();
+				return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>() ?? throw new Exception("Failed to deserialize NumberingSchemeDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -80,7 +80,7 @@ namespace Frontend.Api
 		{
 			var response = await _httpClient.GetAsync($"{_urlPath}/default");
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>() ?? throw new KeyNotFoundException("Default Invoice Numbering Scheme not found");
+				return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>() ?? throw new Exception("Failed to deserialize NumberingSchemeDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -91,11 +91,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<NumberingSchemeDto?> UpdateAsync(int id, NumberingSchemeDto obj)
+		public async Task<NumberingSchemeDto> UpdateAsync(int id, NumberingSchemeDto obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>();
+				return await response.Content.ReadFromJsonAsync<NumberingSchemeDto>() ?? throw new Exception("Failed to deserialize NumberingSchemeDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();

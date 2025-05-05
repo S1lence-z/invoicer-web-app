@@ -16,11 +16,11 @@ namespace Frontend.Api
 			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
 		}
 
-		public async Task<EntityDto?> CreateAsync(EntityDto obj)
+		public async Task<EntityDto> CreateAsync(EntityDto obj)
 		{
 			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<EntityDto>();
+				return await response.Content.ReadFromJsonAsync<EntityDto>() ?? throw new Exception("Failed to deserialize EntityDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -50,7 +50,7 @@ namespace Frontend.Api
 		{
 			var response = await _httpClient.GetAsync(_urlPath);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<IList<EntityDto>>() ?? new List<EntityDto>();
+				return await response.Content.ReadFromJsonAsync<IList<EntityDto>>() ?? [];
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -61,11 +61,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<EntityDto?> GetByIdAsync(int id)
+		public async Task<EntityDto> GetByIdAsync(int id)
 		{
 			var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<EntityDto>();
+				return await response.Content.ReadFromJsonAsync<EntityDto>() ?? throw new Exception("Failed to deserialize EntityDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -76,11 +76,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<EntityDto?> UpdateAsync(int id, EntityDto obj)
+		public async Task<EntityDto> UpdateAsync(int id, EntityDto obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<EntityDto>();
+				return await response.Content.ReadFromJsonAsync<EntityDto>() ?? throw new Exception("Failed to deserialize EntityDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();

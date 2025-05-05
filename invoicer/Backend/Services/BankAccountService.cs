@@ -9,7 +9,7 @@ namespace Backend.Services
 {
 	public class BankAccountService(ApplicationDbContext context) : IBankAccountService
 	{
-		public async Task<BankAccountDto?> GetByIdAsync(int id)
+		public async Task<BankAccountDto> GetByIdAsync(int id)
 		{
 			BankAccount? foundBankAcc = await context.BankAccount.FindAsync(id);
 			if (foundBankAcc is null)
@@ -23,7 +23,7 @@ namespace Backend.Services
 			return allBankAccs.Select(BankAccountMapper.MapToDto).ToList();
 		}
 
-		public async Task<BankAccountDto?> CreateAsync(BankAccountDto newBankAcc)
+		public async Task<BankAccountDto> CreateAsync(BankAccountDto newBankAcc)
 		{
 			BankAccount bankAcc = BankAccountMapper.MapToDomain(newBankAcc);
 			await context.BankAccount.AddAsync(bankAcc);
@@ -31,7 +31,7 @@ namespace Backend.Services
 			return BankAccountMapper.MapToDto(bankAcc);
 		}
 
-		public async Task<BankAccountDto?> UpdateAsync(int id, BankAccountDto updatedBankAcc)
+		public async Task<BankAccountDto> UpdateAsync(int id, BankAccountDto updatedBankAcc)
 		{
 			BankAccount? bankAcc = await context.BankAccount.FindAsync(id);
 			if (bankAcc is null)

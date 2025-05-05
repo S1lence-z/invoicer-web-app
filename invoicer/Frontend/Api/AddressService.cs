@@ -16,11 +16,11 @@ namespace Frontend.Api
 			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
 		}
 
-		public async Task<AddressDto?> CreateAsync(AddressDto obj)
+		public async Task<AddressDto> CreateAsync(AddressDto obj)
 		{
 			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<AddressDto>();
+				return await response.Content.ReadFromJsonAsync<AddressDto>() ?? throw new Exception("Failed to deserialize AddressDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -50,7 +50,7 @@ namespace Frontend.Api
 		{
 			var response = await _httpClient.GetAsync(_urlPath);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<IList<AddressDto>>() ?? new List<AddressDto>();
+				return await response.Content.ReadFromJsonAsync<IList<AddressDto>>() ?? [];
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -61,11 +61,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<AddressDto?> GetByIdAsync(int id)
+		public async Task<AddressDto> GetByIdAsync(int id)
 		{
 			var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<AddressDto>();
+				return await response.Content.ReadFromJsonAsync<AddressDto>() ?? throw new Exception("Failed to deserialize AddressDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
@@ -76,11 +76,11 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<AddressDto?> UpdateAsync(int id, AddressDto obj)
+		public async Task<AddressDto> UpdateAsync(int id, AddressDto obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadFromJsonAsync<AddressDto>();
+				return await response.Content.ReadFromJsonAsync<AddressDto>() ?? throw new Exception("Failed to deserialize AddressDto");
 			else
 			{
 				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
