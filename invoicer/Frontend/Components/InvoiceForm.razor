@@ -194,34 +194,39 @@
 
     private async Task SubmitNewInvoice() 
     {
-        InvoiceDto newInvoice = new InvoiceDto
-            {
-                InvoiceNumber = invoiceFormModel.InvoiceNumber,
-                IssueDate = invoiceFormModel.IssueDate,
-                DueDate = invoiceFormModel.DueDate,
-                VatDate = invoiceFormModel.VatDate,
-                Status = invoiceFormModel.Status,
-                SellerId = invoiceFormModel.SellerId,
-                BuyerId = invoiceFormModel.BuyerId,
-                Currency = invoiceFormModel.Currency,
-                PaymentMethod = invoiceFormModel.PaymentMethod,
-                DeliveryMethod = invoiceFormModel.DeliveryMethod,
-                Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
+        try
+        {
+            InvoiceDto newInvoice = new InvoiceDto
+                {
+                    InvoiceNumber = invoiceFormModel.InvoiceNumber,
+                    IssueDate = invoiceFormModel.IssueDate,
+                    DueDate = invoiceFormModel.DueDate,
+                    VatDate = invoiceFormModel.VatDate,
+                    Status = invoiceFormModel.Status,
+                    SellerId = invoiceFormModel.SellerId,
+                    BuyerId = invoiceFormModel.BuyerId,
+                    Currency = invoiceFormModel.Currency,
+                    PaymentMethod = invoiceFormModel.PaymentMethod,
+                    DeliveryMethod = invoiceFormModel.DeliveryMethod,
+                    Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
 
-            };
-        InvoiceDto? createdInvoice = await invoiceService.CreateAsync(newInvoice);
-        if (createdInvoice is null) {
-            Console.WriteLine("Failed to create invoice");
-            return;
+                };
+            InvoiceDto createdInvoice = await invoiceService.CreateAsync(newInvoice);
         }
-        Console.WriteLine("Invoice created");
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private async Task SubmitEditInvoice()
     {
-        InvoiceDto editedInvoice = new InvoiceDto
+        try
+        {
+            if (InvoiceInstance is null)
+                return;
+            InvoiceDto editedInvoice = InvoiceInstance with
             {
-                Id = invoiceFormModel.Id,
                 InvoiceNumber = invoiceFormModel.InvoiceNumber,
                 IssueDate = invoiceFormModel.IssueDate,
                 DueDate = invoiceFormModel.DueDate,
@@ -234,13 +239,12 @@
                 DeliveryMethod = invoiceFormModel.DeliveryMethod,
                 Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
             };
-        InvoiceDto? updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
-        if (updatedInvoice is null)
-        {
-            Console.WriteLine("Failed to update invoice");
-            return;
+            InvoiceDto updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
         }
-        Console.WriteLine("Invoice updated");
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private void ClearForm()
@@ -272,11 +276,6 @@
             string nextInvoiceNumber = await invoiceNumberingService.PeekNextInvoiceNumberAsync(newSellerId, DateTime.Now);
             invoiceFormModel.SellerId = newSellerId;
             invoiceFormModel.InvoiceNumber = nextInvoiceNumber;
-        }
-        catch (ApiException ex)
-        {
-            invoiceFormModel.InvoiceNumber = "Error fetching invoice number";
-            Console.WriteLine(ex);
         }
         catch (Exception ex)
         {

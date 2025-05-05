@@ -157,8 +157,10 @@
     {
         try
         {
+            if (NumberingSchemeInstance is null)
+                return;
             NumberingSchemeDto updatedScheme = SchemeFormModel.ToDto();
-            updatedScheme.Id = NumberingSchemeInstance!.Id;
+            updatedScheme.Id = NumberingSchemeInstance.Id;
             await numberingService.UpdateAsync(updatedScheme.Id, updatedScheme);
         }
         catch (Exception e)

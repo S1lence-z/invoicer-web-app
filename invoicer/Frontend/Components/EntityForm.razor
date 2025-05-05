@@ -203,21 +203,16 @@
     private async Task SubmitNewEntity() {
         try
         {
-            var newAddress = new AddressDto
-                    {
-                        Street = entityFormModel.Street,
-                        ZipCode = entityFormModel.ZipCode,
-                        City = entityFormModel.City,
-                        Country = entityFormModel.Country
-                    };
-
+            AddressDto newAddress = new()
+                {
+                    Street = entityFormModel.Street,
+                    ZipCode = entityFormModel.ZipCode,
+                    City = entityFormModel.City,
+                    Country = entityFormModel.Country
+                };
             // Create the address
-            AddressDto? newAddressResponse = await addressService.CreateAsync(newAddress);
-            if (newAddressResponse is null)
-            {
-                aresApiErrorMessage = "Address creation failed";
-                return;
-            }
+            AddressDto newAddressResponse = await addressService.CreateAsync(newAddress);
+
             // Create the bank account
             var newBankAccount = new BankAccountDto
                 {
@@ -226,12 +221,8 @@
                     BankName = entityFormModel.BankName,
                     IBAN = entityFormModel.IBAN
                 };
-            BankAccountDto? newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
-            if (newBankAccountResponse is null)
-            {
-                aresApiErrorMessage = "Bank account creation failed";
-                return;
-            }
+            BankAccountDto newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
+
             // Create the entity
             var newEntity = new EntityDto
                 {
@@ -242,12 +233,7 @@
                     AddressId = newAddressResponse.Id,
                     BankAccountId = newBankAccountResponse.Id
                 };
-            EntityDto? newEntityResponse = await entityService.CreateAsync(newEntity);
-            if (newEntityResponse is null)
-            {
-                aresApiErrorMessage = "Entity creation failed";
-                return;
-            }
+            EntityDto newEntityResponse = await entityService.CreateAsync(newEntity);
         } 
         catch (Exception e)
         {
@@ -257,60 +243,53 @@
 
     private async Task SubmitEditEntity() 
     {
-        if (EntityInstance is null)
+        try
         {
-            aresApiErrorMessage = "Entity instance is null";
-            return;
-        }
-        // Edit the address
-        int addressId = EntityInstance.AddressId;
-        AddressDto editedAddress = new()
+            if (EntityInstance is null)
             {
-                Id = addressId,
-                Street = entityFormModel.Street,
-                ZipCode = entityFormModel.ZipCode,
-                City = entityFormModel.City,
-                Country = entityFormModel.Country
-            };
-        AddressDto? editedAddressResponse = await addressService.UpdateAsync(addressId, editedAddress);
-        if (editedAddressResponse is null)
-        {
-            aresApiErrorMessage = "Address update failed";
-            return;
+                aresApiErrorMessage = "Entity instance is null";
+                return;
+            }
+            // Edit the address
+            int addressId = EntityInstance.AddressId;
+            AddressDto editedAddress = new()
+                {
+                    Id = addressId,
+                    Street = entityFormModel.Street,
+                    ZipCode = entityFormModel.ZipCode,
+                    City = entityFormModel.City,
+                    Country = entityFormModel.Country
+                };
+            AddressDto editedAddressResponse = await addressService.UpdateAsync(addressId, editedAddress);
+
+            // Edit the bank account
+            int bankAccountId = EntityInstance.BankAccountId;
+            BankAccountDto editedBankAccount = new()
+                {
+                    Id = bankAccountId,
+                    AccountNumber = entityFormModel.AccountNumber,
+                    BankCode = entityFormModel.BankCode,
+                    BankName = entityFormModel.BankName,
+                    IBAN = entityFormModel.IBAN
+                };
+            BankAccountDto? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, editedBankAccount);
+
+            // Edit the entity
+            EntityDto editedEntity = EntityInstance with
+                {
+                    Ico = entityFormModel.Ico,
+                    Name = entityFormModel.Name,
+                    Email = entityFormModel.Email,
+                    PhoneNumber = entityFormModel.PhoneNumber,
+                    CurrentNumberingSchemeId = EntityInstance.CurrentNumberingSchemeId,
+                    AddressId = editedAddressResponse.Id,
+                    BankAccountId = editedBankAccountResponse.Id
+                };
+            EntityDto editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
         }
-        // Edit the bank account
-        int bankAccountId = EntityInstance.BankAccountId;
-        BankAccountDto editedBankAccount = new()
-            {
-                Id = bankAccountId,
-                AccountNumber = entityFormModel.AccountNumber,
-                BankCode = entityFormModel.BankCode,
-                BankName = entityFormModel.BankName,
-                IBAN = entityFormModel.IBAN
-            };
-        BankAccountDto? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, editedBankAccount);
-        if (editedBankAccountResponse is null)
+        catch (Exception e)
         {
-            aresApiErrorMessage = "Bank account update failed";
-            return;
-        }
-        // Edit the entity
-        var editedEntity = new EntityDto
-            {
-                Id = EntityInstance.Id,
-                Ico = entityFormModel.Ico,
-                Name = entityFormModel.Name,
-                Email = entityFormModel.Email,
-                PhoneNumber = entityFormModel.PhoneNumber,
-                CurrentNumberingSchemeId = EntityInstance.CurrentNumberingSchemeId,
-                AddressId = editedAddressResponse.Id,
-                BankAccountId = editedBankAccountResponse.Id
-            };
-        EntityDto? editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
-        if (editedEntityResponse is null)
-        {
-            aresApiErrorMessage = "Entity update failed";
-            return;
+            Console.WriteLine(e);
         }
     }
 }
