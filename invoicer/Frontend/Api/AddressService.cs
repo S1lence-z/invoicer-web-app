@@ -2,6 +2,7 @@
 using Application.DTOs;
 using System.Net.Http.Json;
 using Frontend.Utils;
+using Application.Api;
 
 namespace Frontend.Api
 {
@@ -18,30 +19,76 @@ namespace Frontend.Api
 		public async Task<AddressDto?> CreateAsync(AddressDto obj)
 		{
 			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
-			return await response.Content.ReadFromJsonAsync<AddressDto>();
+			if (response.IsSuccessStatusCode)
+				return await response.Content.ReadFromJsonAsync<AddressDto>();
+			else
+			{
+				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+				if (errorResponse is not null)
+					throw new ApiException(errorResponse);
+				else
+					throw new Exception($"Failed to create Address: {response.ReasonPhrase}");
+			}
 		}
 
 		public async Task<bool> DeleteAsync(int id)
 		{
 			var response = await _httpClient.DeleteAsync($"{_urlPath}/{id}");
-			return response.IsSuccessStatusCode;
+			if (response.IsSuccessStatusCode)
+				return true;
+			else
+			{
+				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+				if (errorResponse is not null)
+					throw new ApiException(errorResponse);
+				else
+					throw new Exception($"Failed to delete Address with id {id}: {response.ReasonPhrase}");
+			}
 		}
 
 		public async Task<IList<AddressDto>> GetAllAsync()
 		{
-			var reponse = await _httpClient.GetFromJsonAsync<IList<AddressDto>>(_urlPath);
-			return reponse ?? [];
+			var response = await _httpClient.GetAsync(_urlPath);
+			if (response.IsSuccessStatusCode)
+				return await response.Content.ReadFromJsonAsync<IList<AddressDto>>() ?? new List<AddressDto>();
+			else
+			{
+				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+				if (errorResponse is not null)
+					throw new ApiException(errorResponse);
+				else
+					throw new Exception($"Failed to retrieve Addresses: {response.ReasonPhrase}");
+			}
 		}
 
 		public async Task<AddressDto?> GetByIdAsync(int id)
 		{
-			return await _httpClient.GetFromJsonAsync<AddressDto>($"{_urlPath}/{id}");
+			var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
+			if (response.IsSuccessStatusCode)
+				return await response.Content.ReadFromJsonAsync<AddressDto>();
+			else
+			{
+				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+				if (errorResponse is not null)
+					throw new ApiException(errorResponse);
+				else
+					throw new Exception($"Failed to retrieve Address with id {id}: {response.ReasonPhrase}");
+			}
 		}
 
 		public async Task<AddressDto?> UpdateAsync(int id, AddressDto obj)
 		{
 			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
-			return await response.Content.ReadFromJsonAsync<AddressDto>();
+			if (response.IsSuccessStatusCode)
+				return await response.Content.ReadFromJsonAsync<AddressDto>();
+			else
+			{
+				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+				if (errorResponse is not null)
+					throw new ApiException(errorResponse);
+				else
+					throw new Exception($"Failed to update Address with id {id}: {response.ReasonPhrase}");
+			}
 		}
 	}
 }
