@@ -4,10 +4,13 @@
 @using Domain.Enums;
 @using Domain.Interfaces;
 @using Frontend.Models
+@using Frontend.Services
 @using Frontend.Utils;
 @inject IInvoiceService invoiceService;
 @inject IInvoiceNumberingService invoiceNumberingService;
 @inject IEntityService entityService;
+@inject ErrorService errorService;
+@inject LoadingService loadingService;
 
 <EditForm Model="@invoiceFormModel" OnValidSubmit="SubmitForm">
     <DataAnnotationsValidator />
@@ -43,18 +46,24 @@
         <div class="col">
             <label for="seller" class="font-weight-bold">Seller</label>
             <select class="form-control" id="seller" @onchange="ShowNewInvoiceNumber">
-                <option value="0">Select Seller</option>
-                @foreach (var entity in allEntities)
-                {
-                    <option value="@entity.Id">@entity.Name</option>
-                }
+               @if (invoiceFormModel.SellerId == 0)
+               {
+                   <option value="0">Select Seller</option>
+               }
+               @foreach (var entity in allEntities)
+               {
+                   <option value="@entity.Id" selected="@(entity.Id == invoiceFormModel.SellerId)">@entity.Name</option>
+               }
             </select>
             <ValidationMessage For="@(() => invoiceFormModel.SellerId)" />
         </div>
         <div class="col">
             <label for="buyer" class="font-weight-bold">Buyer</label>
             <select class="form-control" id="buyer" @bind="invoiceFormModel.BuyerId">
-                <option value="0">Select Buyer</option>
+                @if (invoiceFormModel.BuyerId == 0)
+                {
+                    <option value="0">Select Buyer</option>
+                }
                 @foreach (var entity in allEntities)
                 {
                     <option value="@entity.Id">@entity.Name</option>
@@ -167,65 +176,41 @@
 
     protected override async Task OnInitializedAsync()
     {
-        allEntities = await entityService.GetAllAsync();
+        try
+        {
+            allEntities = await entityService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
     private async Task SubmitForm() {
+        loadingService.StartLoading();
         try 
         {
             if (InvoiceInstance is null) {
                 await SubmitNewInvoice();
                 return;
             }
-            Console.WriteLine(invoiceFormModel);
             await SubmitEditInvoice();
         } 
         catch (Exception e) 
         {
-            Console.WriteLine(e.Message);
+            errorService.ShowError(e.Message);
         }
         finally 
         {
+            loadingService.StopLoading();
             await SubmitCallback.InvokeAsync();
             ClearForm();
-            StateHasChanged();
         }
     }
 
     private async Task SubmitNewInvoice() 
     {
-        try
-        {
-            InvoiceDto newInvoice = new InvoiceDto
-                {
-                    InvoiceNumber = invoiceFormModel.InvoiceNumber,
-                    IssueDate = invoiceFormModel.IssueDate,
-                    DueDate = invoiceFormModel.DueDate,
-                    VatDate = invoiceFormModel.VatDate,
-                    Status = invoiceFormModel.Status,
-                    SellerId = invoiceFormModel.SellerId,
-                    BuyerId = invoiceFormModel.BuyerId,
-                    Currency = invoiceFormModel.Currency,
-                    PaymentMethod = invoiceFormModel.PaymentMethod,
-                    DeliveryMethod = invoiceFormModel.DeliveryMethod,
-                    Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
-
-                };
-            InvoiceDto createdInvoice = await invoiceService.CreateAsync(newInvoice);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-
-    private async Task SubmitEditInvoice()
-    {
-        try
-        {
-            if (InvoiceInstance is null)
-                return;
-            InvoiceDto editedInvoice = InvoiceInstance with
+        InvoiceDto newInvoice = new InvoiceDto
             {
                 InvoiceNumber = invoiceFormModel.InvoiceNumber,
                 IssueDate = invoiceFormModel.IssueDate,
@@ -238,13 +223,30 @@
                 PaymentMethod = invoiceFormModel.PaymentMethod,
                 DeliveryMethod = invoiceFormModel.DeliveryMethod,
                 Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
+
             };
-            InvoiceDto updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
-        }
-        catch (Exception ex)
+        InvoiceDto createdInvoice = await invoiceService.CreateAsync(newInvoice);
+    }
+
+    private async Task SubmitEditInvoice()
+    {
+        if (InvoiceInstance is null)
+            return;
+        InvoiceDto editedInvoice = InvoiceInstance with
         {
-            Console.WriteLine(ex.Message);
-        }
+            InvoiceNumber = invoiceFormModel.InvoiceNumber,
+            IssueDate = invoiceFormModel.IssueDate,
+            DueDate = invoiceFormModel.DueDate,
+            VatDate = invoiceFormModel.VatDate,
+            Status = invoiceFormModel.Status,
+            SellerId = invoiceFormModel.SellerId,
+            BuyerId = invoiceFormModel.BuyerId,
+            Currency = invoiceFormModel.Currency,
+            PaymentMethod = invoiceFormModel.PaymentMethod,
+            DeliveryMethod = invoiceFormModel.DeliveryMethod,
+            Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
+        };
+        InvoiceDto updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
     }
 
     private void ClearForm()
@@ -269,7 +271,6 @@
         // If we are editing an invoice, we don't want to change the invoice number
         if (InvoiceInstance is not null)
             return;
-
         try
         {
             int newSellerId = int.Parse(args.Value?.ToString() ?? "0");
@@ -279,8 +280,7 @@
         }
         catch (Exception ex)
         {
-            invoiceFormModel.InvoiceNumber = "Error fetching invoice number";
-            Console.WriteLine(ex.Message);
+            errorService.ShowError(ex.Message);
         }
     }
 }
