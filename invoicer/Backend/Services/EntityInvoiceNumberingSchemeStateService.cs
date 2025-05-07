@@ -24,7 +24,7 @@ namespace Backend.Services
 				return state;
 
 			// Create a new numbering scheme state
-			var numberingSchemeState = new EntityInvoiceNumberingSchemeState()
+			EntityInvoiceNumberingSchemeState numberingSchemeState = new()
 			{
 				EntityId = entityId
 			};

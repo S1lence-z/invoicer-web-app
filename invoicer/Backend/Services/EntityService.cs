@@ -96,10 +96,15 @@ namespace Backend.Services
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			Entity? entity = await context.Entity.FindAsync(id);
+			Entity? entity = await context.Entity
+			   .Include(e => e.BankAccount)
+			   .Include(e => e.Address)
+			   .FirstOrDefaultAsync(e => e.Id == id);
 			if (entity is null)
 				return false;
 			context.Entity.Remove(entity);
+			context.Address.Remove(entity.Address!);
+			context.BankAccount.Remove(entity.BankAccount!);
 			await context.SaveChangesAsync();
 			return true;
 		}
