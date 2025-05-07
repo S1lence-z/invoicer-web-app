@@ -40,6 +40,7 @@ namespace Frontend
 
 			// Register other services
 			builder.Services.AddScoped<LoadingService>();
+			builder.Services.AddScoped<ErrorService>();
 
 			// Build and run the app
 			await builder.Build().RunAsync();
