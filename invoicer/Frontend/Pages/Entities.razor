@@ -2,7 +2,9 @@
 @using Application.ServiceInterfaces;
 @using Application.DTOs;
 @using Frontend.Components;
+@using Frontend.Services;
 @inject IEntityService entityService;
+@inject ErrorService errorService;
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3" style="height:90vh;">
@@ -96,11 +98,17 @@
 
     private async Task DeleteEntity(EntityDto entityToDelete)
     {
-        var status = await entityService.DeleteAsync(entityToDelete.Id);
-        if (status) {
-            selectedEntity = null;
-            await LoadEntities();
-            StateHasChanged();
+        try
+        {
+            var status = await entityService.DeleteAsync(entityToDelete.Id);
+            if (status) {
+                selectedEntity = null;
+                await LoadEntities();
+                StateHasChanged();
+            }
+        } catch (Exception ex)
+        {
+            errorService.ShowError(ex.Message);
         }
     }
 

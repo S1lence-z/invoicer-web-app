@@ -10,6 +10,7 @@
 @inject IEntityService entityService;
 @inject IBankAccountService bankAccountService;
 @inject LoadingService loadingService;
+@inject ErrorService errorService;
 
 <div>
     @if (EntityInstance is null)
@@ -195,7 +196,7 @@
         }
         catch (Exception e)
         {
-            aresApiErrorMessage = e.Message;
+            errorService.ShowError(e.Message);
         }
         finally
         {
@@ -205,96 +206,83 @@
         }
     }
 
-    private async Task SubmitNewEntity() {
-        try
-        {
-            AddressDto newAddress = new()
-                {
-                    Street = entityFormModel.Street,
-                    ZipCode = entityFormModel.ZipCode,
-                    City = entityFormModel.City,
-                    Country = entityFormModel.Country
-                };
-            // Create the address
-            AddressDto newAddressResponse = await addressService.CreateAsync(newAddress);
+    private async Task SubmitNewEntity() 
+    {
+        AddressDto newAddress = new()
+            {
+                Street = entityFormModel.Street,
+                ZipCode = entityFormModel.ZipCode,
+                City = entityFormModel.City,
+                Country = entityFormModel.Country
+            };
+        // Create the address
+        AddressDto newAddressResponse = await addressService.CreateAsync(newAddress);
 
-            // Create the bank account
-            var newBankAccount = new BankAccountDto
-                {
-                    AccountNumber = entityFormModel.AccountNumber,
-                    BankCode = entityFormModel.BankCode,
-                    BankName = entityFormModel.BankName,
-                    IBAN = entityFormModel.IBAN
-                };
-            BankAccountDto newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
+        // Create the bank account
+        var newBankAccount = new BankAccountDto
+            {
+                AccountNumber = entityFormModel.AccountNumber,
+                BankCode = entityFormModel.BankCode,
+                BankName = entityFormModel.BankName,
+                IBAN = entityFormModel.IBAN
+            };
+        BankAccountDto newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
 
-            // Create the entity
-            var newEntity = new EntityDto
-                {
-                    Ico = entityFormModel.Ico,
-                    Name = entityFormModel.Name,
-                    Email = entityFormModel.Email,
-                    PhoneNumber = entityFormModel.PhoneNumber,
-                    AddressId = newAddressResponse.Id,
-                    BankAccountId = newBankAccountResponse.Id
-                };
-            EntityDto newEntityResponse = await entityService.CreateAsync(newEntity);
-        } 
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        // Create the entity
+        var newEntity = new EntityDto
+            {
+                Ico = entityFormModel.Ico,
+                Name = entityFormModel.Name,
+                Email = entityFormModel.Email,
+                PhoneNumber = entityFormModel.PhoneNumber,
+                AddressId = newAddressResponse.Id,
+                BankAccountId = newBankAccountResponse.Id
+            };
+        EntityDto newEntityResponse = await entityService.CreateAsync(newEntity);
     }
 
     private async Task SubmitEditEntity() 
     {
-        try
+        if (EntityInstance is null)
         {
-            if (EntityInstance is null)
+            aresApiErrorMessage = "Entity instance is null";
+            return;
+        }
+        // Edit the address
+        int addressId = EntityInstance.AddressId;
+        AddressDto editedAddress = new()
             {
-                aresApiErrorMessage = "Entity instance is null";
-                return;
-            }
-            // Edit the address
-            int addressId = EntityInstance.AddressId;
-            AddressDto editedAddress = new()
-                {
-                    Id = addressId,
-                    Street = entityFormModel.Street,
-                    ZipCode = entityFormModel.ZipCode,
-                    City = entityFormModel.City,
-                    Country = entityFormModel.Country
-                };
-            AddressDto editedAddressResponse = await addressService.UpdateAsync(addressId, editedAddress);
+                Id = addressId,
+                Street = entityFormModel.Street,
+                ZipCode = entityFormModel.ZipCode,
+                City = entityFormModel.City,
+                Country = entityFormModel.Country
+            };
+        AddressDto editedAddressResponse = await addressService.UpdateAsync(addressId, editedAddress);
 
-            // Edit the bank account
-            int bankAccountId = EntityInstance.BankAccountId;
-            BankAccountDto editedBankAccount = new()
-                {
-                    Id = bankAccountId,
-                    AccountNumber = entityFormModel.AccountNumber,
-                    BankCode = entityFormModel.BankCode,
-                    BankName = entityFormModel.BankName,
-                    IBAN = entityFormModel.IBAN
-                };
-            BankAccountDto? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, editedBankAccount);
+        // Edit the bank account
+        int bankAccountId = EntityInstance.BankAccountId;
+        BankAccountDto editedBankAccount = new()
+            {
+                Id = bankAccountId,
+                AccountNumber = entityFormModel.AccountNumber,
+                BankCode = entityFormModel.BankCode,
+                BankName = entityFormModel.BankName,
+                IBAN = entityFormModel.IBAN
+            };
+        BankAccountDto? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, editedBankAccount);
 
-            // Edit the entity
-            EntityDto editedEntity = EntityInstance with
-                {
-                    Ico = entityFormModel.Ico,
-                    Name = entityFormModel.Name,
-                    Email = entityFormModel.Email,
-                    PhoneNumber = entityFormModel.PhoneNumber,
-                    CurrentNumberingSchemeId = EntityInstance.CurrentNumberingSchemeId,
-                    AddressId = editedAddressResponse.Id,
-                    BankAccountId = editedBankAccountResponse.Id
-                };
-            EntityDto editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        // Edit the entity
+        EntityDto editedEntity = EntityInstance with
+            {
+                Ico = entityFormModel.Ico,
+                Name = entityFormModel.Name,
+                Email = entityFormModel.Email,
+                PhoneNumber = entityFormModel.PhoneNumber,
+                CurrentNumberingSchemeId = EntityInstance.CurrentNumberingSchemeId,
+                AddressId = editedAddressResponse.Id,
+                BankAccountId = editedBankAccountResponse.Id
+            };
+        EntityDto editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
     }
 }
