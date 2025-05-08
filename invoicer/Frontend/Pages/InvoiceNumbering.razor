@@ -3,8 +3,10 @@
 @using Frontend.Api;
 @using Application.Extensions;
 @using Application.ServiceInterfaces;
+@using Frontend.Services;
+@inject ErrorService errorService;
 @inject IEntityService entityService;
-@inject IInvoiceNumberingService numberingService;
+@inject INumberingSchemeService numberingService;
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3">
@@ -93,15 +95,11 @@
     {
         try
         {
-            EntityDto? responseEntity = await entityService.UpdateAsync(entityId, updatedEntity);
-            if (responseEntity is null)
-                Console.WriteLine("Failed to update entity numbering scheme");
-            else
-                Console.WriteLine(responseEntity);
+            await entityService.UpdateAsync(entityId, updatedEntity);
         } 
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            errorService.ShowError(e.Message);
         }
     }
 }
