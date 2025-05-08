@@ -22,6 +22,9 @@ namespace Frontend.Models
 		[Required(ErrorMessage = "Invoice number is required")]
 		public string InvoiceNumber { get; set; } = string.Empty;
 
+		[Required]
+		public bool IsCustomInvoiceNumber { get; set; } = false;
+
 		[Required(ErrorMessage = "Issue date is required")]
 		[DataType(DataType.DateTime)]
 		public DateTime IssueDate { get; set; } = DateTime.Now;

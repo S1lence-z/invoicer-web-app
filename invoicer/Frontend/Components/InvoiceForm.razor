@@ -17,9 +17,27 @@
 
     <div class="row mb-4">
         <div class="col">
-            <label for="invoice-number" class="font-weight-bold">Invoice Number</label>  
-            <div class="form-control" id="invoice-number">@invoiceFormModel.InvoiceNumber</div>
-            <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
+            <div class="d-flex flex-row gap-4 align-items-end">
+                <div class="d-flex flex-column">
+                    <label for="invoice-number" class="font-weight-bold">Invoice Number</label>
+                    <input type="text" class="form-control" id="invoice-number"
+                           value="@((isFetchingNextInvoiceNumber ? LOADING_MESSAGE : invoiceFormModel.InvoiceNumber))"
+                           @oninput="e => invoiceFormModel.InvoiceNumber = e.Value?.ToString()!" 
+                           disabled="@(!isCustomInvoiceNumber)"
+                           />
+                           <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
+                </div>
+                <button type="button" class="btn btn-outline-secondary align-self-end" @onclick="ToggleCustomInvoiceNumber">
+                    @if (isCustomInvoiceNumber)
+                    {
+                        <span>Use Default</span>
+                    }
+                    else
+                    {
+                        <span>Customize</span>
+                    }
+                </button>
+            </div>
         </div>
     </div>
 
@@ -126,34 +144,34 @@
     @foreach (var item in invoiceFormModel.Items)
     {
         <div class="row mb-2 align-items-end">
-           <div class="col">
-               <label for="item-description" class="font-weight-bold">Description</label>
-               <input id="item-description" type="text" class="form-control" placeholder="Description" @bind="item.Description" />
-               <ValidationMessage For="@(() => item.Description)" />
-           </div>
-           <div class="col">
-               <label for="item-quantity" class="font-weight-bold">Quantity</label>
-               <input id="item-quantity" type="number" class="form-control" placeholder="Quantity" @bind="item.Quantity" />
-               <ValidationMessage For="@(() => item.Quantity)" />
-           </div>
-           <div class="col">
-               <label for="item-unit" class="font-weight-bold">Unit</label>
-               <input id="item-unit" type="text" class="form-control" placeholder="Unit" @bind="item.Unit" />
-               <ValidationMessage For="@(() => item.Unit)" />
-           </div>
-           <div class="col">
-               <label for="item-unit-price" class="font-weight-bold">Unit Price</label>
-               <input id="item-unit-price" type="number" class="form-control" placeholder="Unit Price" @bind="item.UnitPrice" />
-               <ValidationMessage For="@(() => item.UnitPrice)" />
-           </div>
-           <div class="col">
-               <label for="item-vat-rate" class="font-weight-bold">VAT Rate</label>
-               <input id="item-vat-rate" type="number" class="form-control" placeholder="VAT Rate" @bind="item.VatRate" step="0.01" />
-               <ValidationMessage For="@(() => item.VatRate)" />
-           </div>
-           <div class="col">
-               <button type="button" class="btn btn-danger" @onclick="() => RemoveInvoiceItem(item)">Remove</button>
-           </div>
+            <div class="col">
+                <label for="item-description" class="font-weight-bold">Description</label>
+                <input id="item-description" type="text" class="form-control" placeholder="Description" @bind="item.Description" />
+                <ValidationMessage For="@(() => item.Description)" />
+            </div>
+            <div class="col">
+                <label for="item-quantity" class="font-weight-bold">Quantity</label>
+                <input id="item-quantity" type="number" min="1" class="form-control" placeholder="Quantity" @bind="item.Quantity" />
+                <ValidationMessage For="@(() => item.Quantity)" />
+            </div>
+            <div class="col">
+                <label for="item-unit" class="font-weight-bold">Unit</label>
+                <input id="item-unit" type="text" class="form-control" placeholder="Unit" @bind="item.Unit" />
+                <ValidationMessage For="@(() => item.Unit)" />
+            </div>
+            <div class="col">
+                <label for="item-unit-price" class="font-weight-bold">Unit Price</label>
+                <input id="item-unit-price" type="number" min="0" class="form-control" placeholder="Unit Price" @bind="item.UnitPrice" />
+                <ValidationMessage For="@(() => item.UnitPrice)" />
+            </div>
+            <div class="col">
+                <label for="item-vat-rate" class="font-weight-bold">VAT Rate</label>
+                <input id="item-vat-rate" type="number" min="0" class="form-control" placeholder="VAT Rate" @bind="item.VatRate" step="0.01" />
+                <ValidationMessage For="@(() => item.VatRate)" />
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-danger" @onclick="() => RemoveInvoiceItem(item)">Remove</button>
+            </div>
         </div>
     }
     <button type="submit" class="btn btn-primary float-end mt-4">Submit Invoice</button>
@@ -168,6 +186,14 @@
     // Form Models
     private InvoiceFormModel invoiceFormModel { get; set; } = new();
     private IList<EntityDto> allEntities = new List<EntityDto>();
+
+    // Variables
+    private bool isCustomInvoiceNumber = false;
+    private bool isFetchingNextInvoiceNumber = false;
+    private string nextFetchedInvoiceNumber = string.Empty;
+
+    // Constants
+    private const string LOADING_MESSAGE = "Loading...";
 
     // Methods
     protected override void OnParametersSet()
@@ -190,15 +216,27 @@
         }
     }
 
+    private void ToggleCustomInvoiceNumber()
+    {
+        isCustomInvoiceNumber = !isCustomInvoiceNumber;
+        invoiceFormModel.IsCustomInvoiceNumber = isCustomInvoiceNumber;
+        if (!isCustomInvoiceNumber)
+            invoiceFormModel.InvoiceNumber = nextFetchedInvoiceNumber;
+    }
+
     private async Task SubmitForm() {
         loadingService.StartLoading();
         try 
         {
             if (InvoiceInstance is null) {
                 await SubmitNewInvoice();
-                return;
+            } 
+            else
+            {
+                await SubmitEditInvoice();
             }
-            await SubmitEditInvoice();
+            await SubmitCallback.InvokeAsync();
+            ClearForm();
         } 
         catch (Exception e) 
         {
@@ -207,16 +245,15 @@
         finally 
         {
             loadingService.StopLoading();
-            await SubmitCallback.InvokeAsync();
-            ClearForm();
         }
     }
 
     private async Task SubmitNewInvoice() 
     {
-        InvoiceDto newInvoice = new InvoiceDto
+        InvoiceDto newInvoice = new()
             {
                 InvoiceNumber = invoiceFormModel.InvoiceNumber,
+                IsCustomInvoiceNumber = invoiceFormModel.IsCustomInvoiceNumber,
                 IssueDate = invoiceFormModel.IssueDate,
                 DueDate = invoiceFormModel.DueDate,
                 VatDate = invoiceFormModel.VatDate,
@@ -239,6 +276,7 @@
         InvoiceDto editedInvoice = InvoiceInstance with
         {
             InvoiceNumber = invoiceFormModel.InvoiceNumber,
+            IsCustomInvoiceNumber = invoiceFormModel.IsCustomInvoiceNumber,
             IssueDate = invoiceFormModel.IssueDate,
             DueDate = invoiceFormModel.DueDate,
             VatDate = invoiceFormModel.VatDate,
@@ -277,14 +315,20 @@
             return;
         try
         {
+            isFetchingNextInvoiceNumber = true;
             int newSellerId = int.Parse(args.Value?.ToString() ?? "0");
             InvoiceDto newInvoice = await invoiceService.GetNewInvoiceInformationAsync(newSellerId);
             invoiceFormModel.SellerId = newInvoice.SellerId;
             invoiceFormModel.InvoiceNumber = newInvoice.InvoiceNumber;
+            nextFetchedInvoiceNumber = newInvoice.InvoiceNumber;
         }
         catch (Exception ex)
         {
             errorService.ShowError(ex.Message);
+        }
+        finally
+        {
+            isFetchingNextInvoiceNumber = false;
         }
     }
 }
