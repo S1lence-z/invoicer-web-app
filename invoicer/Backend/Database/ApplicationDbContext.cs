@@ -16,6 +16,7 @@ namespace Backend.Database
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			base.OnModelCreating(modelBuilder);
 			SetUpAddress(modelBuilder);
 			SetUpBankAccount(modelBuilder);
 			SetUpEntity(modelBuilder);
