@@ -27,10 +27,10 @@ namespace Backend
 			builder.Services.AddScoped<IEntityService, EntityService>();
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 			builder.Services.AddScoped<IAresApiService, AresApiService>();
-			builder.Services.AddScoped<IInvoiceNumberingService, InvoiceNumberingService>();
+			builder.Services.AddScoped<INumberingSchemeService, NumberingSchemeService>();
 			builder.Services.AddSingleton<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
 			builder.Services.AddScoped<IInvoicePdfGenerator, InvoicePdfGenerator>();
-			builder.Services.AddScoped<IEntityInvoiceNumberingSchemeState, EntityInvoiceNumberingSchemeStateService>();
+			builder.Services.AddScoped<IEntityInvoiceNumberingStateService, EntityInvoiceNumberingStateService>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();

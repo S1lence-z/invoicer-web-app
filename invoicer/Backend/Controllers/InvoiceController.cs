@@ -126,7 +126,7 @@ namespace Backend.Controllers
 		{
 			try
 			{
-				IPdfGenerationResult invoiceResult = await invoiceService.ExportInvoicePdf(id);
+				IPdfGenerationResult invoiceResult = await invoiceService.ExportInvoicePdfAsync(id);
 				if (!invoiceResult.IsSuccess)
 				{
 					return StatusCode(500, ApiErrorResponse.Create("An error occurred while exporting the invoice to PDF", invoiceResult.ErrorMessage!, invoiceResult.StatusCode));
@@ -141,6 +141,27 @@ namespace Backend.Controllers
 			catch (InvalidOperationException e)
 			{
 				return BadRequest(ApiErrorResponse.Create("Invalid operation", e.Message, 400));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+			}
+		}
+
+		[HttpGet("entity/{entityId:int}/new", Name = "GetNewInvoiceInformation")]
+		[ProducesResponseType(typeof(InvoiceDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
+		public async Task<IActionResult> GetNewInvoiceInformation(int entityId)
+		{
+			try
+			{
+				InvoiceDto? invoice = await invoiceService.GetNewInvoiceInformationAsync(entityId);
+				return Ok(invoice);
+			}
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{

@@ -8,7 +8,7 @@ using Application.PdfGenerator;
 
 namespace Backend.Services
 {
-	public class InvoiceService(ApplicationDbContext context, IInvoiceNumberingService numberingService, IInvoicePdfGenerator invoicePdfGenerator) : IInvoiceService
+	public class InvoiceService(ApplicationDbContext context, IEntityInvoiceNumberingStateService entityInvoiceNumberingStateService, IInvoicePdfGenerator invoicePdfGenerator) : IInvoiceService
 	{
 		public async Task<InvoiceDto> GetByIdAsync(int id)
 		{
@@ -69,7 +69,7 @@ namespace Backend.Services
 			newInvoice.NumberingSchemeId = seller.CurrentNumberingSchemeId;
 
 			// Generate invoice number
-			string newInvoiceNumber = await numberingService.GetNextInvoiceNumberAsync(seller.Id, DateTime.Now);
+			string newInvoiceNumber = await entityInvoiceNumberingStateService.GetNextInvoiceNumberAsync(seller.Id, DateTime.Now);
 			if (string.IsNullOrEmpty(newInvoiceNumber))
 				throw new ArgumentException($"Failed to generate invoice number for seller with id {seller.Id}");
 
@@ -167,7 +167,7 @@ namespace Backend.Services
 			return true;
 		}
 
-		public async Task<IPdfGenerationResult> ExportInvoicePdf(int id)
+		public async Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id)
 		{
 			Invoice? invoiceToExport = await context.Invoice
 				.Include(i => i.Seller)
@@ -219,6 +219,29 @@ namespace Backend.Services
 				newItem.InvoiceId = existingInvoice.Id;
 				await context.InvoiceItem.AddAsync(newItem);
 			}
+		}
+
+		public async Task<InvoiceDto> GetNewInvoiceInformationAsync(int entityId)
+		{
+			Entity? entity = await context.Entity
+				.Include(e => e.BankAccount)
+				.Include(e => e.Address)
+				.AsNoTracking()
+				.FirstOrDefaultAsync(e => e.Id == entityId);
+			if (entity is null)
+				throw new ArgumentException($"Entity with id {entityId} not found");
+
+			// Get the next invoice number
+			string newInvoiceNumber = await entityInvoiceNumberingStateService.PeekNextInvoiceNumberAsync(entity.Id, DateTime.Now);
+			if (string.IsNullOrEmpty(newInvoiceNumber))
+				throw new ArgumentException($"Failed to generate invoice number for entity with id {entity.Id}");
+
+			return new()
+			{
+				SellerId = entity.Id,
+				Seller = EntityMapper.MapToDto(entity),
+				InvoiceNumber = newInvoiceNumber
+			};
 		}
 	}
 }
