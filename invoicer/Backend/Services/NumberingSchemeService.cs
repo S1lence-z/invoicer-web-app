@@ -27,15 +27,19 @@ namespace Backend.Services
 			return allSchemes.Select(NumberingSchemeMapper.MapToDto).ToList();
 		}
 
-		public async Task<NumberingSchemeDto> CreateAsync(NumberingSchemeDto newInvoiceNumberScheme)
-		{			
-			NumberingScheme scheme = NumberingSchemeMapper.MapToDomain(newInvoiceNumberScheme);
+		public async Task<NumberingSchemeDto> CreateAsync(NumberingSchemeDto newNumberingSchemeDto)
+		{
+			NumberingScheme scheme = NumberingSchemeMapper.MapToDomain(newNumberingSchemeDto);
 			await context.NumberingScheme.AddAsync(scheme);
+
+			if (scheme.IsDefault)
+				await SetDefaultSchemeAsync(scheme);
+
 			await context.SaveChangesAsync();
 			return NumberingSchemeMapper.MapToDto(scheme);
 		}
 
-		public async Task<NumberingSchemeDto> UpdateAsync(int id, NumberingSchemeDto udpateScheme)
+		public async Task<NumberingSchemeDto> UpdateAsync(int id, NumberingSchemeDto udpatedSchemeDto)
 		{
 			NumberingScheme? existingScheme = await context.NumberingScheme
 				.FirstOrDefaultAsync(ins => ins.Id == id);
@@ -43,15 +47,18 @@ namespace Backend.Services
 			if (existingScheme is null)
 				throw new KeyNotFoundException($"Invoice Numbering Scheme with id {id} not found");
 
-			existingScheme.Prefix = udpateScheme.Prefix;
-			existingScheme.UseSeperator = udpateScheme.UseSeperator;
-			existingScheme.Seperator = udpateScheme.Seperator;
-			existingScheme.SequencePosition = udpateScheme.SequencePosition;
-			existingScheme.SequencePadding = udpateScheme.SequencePadding;
-			existingScheme.InvoiceNumberYearFormat = udpateScheme.YearFormat;
-			existingScheme.IncludeMonth = udpateScheme.IncludeMonth;
-			existingScheme.ResetFrequency = udpateScheme.ResetFrequency;
-			existingScheme.IsDefault = udpateScheme.IsDefault;
+			existingScheme.Prefix = udpatedSchemeDto.Prefix;
+			existingScheme.UseSeperator = udpatedSchemeDto.UseSeperator;
+			existingScheme.Seperator = udpatedSchemeDto.Seperator;
+			existingScheme.SequencePosition = udpatedSchemeDto.SequencePosition;
+			existingScheme.SequencePadding = udpatedSchemeDto.SequencePadding;
+			existingScheme.InvoiceNumberYearFormat = udpatedSchemeDto.YearFormat;
+			existingScheme.IncludeMonth = udpatedSchemeDto.IncludeMonth;
+			existingScheme.ResetFrequency = udpatedSchemeDto.ResetFrequency;
+			existingScheme.IsDefault = udpatedSchemeDto.IsDefault;
+
+			if (existingScheme.IsDefault)
+				await SetDefaultSchemeAsync(existingScheme);
 
 			await context.SaveChangesAsync();
 
@@ -71,6 +78,10 @@ namespace Backend.Services
 				.FirstOrDefaultAsync(ins => ins.Id == id);
 			if (scheme is null)
 				return false;
+
+			if (scheme.IsDefault)
+				throw new InvalidOperationException("Cannot delete the default numbering scheme");
+
 			context.NumberingScheme.Remove(scheme);
 			await context.SaveChangesAsync();
 			return true;
@@ -86,6 +97,19 @@ namespace Backend.Services
 				throw new KeyNotFoundException("Default Invoice Numbering Scheme not found");
 
 			return NumberingSchemeMapper.MapToDto(defaultScheme);
+		}
+
+		private async Task SetDefaultSchemeAsync(NumberingScheme newDefaultScheme)
+		{
+			List<NumberingScheme> allDefaultSchemes = await context.NumberingScheme
+				.Where(ins => ins.IsDefault)
+				.ToListAsync();
+			foreach (NumberingScheme scheme in allDefaultSchemes)
+			{
+				if (scheme.Id != newDefaultScheme.Id)
+					scheme.IsDefault = false;
+			}
+			newDefaultScheme.IsDefault = true;
 		}
 	}
 }
