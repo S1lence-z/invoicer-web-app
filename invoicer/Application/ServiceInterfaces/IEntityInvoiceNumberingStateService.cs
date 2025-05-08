@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Application.Enums;
 
 namespace Application.ServiceInterfaces
 {
@@ -9,5 +10,7 @@ namespace Application.ServiceInterfaces
 		Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate);
 
 		Task<string> PeekNextInvoiceNumberAsync(int entityId, DateTime generationDate);
+
+		Task<bool> UpdateForNextAsync(int entityId, EntityInvoiceNumberingStateUpdateStatus updateStatus, bool isUsingUserDefinedState, Invoice invoice);
 	}
 }

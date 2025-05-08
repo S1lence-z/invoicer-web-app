@@ -12,15 +12,5 @@
 		public int LastSequenceNumber { get; set; } = 0;
 		public int LastGenerationYear { get; set; } = 0;
 		public int LastGenerationMonth { get; set; } = 0;
-
-		public EntityInvoiceNumberingSchemeState UpdateForNext()
-		{
-			LastSequenceNumber++;
-			int currentYear = DateTime.Now.Year;
-			int currentMonth = DateTime.Now.Month;
-			if (currentYear != LastGenerationYear) LastGenerationYear = currentYear;
-			if (currentMonth != LastGenerationMonth) LastGenerationMonth = currentMonth;
-			return this;
-		}
 	}
 }

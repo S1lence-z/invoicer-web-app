@@ -63,9 +63,17 @@ namespace Backend.Controllers
 				InvoiceDto? createdInvoice = await invoiceService.CreateAsync(invoice);
 				return CreatedAtRoute("GetInvoiceById", new { id = createdInvoice!.Id }, createdInvoice);
 			}
+			catch (ArgumentException e)
+			{
+				return BadRequest(ApiErrorResponse.Create("Invalid request", e.Message, 400));
+			}
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
+			}
 			catch (Exception e)
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return StatusCode(500, ApiErrorResponse.Create(e.Message, e.Message, 500));
 			}
 		}
 
@@ -86,9 +94,13 @@ namespace Backend.Controllers
 				InvoiceDto? updatedInvoice = await invoiceService.UpdateAsync(id, invoice);
 				return Ok(updatedInvoice);
 			}
+			catch (ArgumentException e)
+			{
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
+			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
+				return NotFound(ApiErrorResponse.Create(e.Message, e.Message, 404));
 			}
 			catch (Exception e)
 			{
@@ -110,6 +122,10 @@ namespace Backend.Controllers
 					return NotFound(ApiErrorResponse.Create("Invoice not found", "Not Found", 404));
 				}
 				return Ok($"Invoice with id {id} deleted");
+			}
+			catch (ArgumentException e)
+			{
+				return NotFound(ApiErrorResponse.Create(e.Message, e.Message, 404));
 			}
 			catch (Exception e)
 			{

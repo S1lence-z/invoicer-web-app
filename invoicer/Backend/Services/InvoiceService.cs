@@ -4,7 +4,8 @@ using Application.DTOs;
 using Application.ServiceInterfaces;
 using Application.Mappers;
 using Domain.Models;
-using Application.PdfGenerator; 
+using Application.PdfGenerator;
+using Application.Enums;
 
 namespace Backend.Services
 {
@@ -80,6 +81,7 @@ namespace Backend.Services
 
 			Invoice invoice = InvoiceMapper.MapToDomain(newInvoice);
 			await context.Invoice.AddAsync(invoice);
+			await entityInvoiceNumberingStateService.UpdateForNextAsync(seller.Id, EntityInvoiceNumberingStateUpdateStatus.Creating, newInvoice.IsCustomInvoiceNumber, invoice);
 			await context.SaveChangesAsync();
 
 			Invoice? createdInvoice = await context.Invoice
@@ -136,6 +138,7 @@ namespace Backend.Services
 			existingInvoice.DeliveryMethod = updatedInvoice.DeliveryMethod;
 			await UpdateInvoiceItemsAsync(existingInvoice, updatedInvoice.Items);
 
+			await entityInvoiceNumberingStateService.UpdateForNextAsync(existingInvoice.SellerId, EntityInvoiceNumberingStateUpdateStatus.Updating, updatedInvoice.IsCustomInvoiceNumber, existingInvoice);
 			await context.SaveChangesAsync();
 
 			Invoice? updatedInvoiceEntity = await context.Invoice
@@ -162,6 +165,9 @@ namespace Backend.Services
 			Invoice? existingInvoice = await context.Invoice.FindAsync(id);
 			if (existingInvoice is null)
 				return false;
+
+			await entityInvoiceNumberingStateService.UpdateForNextAsync(existingInvoice.SellerId, EntityInvoiceNumberingStateUpdateStatus.Deleting, false, existingInvoice);
+
 			context.Invoice.Remove(existingInvoice);
 			await context.SaveChangesAsync();
 			return true;

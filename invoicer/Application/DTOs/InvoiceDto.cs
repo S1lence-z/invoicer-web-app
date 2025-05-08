@@ -11,6 +11,7 @@ namespace Application.DTOs
 		public EntityDto? Seller { get; set; }
 		public EntityDto? Buyer { get; set; }
 		public string InvoiceNumber { get; set; } = string.Empty;
+		public bool IsCustomInvoiceNumber { get; set; } = false;
 		public DateTime IssueDate { get; set; } = DateTime.Now;
 		public DateTime DueDate { get; set; }
 		public DateTime VatDate { get; set; } = DateTime.Now;
