@@ -1,7 +1,9 @@
 ﻿@inherits LayoutComponentBase
 @using Frontend.Services
 @using Frontend.Utils
+@using Frontend.Components
 @inject LoadingService LoadingService
+@inject ErrorService ErrorService
 
 <div class="page">
     <div class="sidebar w-auto">
@@ -27,8 +29,21 @@
     </main>
 </div>
 
+@* ERROR MESSAGE MODAL *@
+<Modal Title="Error" IsVisible="ErrorService.EmittedError" OnClose="ErrorService.ClearError">
+    <div class="alert alert-danger" role="alert">
+        @ErrorService.ErrorMessage
+    </div>
+    <button class="btn btn-primary" @onclick="ErrorService.ClearError">Close</button>
+</Modal>
+
 @code {
     private void LoadingStateChanged(object? sender, EventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    private void ErrorStateChanged(object? sender, EventArgs e)
     {
         StateHasChanged();
     }
@@ -36,10 +51,12 @@
     protected override void OnInitialized()
     {
         LoadingService.OnLoadingStateChanged += LoadingStateChanged;
+        ErrorService.OnErrorStateChanged += ErrorStateChanged;
     }
 
     public void Dispose()
     {
         LoadingService.OnLoadingStateChanged -= LoadingStateChanged;
+        ErrorService.OnErrorStateChanged -= ErrorStateChanged;
     }
 }

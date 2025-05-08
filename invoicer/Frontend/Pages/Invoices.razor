@@ -5,8 +5,10 @@
 @using Application.ServiceInterfaces;
 @using Domain.Interfaces;
 @using Frontend.Components;
+@using Frontend.Services
 @inject IInvoiceService invoiceService;
 @inject IJSRuntime jsRuntime;
+@inject ErrorService errorService;
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3">
@@ -171,36 +173,47 @@
 
     private async Task DeleteInvoice(InvoiceDto invToDelete)
     {
-        var status = await invoiceService.DeleteAsync(invToDelete.Id);
-        if (status) {
-            await LoadInvoices();
-            StateHasChanged();
+        try
+        {
+            bool status = await invoiceService.DeleteAsync(invToDelete.Id);
+            if (status)
+            {
+                await LoadInvoices();
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorService.ShowError(ex.Message);
         }
     }
 
     private async Task ExportInvoice(InvoiceDto invToExport)
     {
-        IPdfGenerationResult response = await invoiceService.ExportInvoicePdf(invToExport.Id);
-        if (!response.IsSuccess)
+        try
         {
-            Console.WriteLine(response.ErrorMessage);
+            IPdfGenerationResult response = await invoiceService.ExportInvoicePdf(invToExport.Id);
+            if (!response.IsSuccess)
+            {
+                errorService.ShowError(response.ErrorMessage!);
+                return;
+            }
+
+            string defaultFileName = $"Invoice_{invToExport.InvoiceNumber}.pdf";
+            string? userFileName = await jsRuntime.InvokeAsync<string>("promptFilename", defaultFileName);
+
+            if (string.IsNullOrWhiteSpace(userFileName))
+                return;
+
+            if (!userFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                userFileName += ".pdf";
+
+            await jsRuntime.InvokeVoidAsync("downloadPdf", userFileName, response.Data);
         }
-
-        string defaultFileName = $"Invoice_{invToExport.InvoiceNumber}.pdf";
-        string? userFileName = await jsRuntime.InvokeAsync<string>("promptFilename", defaultFileName);
-
-        if (string.IsNullOrWhiteSpace(userFileName))
+        catch (Exception ex)
         {
-            Console.WriteLine("Download canceled.");
-            return;
+            errorService.ShowError(ex.Message);
         }
-
-        if (!userFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-        {
-            userFileName += ".pdf";
-        }
-
-        await jsRuntime.InvokeVoidAsync("downloadPdf", userFileName, response.Data);
     }
 
     private async Task ShowAddInvoiceModal()

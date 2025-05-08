@@ -10,7 +10,7 @@ namespace Backend.Services
 {
 	public class InvoiceNumberingService(ApplicationDbContext context, IInvoiceNumberGenerator invoiceNumberGenerator) : IInvoiceNumberingService
 	{
-		public async Task<NumberingSchemeDto?> GetByIdAsync(int id)
+		public async Task<NumberingSchemeDto> GetByIdAsync(int id)
 		{
 			NumberingScheme? foundScheme = await context.NumberingScheme
 				.AsNoTracking()
@@ -28,7 +28,7 @@ namespace Backend.Services
 			return allSchemes.Select(InvoiceNumberSchemeMapper.MapToDto).ToList();
 		}
 
-		public async Task<NumberingSchemeDto?> CreateAsync(NumberingSchemeDto newInvoiceNumberScheme)
+		public async Task<NumberingSchemeDto> CreateAsync(NumberingSchemeDto newInvoiceNumberScheme)
 		{			
 			NumberingScheme scheme = InvoiceNumberSchemeMapper.MapToDomain(newInvoiceNumberScheme);
 			await context.NumberingScheme.AddAsync(scheme);
@@ -36,7 +36,7 @@ namespace Backend.Services
 			return InvoiceNumberSchemeMapper.MapToDto(scheme);
 		}
 
-		public async Task<NumberingSchemeDto?> UpdateAsync(int id, NumberingSchemeDto udpateScheme)
+		public async Task<NumberingSchemeDto> UpdateAsync(int id, NumberingSchemeDto udpateScheme)
 		{
 			NumberingScheme? existingScheme = await context.NumberingScheme
 				.FirstOrDefaultAsync(ins => ins.Id == id);

@@ -7,7 +7,6 @@
 
 		// Navigation properties
 		public virtual Entity Entity { get; set; } = null!;
-		public virtual NumberingScheme InvoiceNumberingScheme { get; set; } = null!;
 
 		// Current state
 		public int LastSequenceNumber { get; set; } = 0;

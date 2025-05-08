@@ -3,7 +3,9 @@
 @using Frontend.Api;
 @using Application.ServiceInterfaces;
 @using Frontend.Components;
+@using Frontend.Services;
 @inject IInvoiceNumberingService numberingService;
+@inject ErrorService errorService;
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3">
@@ -83,21 +85,14 @@
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            errorService.ShowError(e.Message);
         }
     }
 
     private async Task EditScheme(NumberingSchemeDto schemeToEdit)
     {
-        try
-        {
-            numberingSchemeToEdit = schemeToEdit;
-            await ShowEditNumberingSchemeModal();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
+        numberingSchemeToEdit = schemeToEdit;
+        await ShowEditNumberingSchemeModal();
     }
 
     private async Task ShowNewNumberingSchemeModal()

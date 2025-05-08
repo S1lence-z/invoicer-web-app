@@ -2,7 +2,6 @@
 using Application.ServiceInterfaces;
 using Application.Api;
 using Microsoft.AspNetCore.Mvc;
-using Domain.Models;
 
 namespace Backend.Controllers
 {
@@ -58,9 +57,9 @@ namespace Backend.Controllers
 
 			try
 			{
-				EntityDto? newEntity = await entityService.CreateAsync(entity);
-				await entityNumberingStateService.CreateByEntityId(newEntity!.Id);
-				return CreatedAtRoute("GetEntityById", new { id = newEntity!.Id }, newEntity);
+				EntityDto newEntity = await entityService.CreateAsync(entity);
+				await entityNumberingStateService.CreateByEntityId(newEntity.Id);
+				return CreatedAtRoute("GetEntityById", new { id = newEntity.Id }, newEntity);
 			}
 			catch (Exception e)
 			{
