@@ -36,7 +36,7 @@ namespace Backend.Services
 			return numberingSchemeState;
 		}
 
-		public async Task<string> PeekNextInvoiceNumberAsync(int entityId, DateTime generationDate)
+		public async Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate)
 		{
 			// Get the entity
 			Entity? existingEntity = await context.Entity
@@ -58,51 +58,10 @@ namespace Backend.Services
 				.AsNoTracking()
 				.FirstOrDefaultAsync(ins => ins.EntityId == entityId);
 			if (state is null)
-				throw new ArgumentException($"Entity Invoice Numbering Scheme State with entity id {entityId} not found");
-
-			// Generate the next newInvoice number
-			string newInvoiceNumber = invoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, state, generationDate);
-			return newInvoiceNumber;
-		}
-
-		public async Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate)
-		{
-			// Get the entity
-			Entity? existingEntity = await context.Entity
-				.AsNoTracking()
-				.FirstOrDefaultAsync(e => e.Id == entityId);
-
-			if (existingEntity is null)
-				throw new ArgumentException($"Entity with id {entityId} not found");
-
-			// Get the numbering scheme
-			int numberingSchemeId = existingEntity.CurrentNumberingSchemeId;
-			NumberingScheme? numberingScheme = await context.NumberingScheme
-				.AsNoTracking()
-				.FirstOrDefaultAsync(ins => ins.Id == numberingSchemeId);
-
-			if (numberingScheme is null)
-				throw new ArgumentException($"Invoice Numbering Scheme with id {numberingSchemeId} not found");
-
-			// Get the state
-			EntityInvoiceNumberingSchemeState? state = await context.EntityInvoiceNumberingSchemeState
-				.FirstOrDefaultAsync(ins => ins.EntityId == entityId);
-
-			if (state is null)
-			{
-				// Create a new state if it doesn't exist
-				state = new EntityInvoiceNumberingSchemeState
-				{
-					EntityId = entityId
-				};
-				await context.EntityInvoiceNumberingSchemeState.AddAsync(state);
-			}
+				throw new ArgumentException($"Entity Invoice Numbering Scheme State for entity id {entityId} not found");
 
 			// Generate the next newInvoice number and update the state
 			string newInvoiceNumber = invoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, state, generationDate);
-
-			// Save the updated state
-			await context.SaveChangesAsync();
 			return newInvoiceNumber;
 		}
 
