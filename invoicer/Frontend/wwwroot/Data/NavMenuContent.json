@@ -16,7 +16,7 @@
 	},
 	{
 		"Label": "Invoice Numbering",
-		"UrlPath": "/entityinvoicenumbering",
+		"UrlPath": "/invoicenumbering",
 		"IconClass": "bi bi-plus-square-fill-nav-menu"
 	},
 	{
