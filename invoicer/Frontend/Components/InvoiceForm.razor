@@ -21,11 +21,11 @@
                 <div class="d-flex flex-column">
                     <label for="invoice-number" class="font-weight-bold">Invoice Number</label>
                     <input type="text" class="form-control" id="invoice-number"
-                           value="@((isFetchingNextInvoiceNumber ? LOADING_MESSAGE : invoiceFormModel.InvoiceNumber))"
-                           @oninput="e => invoiceFormModel.InvoiceNumber = e.Value?.ToString()!" 
-                           disabled="@(!isCustomInvoiceNumber)"
-                           />
-                           <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
+                    value="@((isFetchingNextInvoiceNumber ? LOADING_MESSAGE : invoiceFormModel.InvoiceNumber))"
+                    @oninput="e => invoiceFormModel.InvoiceNumber = e.Value?.ToString()!" 
+                    disabled="@(!isCustomInvoiceNumber)"
+                    />
+                    <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
                 </div>
                 <button type="button" class="btn btn-outline-secondary align-self-end" @onclick="ToggleCustomInvoiceNumber">
                     @if (isCustomInvoiceNumber)
@@ -201,7 +201,7 @@
         if (InvoiceInstance is not null)
             invoiceFormModel = InvoiceFormModel.FromInvoice(InvoiceInstance);
         if (!isActive)
-            ClearForm();
+            ResetForm();
     }
 
     protected override async Task OnInitializedAsync()
@@ -236,7 +236,7 @@
                 await SubmitEditInvoice();
             }
             await SubmitCallback.InvokeAsync();
-            ClearForm();
+            ResetForm();
         } 
         catch (Exception e) 
         {
@@ -291,8 +291,10 @@
         InvoiceDto updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
     }
 
-    private void ClearForm()
+    private void ResetForm()
     {
+        isCustomInvoiceNumber = false;
+        nextFetchedInvoiceNumber = string.Empty;
         invoiceFormModel = new InvoiceFormModel();
     }
 
