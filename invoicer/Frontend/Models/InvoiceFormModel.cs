@@ -11,10 +11,12 @@ namespace Frontend.Models
 
 		// Seller
 		[Required(ErrorMessage = "Seller is required")]
+		[MinValue<int>(1, "Seller is required")]
 		public int SellerId { get; set; }
 
 		// Buyer
 		[Required(ErrorMessage = "Buyer is required")]
+		[MinValue<int>(1, "Buyer is required")]
 		public int BuyerId { get; set; }
 
 		// Invoice attributes
