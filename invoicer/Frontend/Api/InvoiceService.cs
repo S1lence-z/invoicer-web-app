@@ -48,7 +48,7 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<IPdfGenerationResult> ExportInvoicePdf(int id)
+		public async Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id)
 		{
 			HttpResponseMessage response = await _httpClient.GetAsync($"{_urlPath}/{id}/export-pdf");
 
@@ -87,6 +87,21 @@ namespace Frontend.Api
 					throw new ApiException(errorResponse);
 				else
 					throw new Exception($"Failed to retrieve Invoice with id {id}: {response.ReasonPhrase}");
+			}
+		}
+
+		public async Task<InvoiceDto> GetNewInvoiceInformationAsync(int entityId)
+		{
+			var response = await _httpClient.GetAsync($"{_urlPath}/entity/{entityId}/new");
+			if (response.IsSuccessStatusCode)
+				return await response.Content.ReadFromJsonAsync<InvoiceDto>() ?? throw new Exception("Failed to deserialize InvoiceDto");
+			else
+			{
+				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+				if (errorResponse is not null)
+					throw new ApiException(errorResponse);
+				else
+					throw new Exception($"Failed to retrieve new Invoice information for entity with id {entityId}: {response.ReasonPhrase}");
 			}
 		}
 

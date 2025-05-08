@@ -192,7 +192,7 @@
     {
         try
         {
-            IPdfGenerationResult response = await invoiceService.ExportInvoicePdf(invToExport.Id);
+            IPdfGenerationResult response = await invoiceService.ExportInvoicePdfAsync(invToExport.Id);
             if (!response.IsSuccess)
             {
                 errorService.ShowError(response.ErrorMessage!);
