@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 using Application.ServiceInterfaces;
 using Application.DTOs;
 using Application.PdfGenerator;
@@ -148,7 +149,7 @@ namespace Backend.Controllers
 					return StatusCode(500, ApiErrorResponse.Create("An error occurred while exporting the invoice to PDF", invoiceResult.ErrorMessage!, invoiceResult.StatusCode));
 				}
 				byte[] pdfFile = invoiceResult.Data!;
-				return File(pdfFile, "application/pdf", $"invoice_{id}.pdf");
+				return File(pdfFile, "application/pdf", invoiceResult.FileName);
 			}
 			catch (ArgumentException e)
 			{
