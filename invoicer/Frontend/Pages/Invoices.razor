@@ -70,14 +70,14 @@
     </div>
 </div>
 @* ADD NEW INVOICE MODAL *@
-<Modal Title="Add New Invoice" IsVisible="isAddingNewInvoice" OnClose="ShowAddInvoiceModal">
+<Modal Title="Add New Invoice" IsVisible="isAddingNewInvoice" OnClose="ShowAddInvoiceModal" Size="xl">
     <InvoiceForm SubmitCallback="ShowAddInvoiceModal" isActive="isAddingNewInvoice" />
 </Modal>
 @* EDIT INVOICE MODAL *@
-<Modal Title="Edit Invoice" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal">
+<Modal Title="Edit Invoice" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal" Size="xl">
     @if (invoiceToEdit is not null)
     {
-        <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isEditingInvoice" InvoiceInstance="invoiceToEdit" />
+        <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isEditingInvoice" InvoiceInstance="invoiceToEdit"/>
     }
 </Modal>
 @* PREVIEW MODAL *@

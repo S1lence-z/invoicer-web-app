@@ -25,7 +25,6 @@
                     @oninput="e => invoiceFormModel.InvoiceNumber = e.Value?.ToString()!" 
                     disabled="@(!isCustomInvoiceNumber)"
                     />
-                    <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
                 </div>
                 <button type="button" class="btn btn-outline-secondary align-self-end" @onclick="ToggleCustomInvoiceNumber">
                     @if (isCustomInvoiceNumber)
@@ -38,6 +37,7 @@
                     }
                 </button>
             </div>
+            <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
         </div>
     </div>
 
@@ -77,11 +77,8 @@
         <div class="col">
             <label for="buyer" class="font-weight-bold">Buyer</label>
             <select class="form-control" id="buyer" @bind="invoiceFormModel.BuyerId">
-                @if (invoiceFormModel.SellerId == 0)
-                {
-                    <option value="0">Select a buyer</option>
-                }
-                @foreach (var entity in allEntities.Where(e => e.Id != invoiceFormModel.SellerId))
+                <option value="0">Select a buyer</option>
+                @foreach (var entity in allBuyers)
                 {
                     <option value="@entity.Id">@entity.Name</option>
                 }
@@ -136,45 +133,60 @@
         </div>
     </div>
 
-    <hr />
+    <hr class="my-4" />
     <h4>Invoice Items</h4>
-    <div class="mb-3">
-        <button type="button" class="btn btn-success" @onclick="AddInvoiceItem">Add Item</button>
-    </div>
+    <button type="button" class="btn btn-success mb-2" @onclick="AddInvoiceItem">
+        Add Item
+    </button>
+    @if (!invoiceFormModel.Items.Any())
+    {
+        <p class="text-muted">No items added yet.</p>
+        <ValidationMessage For="@(() => invoiceFormModel.Items)" />
+    }
     @foreach (var item in invoiceFormModel.Items)
     {
-        <div class="row mb-2 align-items-end">
-            <div class="col">
-                <label for="item-description" class="font-weight-bold">Description</label>
-                <input id="item-description" type="text" class="form-control" placeholder="Description" @bind="item.Description" />
+        var itemUniqueSuffix = item.GetHashCode();
+        <div class="row g-2 mb-3 pb-3 border-bottom align-items-start">
+            <div class="col-md-4">
+                <label for="item-description-@itemUniqueSuffix" class="form-label small">Description</label>
+                <input id="item-description-@itemUniqueSuffix" type="text" class="form-control form-control-sm" placeholder="Description" @bind="item.Description" />
                 <ValidationMessage For="@(() => item.Description)" />
             </div>
-            <div class="col">
-                <label for="item-quantity" class="font-weight-bold">Quantity</label>
-                <input id="item-quantity" type="number" min="1" class="form-control" placeholder="Quantity" @bind="item.Quantity" />
+            <div class="col-md-1 col-6">
+                <label for="item-quantity-@itemUniqueSuffix" class="form-label small">Quantity</label>
+                <input id="item-quantity-@itemUniqueSuffix" type="number" min="0.01" step="any" class="form-control form-control-sm" placeholder="Qty" @bind="item.Quantity" />
                 <ValidationMessage For="@(() => item.Quantity)" />
             </div>
-            <div class="col">
-                <label for="item-unit" class="font-weight-bold">Unit</label>
-                <input id="item-unit" type="text" class="form-control" placeholder="Unit" @bind="item.Unit" />
+            <div class="col-md-2 col-6">
+                <label for="item-unit-@itemUniqueSuffix" class="form-label small">Unit</label>
+                <input id="item-unit-@itemUniqueSuffix" type="text" class="form-control form-control-sm" placeholder="kg, ml, ..." @bind="item.Unit" />
                 <ValidationMessage For="@(() => item.Unit)" />
             </div>
-            <div class="col">
-                <label for="item-unit-price" class="font-weight-bold">Unit Price</label>
-                <input id="item-unit-price" type="number" min="0" class="form-control" placeholder="Unit Price" @bind="item.UnitPrice" />
+            <div class="col-md-2">
+                <label for="item-unit-price-@itemUniqueSuffix" class="form-label small">Unit Price</label>
+                <input id="item-unit-price-@itemUniqueSuffix" type="number" min="0" step="any" class="form-control form-control-sm" placeholder="Price" @bind="item.UnitPrice" />
                 <ValidationMessage For="@(() => item.UnitPrice)" />
             </div>
-            <div class="col">
-                <label for="item-vat-rate" class="font-weight-bold">VAT Rate</label>
-                <input id="item-vat-rate" type="number" min="0" class="form-control" placeholder="VAT Rate" @bind="item.VatRate" step="0.01" />
+            <div class="col-md-2">
+                <label for="item-vat-rate-@itemUniqueSuffix" class="form-label small">VAT Rate</label>
+                <input id="item-vat-rate-@itemUniqueSuffix" type="number" min="0" class="form-control form-control-sm" @bind="item.VatRate" step="0.01" />
                 <ValidationMessage For="@(() => item.VatRate)" />
+                <div class="btn-group btn-group-sm mt-1" role="group" aria-label="VAT Rate Presets">
+                    <button type="button" class="btn btn-outline-secondary" @onclick="() => SetVatRate(item, 0)">0 %</button>
+                    <button type="button" class="btn btn-outline-secondary" @onclick="() => SetVatRate(item, 15)">15 %</button>
+                    <button type="button" class="btn btn-outline-secondary" @onclick="() => SetVatRate(item, 18)">18 %</button>
+                    <button type="button" class="btn btn-outline-secondary" @onclick="() => SetVatRate(item, 21)">21 %</button>
+                </div>
             </div>
-            <div class="col">
-                <button type="button" class="btn btn-danger" @onclick="() => RemoveInvoiceItem(item)">Remove</button>
+            <div class="col-md-1 text-end">
+                <label class="form-label small d-block invisible">Actions</label>
+                <button type="button" title="Remove item" class="btn btn-danger btn-sm" @onclick="() => RemoveInvoiceItem(item)">
+                    Remove
+                </button>
             </div>
         </div>
     }
-    <button type="submit" class="btn btn-primary float-end mt-4">Submit Invoice</button>
+    <button type="submit" class="btn btn-primary float-end">Submit Invoice</button>
 </EditForm>
 
 @code {
@@ -186,6 +198,7 @@
     // Form Models
     private InvoiceFormModel invoiceFormModel { get; set; } = new();
     private IList<EntityDto> allEntities = new List<EntityDto>();
+    private IList<EntityDto> allBuyers = new List<EntityDto>();
 
     // Variables
     private bool isCustomInvoiceNumber = false;
@@ -209,6 +222,7 @@
         try
         {
             allEntities = await entityService.GetAllAsync();
+            allBuyers = allEntities.Where(e => e.Id != invoiceFormModel.SellerId).ToList();
         }
         catch (Exception e)
         {
@@ -312,6 +326,23 @@
         if (newInvoice is null)
             return;
         invoiceFormModel.InvoiceNumber = newInvoice.InvoiceNumber;
+        UpdateBuyers(sellerId);
+    }
+
+    private void UpdateBuyers(int newSellerId)
+    {
+        // Store the buyer ID that was selected *before* this seller change.
+        int buyerIdBeforeSellerChange = invoiceFormModel.BuyerId;
+
+        // Update the list of available buyers for the dropdown, excluding the new seller.
+        allBuyers = allEntities
+            .Where(e => e.Id != newSellerId)
+            .ToList();
+
+        if (buyerIdBeforeSellerChange == 0)
+            invoiceFormModel.BuyerId = 0;
+        else if (buyerIdBeforeSellerChange == newSellerId || !allBuyers.Any(b => b.Id == buyerIdBeforeSellerChange))
+            invoiceFormModel.BuyerId = allBuyers.FirstOrDefault()?.Id ?? 0;
     }
 
     private async Task<InvoiceDto?> GetNewOrUpdatedInvoiceInitialData(int sellerId)
@@ -332,5 +363,10 @@
         {
             isFetchingNextInvoiceNumber = false;
         }
+    }
+
+    private void SetVatRate(InvoiceItemFormModel item, decimal ratePercentage)
+    {
+        item.VatRate = ratePercentage / 100.0m;
     }
 }
