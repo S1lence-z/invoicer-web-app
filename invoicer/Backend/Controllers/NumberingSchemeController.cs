@@ -7,7 +7,7 @@ namespace Backend.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
-	public class InvoiceNumberingController(IInvoiceNumberingService numberingService) : ControllerBase
+	public class NumberingSchemeController(INumberingSchemeService numberingService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetInvoiceNumberingSchemeById")]
 		[ProducesResponseType(typeof(NumberingSchemeDto), 200)]
@@ -106,26 +106,13 @@ namespace Backend.Controllers
 						);
 				return Ok($"Invoice Numbering Scheme with id {id} deleted");
 			}
-			catch (Exception e)
+			catch (ArgumentException e) 
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
 			}
-		}
-
-		[HttpGet("PeekNextInvoiceNumber/{entityId:int}", Name = "PeekNextInvoiceNumber")]
-		[ProducesResponseType(typeof(string), 200)]
-		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
-		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
-		public async Task<IActionResult> PeekNextInvoiceNumber(int entityId)
-		{
-			try
+			catch (InvalidOperationException e)
 			{
-				string nextInvoiceNumber = await numberingService.PeekNextInvoiceNumberAsync(entityId, DateTime.Now);
-				return Ok(nextInvoiceNumber);
-			}
-			catch (KeyNotFoundException e)
-			{
-				return NotFound(ApiErrorResponse.Create("Invoice numbering scheme not found", e.Message, 404));
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
 			}
 			catch (Exception e)
 			{

@@ -3,7 +3,7 @@ using Application.DTOs;
 
 namespace Frontend.Models
 {
-	public class EntityFormModel
+	public record class EntityFormModel
 	{
 		public int Id { get; set; }
 

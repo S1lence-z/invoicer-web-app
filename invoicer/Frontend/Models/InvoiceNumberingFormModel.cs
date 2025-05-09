@@ -4,7 +4,7 @@ using Application.DTOs;
 
 namespace Frontend.Models
 {
-	public class InvoiceNumberingFormModel
+	public record class InvoiceNumberingFormModel
 	{
 		public int Id { get; set; }
 

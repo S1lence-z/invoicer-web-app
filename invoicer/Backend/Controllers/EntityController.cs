@@ -7,7 +7,7 @@ namespace Backend.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
-	public class EntityController(IEntityService entityService, IEntityInvoiceNumberingSchemeState entityNumberingStateService) : ControllerBase
+	public class EntityController(IEntityService entityService, IEntityInvoiceNumberingStateService entityNumberingStateService) : ControllerBase
 	{
 		[HttpGet("{id:int}", Name = "GetEntityById")]
 		[ProducesResponseType(typeof(EntityDto), 200)]

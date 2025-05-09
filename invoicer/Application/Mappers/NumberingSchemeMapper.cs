@@ -3,7 +3,7 @@ using Domain.Models;
 
 namespace Application.Mappers
 {
-	public class InvoiceNumberSchemeMapper
+	public class NumberingSchemeMapper
 	{
 		public static NumberingSchemeDto MapToDto(NumberingScheme scheme)
 		{

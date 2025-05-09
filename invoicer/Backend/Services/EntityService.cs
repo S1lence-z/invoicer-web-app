@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
-	public class EntityService(ApplicationDbContext context, IInvoiceNumberingService numberingService) : IEntityService
+	public class EntityService(ApplicationDbContext context, INumberingSchemeService numberingSchemeService) : IEntityService
 	{
 		public async Task<EntityDto> GetByIdAsync(int id)
 		{
@@ -40,7 +40,7 @@ namespace Backend.Services
 			if (bankAccount is null)
 				throw new ArgumentException($"Bank account with id {newEntity.BankAccountId} not found.");
 
-			NumberingSchemeDto? defaultScheme = await numberingService.GetDefaultNumberScheme();
+			NumberingSchemeDto? defaultScheme = await numberingSchemeService.GetDefaultNumberingSchemeAsync();
 			newEntity.CurrentNumberingSchemeId = defaultScheme.Id;
 			Entity entity = EntityMapper.MapToDomain(newEntity);
 

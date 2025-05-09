@@ -3,12 +3,14 @@
 @using Application.Extensions;
 
 <div class="card border-1 shadow-sm">
-    <div class="card-body row align-items-center" style="cursor: pointer;">
-        <div class="col">
-            <span class="fw-bold">@NumberingScheme.ShowNumberingSchemePreview()</span>
-        </div>
-        <div class="col">
-            <span class="text-muted">Default: @(NumberingScheme.IsDefault ? "Yes" : "No")</span>
+    <div class="card-body row align-items-center">
+        <div class="d-flex justify-content-between">
+            <div class="d-flex flex-grow-1">
+                <span class="fw-bold">@NumberingScheme.ShowNumberingSchemePreview()</span>
+            </div>
+            <div class="d-flex flex-grow-1 justify-content-around">
+                <span class="text-muted pe-lg-5">Default: @(NumberingScheme.IsDefault ? "Yes" : "No")</span>
+            </div>
         </div>
     </div>
     <div class="card-footer bg-white border-0 d-flex gap-2">

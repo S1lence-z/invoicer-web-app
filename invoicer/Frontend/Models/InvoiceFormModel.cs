@@ -5,22 +5,27 @@ using Application.DTOs;
 
 namespace Frontend.Models
 {
-	public class InvoiceFormModel
+	public record class InvoiceFormModel
 	{
 		public int Id { get; set; }
 
 		// Seller
 		[Required(ErrorMessage = "Seller is required")]
+		[MinValue<int>(1, "Seller is required")]
 		public int SellerId { get; set; }
 
 		// Buyer
 		[Required(ErrorMessage = "Buyer is required")]
+		[MinValue<int>(1, "Buyer is required")]
 		public int BuyerId { get; set; }
 
 		// Invoice attributes
 
 		[Required(ErrorMessage = "Invoice number is required")]
 		public string InvoiceNumber { get; set; } = string.Empty;
+
+		[Required]
+		public bool IsCustomInvoiceNumber { get; set; } = false;
 
 		[Required(ErrorMessage = "Issue date is required")]
 		[DataType(DataType.DateTime)]

@@ -4,7 +4,7 @@
 @using Application.ServiceInterfaces;
 @using Frontend.Components;
 @using Frontend.Services;
-@inject IInvoiceNumberingService numberingService;
+@inject INumberingSchemeService numberingSchemeService;
 @inject ErrorService errorService;
 
 @* PAGE CONTAINER *@
@@ -65,7 +65,7 @@
     {
         try
         {
-            allNumberingSchemes = (await numberingService.GetAllAsync()).ToList();
+            allNumberingSchemes = (await numberingSchemeService.GetAllAsync()).ToList();
         }
         catch (Exception e)
         {
@@ -77,7 +77,7 @@
     {
         try
         {
-            bool status = await numberingService.DeleteAsync(schemeToDelete.Id);
+            bool status = await numberingSchemeService.DeleteAsync(schemeToDelete.Id);
             if (status)
             {
                 await LoadNumberingSchemes();

@@ -125,7 +125,7 @@
         if (EntityInstance is not null)
             entityFormModel = EntityFormModel.FromEntity(EntityInstance);
         if (!isActive)
-            ClearForm();
+            ResetForm();
     }
 
     private async Task FillInAresData()
@@ -175,9 +175,9 @@
         entityFormModel.Country = newData.sidlo.nazevStatu!;
     }
 
-    private void ClearForm()
+    private void ResetForm()
     {
-        entityFormModel = new EntityFormModel();
+        entityFormModel = new();
         userInputIco = string.Empty;
         aresApiErrorMessage = string.Empty;
     }
@@ -188,11 +188,11 @@
         try 
         {
             if (EntityInstance is null)
-            {
                 await SubmitNewEntity();
-                return;
-            }
-            await SubmitEditEntity();
+            else
+                await SubmitEditEntity();
+            await SubmitCallback.InvokeAsync();
+            ResetForm();
         }
         catch (Exception e)
         {
@@ -201,8 +201,6 @@
         finally
         {
             loadingService.StopLoading();
-            await SubmitCallback.InvokeAsync();
-            ClearForm();
         }
     }
 

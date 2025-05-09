@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 using Application.ServiceInterfaces;
 using Application.DTOs;
 using Application.PdfGenerator;
@@ -63,9 +64,17 @@ namespace Backend.Controllers
 				InvoiceDto? createdInvoice = await invoiceService.CreateAsync(invoice);
 				return CreatedAtRoute("GetInvoiceById", new { id = createdInvoice!.Id }, createdInvoice);
 			}
+			catch (ArgumentException e)
+			{
+				return BadRequest(ApiErrorResponse.Create("Invalid request", e.Message, 400));
+			}
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
+			}
 			catch (Exception e)
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return StatusCode(500, ApiErrorResponse.Create(e.Message, e.Message, 500));
 			}
 		}
 
@@ -86,9 +95,13 @@ namespace Backend.Controllers
 				InvoiceDto? updatedInvoice = await invoiceService.UpdateAsync(id, invoice);
 				return Ok(updatedInvoice);
 			}
+			catch (ArgumentException e)
+			{
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
+			}
 			catch (KeyNotFoundException e)
 			{
-				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
+				return NotFound(ApiErrorResponse.Create(e.Message, e.Message, 404));
 			}
 			catch (Exception e)
 			{
@@ -111,6 +124,10 @@ namespace Backend.Controllers
 				}
 				return Ok($"Invoice with id {id} deleted");
 			}
+			catch (ArgumentException e)
+			{
+				return NotFound(ApiErrorResponse.Create(e.Message, e.Message, 404));
+			}
 			catch (Exception e)
 			{
 				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
@@ -126,13 +143,13 @@ namespace Backend.Controllers
 		{
 			try
 			{
-				IPdfGenerationResult invoiceResult = await invoiceService.ExportInvoicePdf(id);
+				IPdfGenerationResult invoiceResult = await invoiceService.ExportInvoicePdfAsync(id);
 				if (!invoiceResult.IsSuccess)
 				{
 					return StatusCode(500, ApiErrorResponse.Create("An error occurred while exporting the invoice to PDF", invoiceResult.ErrorMessage!, invoiceResult.StatusCode));
 				}
 				byte[] pdfFile = invoiceResult.Data!;
-				return File(pdfFile, "application/pdf", $"invoice_{id}.pdf");
+				return File(pdfFile, "application/pdf", invoiceResult.FileName);
 			}
 			catch (ArgumentException e)
 			{
@@ -141,6 +158,27 @@ namespace Backend.Controllers
 			catch (InvalidOperationException e)
 			{
 				return BadRequest(ApiErrorResponse.Create("Invalid operation", e.Message, 400));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+			}
+		}
+
+		[HttpGet("entity/{entityId:int}/new", Name = "GetNewInvoiceInformation")]
+		[ProducesResponseType(typeof(InvoiceDto), 200)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
+		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
+		public async Task<IActionResult> GetNewInvoiceInformation(int entityId)
+		{
+			try
+			{
+				InvoiceDto? invoice = await invoiceService.GetNewInvoiceInformationAsync(entityId);
+				return Ok(invoice);
+			}
+			catch (KeyNotFoundException e)
+			{
+				return NotFound(ApiErrorResponse.Create("Invoice not found", e.Message, 404));
 			}
 			catch (Exception e)
 			{

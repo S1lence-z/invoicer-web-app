@@ -3,7 +3,7 @@ using Application.DTOs;
 
 namespace Frontend.Models
 {
-	public class InvoiceItemFormModel
+	public record class InvoiceItemFormModel
 	{
 		public int Id { get; set; }
 

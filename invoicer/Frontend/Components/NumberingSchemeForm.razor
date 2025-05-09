@@ -5,7 +5,7 @@
 @using Frontend.Models;
 @using Frontend.Services
 @using Frontend.Utils;
-@inject IInvoiceNumberingService numberingService;
+@inject INumberingSchemeService numberingService;
 @inject LoadingService loadingService;
 @inject ErrorService errorService;
 
@@ -21,6 +21,13 @@
                     <input id="use-seperator" type="checkbox" class="form-check-input" @bind="SchemeFormModel.UseSeperator" />
                 </div>
                 <ValidationMessage For="@(() => SchemeFormModel.UseSeperator)" />
+            </div>
+            <div class="col">
+                <div class="form-check mt-4">
+                    <label class="form-check-label" for="new-default">Set as Default</label>
+                    <input id="new-default" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IsDefault" />
+                </div>
+                <ValidationMessage For="@(() => SchemeFormModel.IsDefault)" />
             </div>
         </div>
 
@@ -109,10 +116,10 @@
         if (NumberingSchemeInstance is not null)
             SchemeFormModel = InvoiceNumberingFormModel.FromDto(NumberingSchemeInstance);
         if (!isActive)
-            ClearForm();
+            ResetForm();
     }
 
-    private void ClearForm()
+    private void ResetForm()
     {
         SchemeFormModel = new InvoiceNumberingFormModel();
     }
@@ -123,11 +130,11 @@
         try
         {
             if (NumberingSchemeInstance is null)
-            {
                 await SubmitNewScheme();
-                return;
-            }
-            await SubmitEditScheme();
+            else
+                await SubmitEditScheme();
+            await SubmitCallback.InvokeAsync();
+            ResetForm();
         }
         catch (Exception e)
         {
@@ -136,8 +143,6 @@
         finally
         {
             loadingService.StopLoading();
-            await SubmitCallback.InvokeAsync();
-            ClearForm();
         }
     }
 

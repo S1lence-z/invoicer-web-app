@@ -16,12 +16,18 @@ namespace Backend.Utils.InvoicePdfGenerator
 				QuestPDF.Settings.License = LicenseType.Community;
 				InvoicePdfDocument newDoc = new(invoice);
 				byte[] pdfFile = newDoc.GeneratePdf();
-				return PdfGenerationResult.Success(pdfFile);
+				string fileName = CreateInvoiceName(invoice);
+				return PdfGenerationResult.Success(pdfFile, fileName);
 			}
 			catch (Exception e)
 			{
 				return PdfGenerationResult.Failure(e.Message);
 			}
+		}
+
+		private static string CreateInvoiceName(Invoice invoice)
+		{
+			return $"{invoice.Seller!.Name}_{invoice.InvoiceNumber}";
 		}
 	}
 }

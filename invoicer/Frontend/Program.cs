@@ -36,7 +36,7 @@ namespace Frontend
 			builder.Services.AddScoped<IAddressService, AddressService>();
 			builder.Services.AddScoped<IBankAccountService, BankAccountService>();
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
-			builder.Services.AddScoped<IInvoiceNumberingService, InvoiceNumberingService>();
+			builder.Services.AddScoped<INumberingSchemeService, NumberingSchemeService>();
 
 			// Register other services
 			builder.Services.AddScoped<LoadingService>();

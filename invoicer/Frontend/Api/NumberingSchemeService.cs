@@ -6,12 +6,12 @@ using Application.Api;
 
 namespace Frontend.Api
 {
-	public class InvoiceNumberingService : IInvoiceNumberingService
+	public class NumberingSchemeService : INumberingSchemeService
 	{
 		private readonly HttpClient _httpClient;
-		private readonly string _urlPath = "api/InvoiceNumbering";
+		private readonly string _urlPath = "api/NumberingScheme";
 
-		public InvoiceNumberingService(EnvironmentConfig config)
+		public NumberingSchemeService(EnvironmentConfig config)
 		{
 			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
 		}
@@ -76,7 +76,7 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<NumberingSchemeDto> GetDefaultNumberScheme()
+		public async Task<NumberingSchemeDto> GetDefaultNumberingSchemeAsync()
 		{
 			var response = await _httpClient.GetAsync($"{_urlPath}/default");
 			if (response.IsSuccessStatusCode)
@@ -103,26 +103,6 @@ namespace Frontend.Api
 					throw new ApiException(errorResponse);
 				else
 					throw new Exception($"Failed to update Invoice Numbering Scheme with id {id}: {response.ReasonPhrase}");
-			}
-		}
-
-		public Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate)
-		{
-			throw new NotImplementedException("GetNextInvoiceNumberAsync method is not implemented.");
-		}
-
-		public async Task<string> PeekNextInvoiceNumberAsync(int entityId, DateTime generationDate)
-		{
-			var response = await _httpClient.GetAsync($"{_urlPath}/PeekNextInvoiceNumber/{entityId}");
-			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadAsStringAsync();
-			else
-			{
-				var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-				if (errorResponse is not null)
-					throw new ApiException(errorResponse);
-				else
-					throw new Exception($"Failed to peek next Invoice Number: {response.ReasonPhrase}");
 			}
 		}
 	}
