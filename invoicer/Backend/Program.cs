@@ -60,9 +60,10 @@ namespace Backend
 		{
 			app.UseCors(builder =>
 			{
-				builder.AllowAnyOrigin();
-				builder.AllowAnyMethod();
-				builder.AllowAnyHeader();
+				builder.AllowAnyOrigin()
+					.AllowAnyMethod()
+					.AllowAnyHeader()
+					.WithExposedHeaders("Content-Disposition");
 			});
 		}
 	}
