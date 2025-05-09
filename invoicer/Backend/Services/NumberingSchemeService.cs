@@ -74,15 +74,20 @@ namespace Backend.Services
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			NumberingScheme? scheme = await context.NumberingScheme
+			NumberingScheme? schemeToDelete = await context.NumberingScheme
 				.FirstOrDefaultAsync(ins => ins.Id == id);
-			if (scheme is null)
+			if (schemeToDelete is null)
 				return false;
 
-			if (scheme.IsDefault)
+			if (schemeToDelete.IsDefault)
 				throw new InvalidOperationException("Cannot delete the default numbering scheme");
 
-			context.NumberingScheme.Remove(scheme);
+			// Check if the schemeToDelete is in use
+			bool isInUseByEntity = await context.Entity.AnyAsync(e => e.CurrentNumberingSchemeId == id);
+			if (isInUseByEntity)
+				throw new ArgumentException("Cannot delete the scheme as it is being used by and entity");
+
+			context.NumberingScheme.Remove(schemeToDelete);
 			await context.SaveChangesAsync();
 			return true;
 		}

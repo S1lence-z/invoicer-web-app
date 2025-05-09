@@ -106,6 +106,10 @@ namespace Backend.Controllers
 						);
 				return Ok($"Invoice Numbering Scheme with id {id} deleted");
 			}
+			catch (ArgumentException e) 
+			{
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
+			}
 			catch (InvalidOperationException e)
 			{
 				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
