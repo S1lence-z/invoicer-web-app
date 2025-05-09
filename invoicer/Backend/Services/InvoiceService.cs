@@ -136,7 +136,6 @@ namespace Backend.Services
 			if (buyer.Id == seller.Id)
 				throw new ArgumentException($"Seller and buyer cannot be the same entity");
 
-			existingInvoice.InvoiceNumber = updatedInvoice.InvoiceNumber;
 			existingInvoice.IssueDate = updatedInvoice.IssueDate;
 			existingInvoice.DueDate = updatedInvoice.DueDate;
 			existingInvoice.Currency = updatedInvoice.Currency;
@@ -144,9 +143,15 @@ namespace Backend.Services
 			existingInvoice.VatDate = updatedInvoice.VatDate;
 			existingInvoice.Status = updatedInvoice.Status;
 			existingInvoice.DeliveryMethod = updatedInvoice.DeliveryMethod;
+			existingInvoice.BuyerId = updatedInvoice.BuyerId;
 			await UpdateInvoiceItemsAsync(existingInvoice, updatedInvoice.Items);
 
-			await entityInvoiceNumberingStateService.UpdateForNextAsync(existingInvoice.SellerId, EntityInvoiceNumberingStateUpdateStatus.Updating, updatedInvoice.IsCustomInvoiceNumber, existingInvoice);
+			if (existingInvoice.InvoiceNumber != updatedInvoice.InvoiceNumber)
+			{
+				existingInvoice.InvoiceNumber = updatedInvoice.InvoiceNumber;
+				await entityInvoiceNumberingStateService.UpdateForNextAsync(existingInvoice.SellerId, EntityInvoiceNumberingStateUpdateStatus.Updating, updatedInvoice.IsCustomInvoiceNumber, existingInvoice);
+			}
+
 			await context.SaveChangesAsync();
 
 			Invoice? updatedInvoiceEntity = await context.Invoice
