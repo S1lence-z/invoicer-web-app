@@ -62,14 +62,14 @@
     <div class="row mb-4">
         <div class="col">
             <label for="seller" class="font-weight-bold">Seller</label>
-            <select class="form-control" id="seller" @onchange="GetNewInvoiceInitialData">
+            <select class="form-control" id="seller" @bind="invoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind">
                 @if (invoiceFormModel.SellerId == 0)
                 {
-                    <option value="0">Select Seller</option>
+                    <option value="0">Select a seller</option>
                 }
                 @foreach (var entity in allEntities)
                 {
-                    <option value="@entity.Id" selected="@(entity.Id == invoiceFormModel.SellerId)">@entity.Name</option>
+                    <option value="@entity.Id">@entity.Name</option>
                 }
             </select>
             <ValidationMessage For="@(() => invoiceFormModel.SellerId)" />
@@ -77,11 +77,11 @@
         <div class="col">
             <label for="buyer" class="font-weight-bold">Buyer</label>
             <select class="form-control" id="buyer" @bind="invoiceFormModel.BuyerId">
-                @if (invoiceFormModel.BuyerId == 0)
+                @if (invoiceFormModel.SellerId == 0)
                 {
-                    <option value="0">Select Buyer</option>
+                    <option value="0">Select a buyer</option>
                 }
-                @foreach (var entity in allEntities)
+                @foreach (var entity in allEntities.Where(e => e.Id != invoiceFormModel.SellerId))
                 {
                     <option value="@entity.Id">@entity.Name</option>
                 }
@@ -292,38 +292,41 @@
     {
         isCustomInvoiceNumber = false;
         nextFetchedInvoiceNumber = string.Empty;
-        invoiceFormModel = new InvoiceFormModel();
+        invoiceFormModel = new();
     }
 
     private void AddInvoiceItem()
     {
         invoiceFormModel.Items.Add(new());
-        StateHasChanged();
     }
 
     private void RemoveInvoiceItem(InvoiceItemFormModel item)
     {
         invoiceFormModel.Items.Remove(item);
-        StateHasChanged();
     }
 
-    private async Task GetNewInvoiceInitialData(ChangeEventArgs args)
+    private async Task OnChosenSellerChangedAfterBind()
     {
-        // If we are editing an invoice, we don't want to change the invoice number
-        if (InvoiceInstance is not null)
+        int sellerId = invoiceFormModel.SellerId;
+        InvoiceDto? newInvoice = await GetNewOrUpdatedInvoiceInitialData(sellerId);
+        if (newInvoice is null)
             return;
+        invoiceFormModel.InvoiceNumber = newInvoice.InvoiceNumber;
+    }
+
+    private async Task<InvoiceDto?> GetNewOrUpdatedInvoiceInitialData(int sellerId)
+    {
+        if (sellerId == 0) return null;
+        isFetchingNextInvoiceNumber = true;
         try
         {
-            isFetchingNextInvoiceNumber = true;
-            int newSellerId = int.Parse(args.Value?.ToString() ?? "0");
-            InvoiceDto newInvoice = await invoiceService.GetNewInvoiceInformationAsync(newSellerId);
-            invoiceFormModel.SellerId = newInvoice.SellerId;
-            invoiceFormModel.InvoiceNumber = newInvoice.InvoiceNumber;
-            nextFetchedInvoiceNumber = newInvoice.InvoiceNumber;
+            InvoiceDto newInvoice = await invoiceService.GetNewInvoiceInformationAsync(sellerId);
+            return newInvoice;
         }
         catch (Exception ex)
         {
             errorService.ShowError(ex.Message);
+            return null;
         }
         finally
         {
