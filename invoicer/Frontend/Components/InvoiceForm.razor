@@ -62,7 +62,7 @@
     <div class="row mb-4">
         <div class="col">
             <label for="seller" class="font-weight-bold">Seller</label>
-            <select class="form-control" id="seller" @bind="invoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind">
+            <select class="form-control" id="seller" @bind="invoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind" disabled="@(InvoiceInstance is not null)">
                 @if (invoiceFormModel.SellerId == 0)
                 {
                     <option value="0">Select a seller</option>
