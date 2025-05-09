@@ -1,9 +1,9 @@
 ﻿@using Application.ServiceInterfaces;
 
 @* ARES API WINDOW *@
-<div class="border border-primary rounded bg-gradient p-2 mb-4 d-flex flex-column justify-content-center">    
+<div class="border border-primary rounded bg-gradient p-2 mb-2 d-flex flex-column justify-content-center">    
     <h4 class="text-primary mx-auto">Enter the ICO of the Entity</h4>
-    <div class="d-flex flex-row gap-4 text-center align-items-center my-4">
+    <div class="d-flex flex-row gap-4 text-center align-items-center my-2">
         <input type="text" class="form-control" placeholder="Enter ICO..." value="@UserInputIco" @oninput="HandleUserInputChange" />
         <button class="btn btn-success w-50" @onclick="OnFillInAresData.InvokeAsync">Fill In</button>
     </div>
