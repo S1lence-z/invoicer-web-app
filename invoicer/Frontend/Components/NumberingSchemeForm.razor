@@ -116,10 +116,10 @@
         if (NumberingSchemeInstance is not null)
             SchemeFormModel = InvoiceNumberingFormModel.FromDto(NumberingSchemeInstance);
         if (!isActive)
-            ClearForm();
+            ResetForm();
     }
 
-    private void ClearForm()
+    private void ResetForm()
     {
         SchemeFormModel = new InvoiceNumberingFormModel();
     }
@@ -130,11 +130,11 @@
         try
         {
             if (NumberingSchemeInstance is null)
-            {
                 await SubmitNewScheme();
-                return;
-            }
-            await SubmitEditScheme();
+            else
+                await SubmitEditScheme();
+            await SubmitCallback.InvokeAsync();
+            ResetForm();
         }
         catch (Exception e)
         {
@@ -143,8 +143,6 @@
         finally
         {
             loadingService.StopLoading();
-            await SubmitCallback.InvokeAsync();
-            ClearForm();
         }
     }
 

@@ -228,13 +228,10 @@
         loadingService.StartLoading();
         try 
         {
-            if (InvoiceInstance is null) {
+            if (InvoiceInstance is null)
                 await SubmitNewInvoice();
-            } 
             else
-            {
                 await SubmitEditInvoice();
-            }
             await SubmitCallback.InvokeAsync();
             ResetForm();
         } 
@@ -300,7 +297,7 @@
 
     private void AddInvoiceItem()
     {
-        invoiceFormModel.Items.Add(new InvoiceItemFormModel());
+        invoiceFormModel.Items.Add(new());
         StateHasChanged();
     }
 
