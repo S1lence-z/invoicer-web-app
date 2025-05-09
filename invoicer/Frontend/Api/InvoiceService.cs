@@ -5,6 +5,7 @@ using Application.InvoicePdfGenerator;
 using Application.PdfGenerator;
 using Frontend.Utils;
 using Application.Api;
+using System.Net.Http.Headers;
 
 namespace Frontend.Api
 {
@@ -55,9 +56,18 @@ namespace Frontend.Api
 			if (!response.IsSuccessStatusCode)
 				return PdfGenerationResult.Failure("Failed to generate PDF", (int)response.StatusCode);
 
+			string? receivedFileName = null;
+
+			ContentDispositionHeaderValue? contentDisposition = response.Content.Headers.ContentDisposition;
+			if (contentDisposition is not null)
+				receivedFileName = contentDisposition.FileNameStar ?? contentDisposition.FileName;
+
+			if (string.IsNullOrEmpty(receivedFileName))
+				receivedFileName = $"Invoice_{id}.pdf";
+
 			byte[] pdfFile = await response.Content.ReadAsByteArrayAsync();
 
-			return PdfGenerationResult.Success(pdfFile);
+			return PdfGenerationResult.Success(pdfFile, receivedFileName);
 		}
 
 		public async Task<IList<InvoiceDto>> GetAllAsync()

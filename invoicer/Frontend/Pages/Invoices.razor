@@ -199,7 +199,7 @@
                 return;
             }
 
-            string defaultFileName = $"Invoice_{invToExport.InvoiceNumber}.pdf";
+            string defaultFileName = response.FileName;
             string? userFileName = await jsRuntime.InvokeAsync<string>("promptFilename", defaultFileName);
 
             if (string.IsNullOrWhiteSpace(userFileName))
