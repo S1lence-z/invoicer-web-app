@@ -27,12 +27,12 @@
             <div class="row g-2">
                 <div class="col-md-6">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search invoices..." @oninput="SearchInvoices" />
-                        <select class="btn border-1 border-primary" @bind="searchType">
-                            <option value="InvoiceNumber">Invoice Number</option>
-                            <option value="Buyer">Buyer</option>
-                            <option value="Seller">Seller</option>
-                        </select>
+                       <input type="text" class="form-control" placeholder="Search invoices..." @oninput="SearchInvoices" />
+                       <select class="form-select" @bind="searchType">
+                           <option value="InvoiceNumber">Invoice Number</option>
+                           <option value="Buyer">Buyer</option>
+                           <option value="Seller">Seller</option>
+                       </select>
                     </div>
                 </div>
             </div>
