@@ -1,0 +1,37 @@
+﻿@using System.Globalization
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<div class="d-inline-block">
+    <select class="form-select form-select-sm" @onchange="OnCultureChanged">
+        @foreach (var culture in supportedCultures)
+        {
+            <option value="@culture.Name" selected="@(CultureInfo.CurrentCulture.Name == culture.Name)">
+                @culture.DisplayName
+            </option>
+        }
+    </select>
+</div>
+
+@code {
+    private CultureInfo[] supportedCultures = new[]
+    {
+        new CultureInfo("en-US"),
+        new CultureInfo("cs-CZ")
+    };
+
+    private async Task OnCultureChanged(ChangeEventArgs e)
+    {
+        var newCultureName = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(newCultureName))
+        {
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "blazorCulture", newCultureName);
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var persistedCulture = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "blazorCulture");
+    }
+}
