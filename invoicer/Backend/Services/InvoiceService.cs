@@ -66,6 +66,9 @@ namespace Backend.Services
 			if (buyer is null)
 				throw new ArgumentException($"Buyer entity with id {newInvoice.BuyerId} not found");
 
+			if (buyer.Id == seller.Id)
+				throw new ArgumentException($"Seller and buyer cannot be the same entity");
+
 			// Assign the seller numbering scheme, the one who is generating the invoice
 			newInvoice.NumberingSchemeId = seller.CurrentNumberingSchemeId;
 
@@ -129,6 +132,9 @@ namespace Backend.Services
 
 			if (buyer is null)
 				throw new KeyNotFoundException($"Buyer entity with id {updatedInvoice.BuyerId} not found");
+
+			if (buyer.Id == seller.Id)
+				throw new ArgumentException($"Seller and buyer cannot be the same entity");
 
 			existingInvoice.InvoiceNumber = updatedInvoice.InvoiceNumber;
 			existingInvoice.IssueDate = updatedInvoice.IssueDate;
