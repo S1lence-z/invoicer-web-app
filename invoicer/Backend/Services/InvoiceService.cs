@@ -237,7 +237,7 @@ namespace Backend.Services
 				.AsNoTracking()
 				.FirstOrDefaultAsync(e => e.Id == entityId);
 			if (entity is null)
-				throw new ArgumentException($"Entity with id {entityId} not found");
+				throw new KeyNotFoundException($"Entity with id {entityId} not found");
 
 			// Get the next invoice number
 			string newInvoiceNumber = await entityInvoiceNumberingStateService.GetNextInvoiceNumberAsync(entity.Id, DateTime.Now);
