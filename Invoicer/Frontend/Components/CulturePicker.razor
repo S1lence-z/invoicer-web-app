@@ -7,7 +7,7 @@
         @foreach (var culture in supportedCultures)
         {
             <option value="@culture.Name" selected="@(CultureInfo.CurrentCulture.Name == culture.Name)">
-                @culture.DisplayName
+                @FormatCultureDisplayName(culture)
             </option>
         }
     </select>
@@ -29,6 +29,16 @@
             NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
         }
     }
+
+    private string FormatCultureDisplayName(CultureInfo culture)  
+       {  
+           return culture.Name switch  
+           {  
+               "en-US" => "English (US)",  
+               "cs-CZ" => "Czech",  
+               _ => culture.DisplayName  
+           };
+       }
 
     protected override async Task OnInitializedAsync()
     {
