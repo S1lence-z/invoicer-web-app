@@ -1,32 +1,44 @@
 ﻿@using Domain.Enums;
 @using Application.DTOs;
+@using Application.Extensions;
 
 <div class="card border-1 shadow-sm">
     <div class="card-body row align-items-center" style="cursor: pointer;">
-        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
+        <div class="col">
             <span class="fw-bold">@Invoice.InvoiceNumber</span>
         </div>
-        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
+        <div class="col">
             <span class="text-muted">@Invoice.Seller!.Name</span>
         </div>
-        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
+        <div class="col">
             <span class="text-muted">@Invoice.Buyer!.Name</span>
         </div>
-        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
+        <div class="col">
             <span class="text-muted">@Invoice.DueDate.ToString("d")</span>
         </div>
-        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
+        <div class="col">
             <span class="@GetStatusColorClass(Invoice.Status) fw-bold">@Invoice.Status.ToString()</span>
         </div>
-        <div class="col" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
+        <div class="col">
             <span class="fw-bold">
-                @CalculateInvoiceSum(Invoice) @Invoice.Currency
+                @Invoice.Currency.FormatAmount(Invoice.GetTotalWithTax())
             </span>
         </div>
         <div class="col">
-            <button class="btn btn-outline-success btn-sm" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">Export</button>
-            <button class="btn btn-outline-primary btn-sm" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">Edit</button>
-            <button class="btn btn-outline-danger btn-sm" @onclick ="() => OnDeleteInvoice.InvokeAsync(Invoice)">Delete</button>
+            <div class="row gx-1 gy-1">
+                <div class="col-6">
+                    <button class="btn btn-outline-primary btn-sm w-100" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">Edit</button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-outline-danger btn-sm w-100" @onclick="() => OnDeleteInvoice.InvokeAsync(Invoice)">Delete</button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-outline-dark btn-sm w-100" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">Preview</button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-outline-success btn-sm w-100" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">Export</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -46,17 +58,6 @@
 
     [Parameter]
     public EventCallback<InvoiceDto> OnPreviewInvoice { get; set; }
-
-    private decimal CalculateInvoiceSum(InvoiceDto invoice)
-    {
-        decimal total = 0;
-        foreach (var item in invoice.Items) 
-        {
-            decimal itemTotal = item.Quantity * item.UnitPrice;
-            total += itemTotal;
-        }
-        return total;
-    }
 
     private string GetStatusColorClass(InvoiceStatus status)
     {
