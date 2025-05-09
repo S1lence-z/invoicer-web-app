@@ -63,7 +63,6 @@ namespace Frontend
 				}
 				catch (CultureNotFoundException)
 				{
-					// Fallback if the persisted culture string is invalid
 					initialCulture = new CultureInfo("en-US");
 				}
 			}
