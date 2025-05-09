@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Application.ServiceInterfaces;
 using Frontend.Services;
 using Microsoft.JSInterop;
+using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 
 namespace Frontend
@@ -47,21 +48,33 @@ namespace Frontend
 			builder.Services.AddScoped<LoadingService>();
 			builder.Services.AddScoped<ErrorService>();
 
-			// Build and run the app
-			var host = builder.Build();
+			// Localization
+			var tempServices = builder.Services.BuildServiceProvider();
+			var jsRuntime = tempServices.GetRequiredService<IJSRuntime>();
 
-			// Set initial culture
-			var jsRuntime = host.Services.GetRequiredService<IJSRuntime>();
 			var persistedCultureName = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "blazorCulture");
+
 			CultureInfo initialCulture;
-			if (!string.IsNullOrEmpty(persistedCultureName) && persistedCultureName == "cs-CZ")
-				initialCulture = new CultureInfo("cs-CZ");
+			if (!string.IsNullOrEmpty(persistedCultureName))
+			{
+				try
+				{
+					initialCulture = new CultureInfo(persistedCultureName);
+				}
+				catch (CultureNotFoundException)
+				{
+					// Fallback if the persisted culture string is invalid
+					initialCulture = new CultureInfo("en-US");
+				}
+			}
 			else
 				initialCulture = new CultureInfo("en-US");
+
 			CultureInfo.DefaultThreadCurrentCulture = initialCulture;
 			CultureInfo.DefaultThreadCurrentUICulture = initialCulture;
 
-			// Run the app
+			// Build and run the app
+			var host = builder.Build();
 			await host.RunAsync();
 		}
 	}
