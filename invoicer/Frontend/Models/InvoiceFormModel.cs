@@ -5,7 +5,7 @@ using Application.DTOs;
 
 namespace Frontend.Models
 {
-	public class InvoiceFormModel
+	public record class InvoiceFormModel
 	{
 		public int Id { get; set; }
 
