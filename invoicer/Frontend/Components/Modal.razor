@@ -1,5 +1,5 @@
 ﻿<div class="modal" tabindex="-1" role="dialog" style="display:@(IsVisible ? "block" : "none"); background: rgba(0, 0, 0, 0.5);">
-    <div class="modal-lg" role="document" style="margin: auto;">
+    <div class="modal-@Size" role="document" style="margin: auto;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">@Title</h5>
@@ -25,4 +25,7 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Size { get; set; } = "lg";
 }
