@@ -1,22 +1,24 @@
-﻿@using Domain.Enums;
-@using Application.Extensions;
-@using Application.DTOs;
-@using Frontend.Utils;
+﻿@using Domain.Enums
+@using Application.Extensions
+@using Application.DTOs
+@using Frontend.Utils
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<InvoicePreview> L
 
 <div class="container my-4">
     <div class="card border-0 shadow-sm">
         <div class="card-body">
             <!-- Invoice Header -->
-            <h5 class="text-center">Invoice</h5>
+            <h5 class="text-center">@L["HeaderTitle"]</h5>
             <div class="d-flex justify-content-between">
                 <div>
-                    <h5>Invoice Number: @Invoice.InvoiceNumber</h5>
-                    <p><strong>Issue Date:</strong> @Invoice.IssueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
-                    <p><strong>Due Date:</strong> @Invoice.DueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
+                    <h5>@L["InvoiceNumberLabel"] @Invoice.InvoiceNumber</h5>
+                    <p><strong>@L["IssueDateLabel"]</strong> @Invoice.IssueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
+                    <p><strong>@L["DueDateLabel"]</strong> @Invoice.DueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
                 </div>
                 <div class="text-end">
-                    <p><strong>Payment Method:</strong> @Invoice.PaymentMethod.ToString().SeperateCamelCase()</p>
-                    <p><strong>Delivery Method:</strong> @Invoice.DeliveryMethod.ToString().SeperateCamelCase()</p>
+                    <p><strong>@L["PaymentMethodLabel"]</strong> @L[Invoice.PaymentMethod.ToString().SeperateCamelCase()]</p>
+                    <p><strong>@L["DeliveryMethodLabel"]</strong> @L[Invoice.DeliveryMethod.ToString().SeperateCamelCase()]</p>
                 </div>
             </div>
 
@@ -25,18 +27,18 @@
             <!-- Seller and Buyer Information -->
             <div class="d-flex justify-content-between">
                 <div>
-                    <h5>Seller</h5>
-                    <p><strong>Name:</strong> @Invoice.Seller?.Name</p>
-                    <p><strong>Address:</strong> @Invoice.Seller?.Address?.Street, @Invoice.Seller?.Address?.City @Invoice.Seller?.Address?.ZipCode, @Invoice.Seller?.Address?.Country</p>
-                    <p><strong>Email:</strong> @Invoice.Seller?.Email</p>
-                    <p><strong>Phone Number:</strong> @Invoice.Seller?.PhoneNumber</p>
+                    <h5>@L["SellerSectionTitle"]</h5>
+                    <p><strong>@L["NameLabel"]</strong> @Invoice.Seller?.Name</p>
+                    <p><strong>@L["AddressLabel"]</strong> @Invoice.Seller?.Address?.Street, @Invoice.Seller?.Address?.City @Invoice.Seller?.Address?.ZipCode, @Invoice.Seller?.Address?.Country</p>
+                    <p><strong>@L["EmailLabel"]</strong> @Invoice.Seller?.Email</p>
+                    <p><strong>@L["PhoneNumberLabel"]</strong> @Invoice.Seller?.PhoneNumber</p>
                 </div>
                 <div>
-                    <h5>Buyer</h5>
-                    <p><strong>Name:</strong> @Invoice.Buyer?.Name</p>
-                    <p><strong>Address:</strong> @Invoice.Buyer?.Address?.Street, @Invoice.Buyer?.Address?.City @Invoice.Buyer?.Address?.ZipCode, @Invoice.Buyer?.Address?.Country </p>
-                    <p><strong>Email:</strong> @Invoice.Buyer?.Email</p>
-                    <p><strong>Phone Number:</strong> @Invoice.Buyer?.PhoneNumber</p>
+                    <h5>@L["BuyerSectionTitle"]</h5>
+                    <p><strong>@L["NameLabel"]</strong> @Invoice.Buyer?.Name</p>
+                    <p><strong>@L["AddressLabel"]</strong> @Invoice.Buyer?.Address?.Street, @Invoice.Buyer?.Address?.City @Invoice.Buyer?.Address?.ZipCode, @Invoice.Buyer?.Address?.Country </p>
+                    <p><strong>@L["EmailLabel"]</strong> @Invoice.Buyer?.Email</p>
+                    <p><strong>@L["PhoneNumberLabel"]</strong> @Invoice.Buyer?.PhoneNumber</p>
                 </div>
             </div>
 
@@ -47,12 +49,12 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Description</th>
-                            <th>Qty</th>
-                            <th>Unit</th>
-                            <th>Unit Price</th>
-                            <th>Total</th>
-                            <th>VAT Rate</th>
+                            <th>@L["TableHeaderDescription"]</th>
+                            <th>@L["TableHeaderQty"]</th>
+                            <th>@L["TableHeaderUnit"]</th>
+                            <th>@L["TableHeaderUnitPrice"]</th>
+                            <th>@L["TableHeaderTotal"]</th>
+                            <th>@L["TableHeaderVatRate"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,11 +78,11 @@
             <!-- Totals Section -->
             <div class="d-flex justify-content-between">
                 <div>
-                    <p><strong>Total Price without VAT:</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice))</p>
-                    <p><strong>Total VAT:</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)0.21)</p>
+                    <p><strong>@L["TotalPriceWithoutVatLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice))</p>
+                    <p><strong>@L["TotalVatLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice * i.VatRate))</p>
                 </div>
                 <div>
-                    <p><strong>Total Price with VAT:</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)1.21)</p>
+                    <p><strong>@L["TotalPriceWithVatLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice * (1 + i.VatRate)))</p>
                 </div>
             </div>
 
@@ -88,7 +90,7 @@
 
             <!-- Final Price -->
             <div class="text-end">
-                <h5><strong>Final Price:</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)1.21)</h5>
+                <h5><strong>@L["FinalPriceLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice * (1 + i.VatRate)))</h5>
             </div>
         </div>
     </div>

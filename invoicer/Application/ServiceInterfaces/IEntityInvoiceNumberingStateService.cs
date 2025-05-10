@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Application.Enums;
+using Domain.Enums;
 
 namespace Application.ServiceInterfaces
 {

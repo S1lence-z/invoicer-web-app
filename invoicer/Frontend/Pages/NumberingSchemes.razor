@@ -4,16 +4,18 @@
 @using Application.ServiceInterfaces;
 @using Frontend.Components;
 @using Frontend.Services;
+@using Microsoft.Extensions.Localization
 @inject INumberingSchemeService numberingSchemeService;
 @inject ErrorService errorService;
+@inject IStringLocalizer<NumberingSchemes> L;
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3">
     @* HEADER *@
     <div class="d-flex justify-content-between align-items-center px-4 pt-4">
-        <h3>Invoice Numbering</h3>
+        <h3>@L["PageTitle"]</h3>
         <button class="btn btn-primary" @onclick="ShowNewNumberingSchemeModal">
-            Add Numbering Scheme
+            @L["AddSchemeButton"]
         </button>
     </div>
     <hr />
@@ -23,11 +25,11 @@
         <div class="d-flex flex-column overflow-auto px-4 gap-2">
             @if (allNumberingSchemes is null)
             {
-                <p>Loading...</p>
+                <p>@L["LoadingMessage"]</p>
             }
             else if (allNumberingSchemes.Count == 0)
             {
-                <p>No numbering schemes found</p>
+                <p>@L["NoSchemesFoundMessage"]</p>
             }
             else
             {
@@ -41,12 +43,12 @@
 </div>
 
 @* ADD NEW NUMBERING SCHEME MODAL *@
-<Modal Title="Add New Numbering Scheme" IsVisible="isAddingNewNumberingScheme" OnClose="ShowNewNumberingSchemeModal">
+<Modal Title="@L["AddModalTitle"]" IsVisible="isAddingNewNumberingScheme" OnClose="ShowNewNumberingSchemeModal">
     <NumberingSchemeForm SubmitCallback="ShowNewNumberingSchemeModal" isActive="isAddingNewNumberingScheme" />
 </Modal>
 
 @* EDIT NUMBERING SCHEME MODAL *@
-<Modal Title="Edit Numbering Scheme" IsVisible="isEditingNumberingScheme" OnClose="ShowEditNumberingSchemeModal">
+<Modal Title="@L["EditModalTitle"]" IsVisible="isEditingNumberingScheme" OnClose="ShowEditNumberingSchemeModal">
     <NumberingSchemeForm SubmitCallback="ShowEditNumberingSchemeModal" NumberingSchemeInstance="numberingSchemeToEdit" isActive="isEditingNumberingScheme" />
 </Modal>
 
@@ -69,7 +71,7 @@
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            errorService.ShowError(e.Message);
         }
     }
 
@@ -98,12 +100,14 @@
     private async Task ShowNewNumberingSchemeModal()
     {
         isAddingNewNumberingScheme = !isAddingNewNumberingScheme;
-        await LoadNumberingSchemes();
+        if (!isAddingNewNumberingScheme)
+            await LoadNumberingSchemes();
     }
 
     private async Task ShowEditNumberingSchemeModal()
     {
         isEditingNumberingScheme = !isEditingNumberingScheme;
-        await LoadNumberingSchemes();
+        if (!isEditingNumberingScheme)
+            await LoadNumberingSchemes();
     }
 }

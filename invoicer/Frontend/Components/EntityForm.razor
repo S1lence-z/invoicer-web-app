@@ -1,16 +1,18 @@
-﻿@using Application.AresApiModels;
-@using Application.DTOs;
-@using Application.ServiceInterfaces;
-@using Domain.Interfaces;
-@using Frontend.Models;
+﻿@using Application.AresApiModels
+@using Application.DTOs
+@using Application.ServiceInterfaces
+@using Domain.Interfaces
+@using Frontend.Models
 @using Frontend.Services
-@using Frontend.Utils;
-@inject IAresApiService aresApiService;
-@inject IAddressService addressService;
-@inject IEntityService entityService;
-@inject IBankAccountService bankAccountService;
-@inject LoadingService loadingService;
-@inject ErrorService errorService;
+@using Frontend.Utils
+@using Microsoft.Extensions.Localization
+@inject IAresApiService aresApiService
+@inject IAddressService addressService
+@inject IEntityService entityService
+@inject IBankAccountService bankAccountService
+@inject LoadingService loadingService
+@inject ErrorService errorService
+@inject IStringLocalizer<EntityForm> L
 
 <div>
     @if (EntityInstance is null)
@@ -20,7 +22,7 @@
             UserInputIcoChanged="@((string ico) => userInputIco = ico)"
             AresApiService="aresApiService"
             AresApiErrorMessage="@aresApiErrorMessage"
-            OnFillInAresData="FillInAresData" 
+            OnFillInAresData="FillInAresData"
             />
     }
     @* ENTITY FORM *@
@@ -28,25 +30,25 @@
         <DataAnnotationsValidator />
         <div class="row mb-4">
             <div class="col">
-                <label for="entity-name" class="font-weight-bold">Name</label>
-                <input type="text" class="form-control" id="entity-name" placeholder="Enter Name" @bind="entityFormModel.Name" />
+                <label for="entity-name" class="font-weight-bold">@L["NameLabel"]</label>
+                <input type="text" class="form-control" id="entity-name" placeholder="@L["NamePlaceholder"]" @bind="entityFormModel.Name" />
                 <ValidationMessage For="@(() => entityFormModel.Name)" />
             </div>
             <div class="col">
-                <label for="entity-ico" class="font-weight-bold">ICO</label>
-                <input type="text" class="form-control" id="entity-ico" placeholder="Enter ICO" @bind="entityFormModel.Ico" />
+                <label for="entity-ico" class="font-weight-bold">@L["IcoLabel"]</label>
+                <input type="text" class="form-control" id="entity-ico" placeholder="@L["IcoPlaceholder"]" @bind="entityFormModel.Ico" />
                 <ValidationMessage For="@(() => entityFormModel.Ico)" />
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <label for="entity-email" class="font-weight-bold">Email Address</label>
-                <input type="email" class="form-control" id="entity-email" placeholder="Enter Email" @bind="entityFormModel.Email" />
+                <label for="entity-email" class="font-weight-bold">@L["EmailLabel"]</label>
+                <input type="email" class="form-control" id="entity-email" placeholder="@L["EmailPlaceholder"]" @bind="entityFormModel.Email" />
                 <ValidationMessage For="@(() => entityFormModel.Email)" />
             </div>
             <div class="col">
-                <label for="entity-phone" class="font-weight-bold">Phone Number</label>
-                <input type="tel" class="form-control" id="entity-phone" placeholder="Enter Phone Number" @bind="entityFormModel.PhoneNumber" />
+                <label for="entity-phone" class="font-weight-bold">@L["PhoneLabel"]</label>
+                <input type="tel" class="form-control" id="entity-phone" placeholder="@L["PhonePlaceholder"]" @bind="entityFormModel.PhoneNumber" />
                 <ValidationMessage For="@(() => entityFormModel.PhoneNumber)" />
             </div>
         </div>
@@ -54,25 +56,25 @@
         @* ADDRESS FORM *@
         <div class="row mb-4">
             <div class="col">
-                <label for="address-street" class="font-weight-bold">Street And Number</label>
-                <input type="text" class="form-control" id="address-street" placeholder="Street And Number" @bind="entityFormModel.Street" />
+                <label for="address-street" class="font-weight-bold">@L["AddressStreetLabel"]</label>
+                <input type="text" class="form-control" id="address-street" placeholder="@L["AddressStreetPlaceholder"]" @bind="entityFormModel.Street" />
                 <ValidationMessage For="@(() => entityFormModel.Street)" />
             </div>
             <div class="col">
-                <label for="address-zipcode" class="font-weight-bold">Zip Code</label>
-                <input type="number" class="form-control" id="address-zipcode" placeholder="Zip Code" @bind="entityFormModel.ZipCode" />
+                <label for="address-zipcode" class="font-weight-bold">@L["AddressZipCodeLabel"]</label>
+                <input type="number" class="form-control" id="address-zipcode" placeholder="@L["AddressZipCodePlaceholder"]" @bind="entityFormModel.ZipCode" />
                 <ValidationMessage For="@(() => entityFormModel.ZipCode)" />
             </div>
         </div>
         <div class="row mb-4">
             <div class="col">
-                <label for="address-city" class="font-weight-bold">City</label>
-                <input type="text" class="form-control" id="address-city" placeholder="City" @bind="entityFormModel.City" />
+                <label for="address-city" class="font-weight-bold">@L["AddressCityLabel"]</label>
+                <input type="text" class="form-control" id="address-city" placeholder="@L["AddressCityPlaceholder"]" @bind="entityFormModel.City" />
                 <ValidationMessage For="@(() => entityFormModel.City)" />
             </div>
             <div class="col">
-                <label for="address-country" class="font-weight-bold">Country</label>
-                <input type="text" class="form-control" id="address-country" placeholder="Country" @bind="entityFormModel.Country" />
+                <label for="address-country" class="font-weight-bold">@L["AddressCountryLabel"]</label>
+                <input type="text" class="form-control" id="address-country" placeholder="@L["AddressCountryPlaceholder"]" @bind="entityFormModel.Country" />
                 <ValidationMessage For="@(() => entityFormModel.Country)" />
             </div>
         </div>
@@ -80,29 +82,29 @@
         @* BANK ACCOUNT FORM *@
         <div class="row mb-4">
             <div class="col">
-                <label for="bank-acc-accNumber" class="font-weight-bold">Account Number</label>
-                <input type="text" class="form-control" id="bank-acc-accNumber" placeholder="Account Number" @bind="entityFormModel.AccountNumber" />
+                <label for="bank-acc-accNumber" class="font-weight-bold">@L["BankAccountNumberLabel"]</label>
+                <input type="text" class="form-control" id="bank-acc-accNumber" placeholder="@L["BankAccountNumberPlaceholder"]" @bind="entityFormModel.AccountNumber" />
                 <ValidationMessage For="@(() => entityFormModel.AccountNumber)" />
             </div>
             <div class="col">
-                <label for="bank-acc-accCode" class="font-weight-bold">Bank Code</label>
-                <input type="text" class="form-control" id="bank-acc-accCode" placeholder="Bank Code" @bind="entityFormModel.BankCode" />
+                <label for="bank-acc-accCode" class="font-weight-bold">@L["BankCodeLabel"]</label>
+                <input type="text" class="form-control" id="bank-acc-accCode" placeholder="@L["BankCodePlaceholder"]" @bind="entityFormModel.BankCode" />
                 <ValidationMessage For="@(() => entityFormModel.BankCode)" />
             </div>
         </div>
         <div class="row mb-4">
             <div class="col">
-                <label for="bank-acc-name" class="font-weight-bold">Bank Name</label>
-                <input type="text" class="form-control" id="bank-acc-name" placeholder="Bank Name" @bind="entityFormModel.BankName" />
+                <label for="bank-acc-name" class="font-weight-bold">@L["BankNameLabel"]</label>
+                <input type="text" class="form-control" id="bank-acc-name" placeholder="@L["BankNamePlaceholder"]" @bind="entityFormModel.BankName" />
                 <ValidationMessage For="@(() => entityFormModel.BankName)" />
             </div>
             <div class="col">
-                <label for="bank-acc-iban" class="font-weight-bold">IBAN</label>
-                <input type="text" class="form-control" id="bank-acc-iban" placeholder="IBAN" @bind="entityFormModel.IBAN" />
+                <label for="bank-acc-iban" class="font-weight-bold">@L["IBANLabel"]</label>
+                <input type="text" class="form-control" id="bank-acc-iban" placeholder="@L["IBANPlaceholder"]" @bind="entityFormModel.IBAN" />
                 <ValidationMessage For="@(() => entityFormModel.IBAN)" />
             </div>
         </div>
-        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">Submit</button>
+        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">@L["SubmitButton"]</button>
     </EditForm>
 </div>
 

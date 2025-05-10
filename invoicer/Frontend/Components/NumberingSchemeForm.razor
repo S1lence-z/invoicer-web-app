@@ -1,13 +1,15 @@
-﻿@using Application.DTOs;
-@using Application.Extensions;
-@using Application.ServiceInterfaces;
-@using Domain.Enums;
-@using Frontend.Models;
+﻿@using Application.DTOs
+@using Application.Extensions
+@using Application.ServiceInterfaces
+@using Domain.Enums
+@using Frontend.Models
 @using Frontend.Services
-@using Frontend.Utils;
-@inject INumberingSchemeService numberingService;
-@inject LoadingService loadingService;
-@inject ErrorService errorService;
+@using Frontend.Utils
+@using Microsoft.Extensions.Localization
+@inject INumberingSchemeService numberingService
+@inject LoadingService loadingService
+@inject ErrorService errorService
+@inject IStringLocalizer<NumberingSchemeForm> L
 
 <div>
     <EditForm Model="@SchemeFormModel" OnValidSubmit="SubmitForm">
@@ -17,14 +19,14 @@
         <div class="row mb-4">
             <div class="col">
                 <div class="form-check mt-4">
-                    <label class="form-check-label" for="use-seperator">Use Seperator</label>
+                    <label class="form-check-label" for="use-seperator">@L["UseSeparatorLabel"]</label>
                     <input id="use-seperator" type="checkbox" class="form-check-input" @bind="SchemeFormModel.UseSeperator" />
                 </div>
                 <ValidationMessage For="@(() => SchemeFormModel.UseSeperator)" />
             </div>
             <div class="col">
                 <div class="form-check mt-4">
-                    <label class="form-check-label" for="new-default">Set as Default</label>
+                    <label class="form-check-label" for="new-default">@L["SetAsDefaultLabel"]</label>
                     <input id="new-default" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IsDefault" />
                 </div>
                 <ValidationMessage For="@(() => SchemeFormModel.IsDefault)" />
@@ -33,15 +35,15 @@
 
         <div class="row mb-4">
             <div class="col">
-                <label for="prefix" class="font-weight-bold">Prefix</label>
-                <input id="prefix" type="text" class="form-control" placeholder="Enter Prefix" @bind="SchemeFormModel.Prefix" />
+                <label for="prefix" class="font-weight-bold">@L["PrefixLabel"]</label>
+                <input id="prefix" type="text" class="form-control" placeholder="@L["PrefixPlaceholder"]" @bind="SchemeFormModel.Prefix" />
                 <ValidationMessage For="@(() => SchemeFormModel.Prefix)" />
             </div>
             @if (SchemeFormModel.UseSeperator)
             {
                 <div class="col">
-                    <label for="seperator" class="font-weight-bold">Seperator</label>
-                    <input id="seperator" type="text" class="form-control" placeholder="Enter Seperator" @bind="SchemeFormModel.Seperator" />
+                    <label for="seperator" class="font-weight-bold">@L["SeparatorLabel"]</label>
+                    <input id="seperator" type="text" class="form-control" placeholder="@L["SeparatorPlaceholder"]" @bind="SchemeFormModel.Seperator" />
                     <ValidationMessage For="@(() => SchemeFormModel.Seperator)" />
                 </div>
             }
@@ -49,15 +51,15 @@
 
         <div class="row mb-4">
             <div class="col">
-                <label for="sequence-padding" class="font-weight-bold">Padding</label>
-                <input id="sequence-padding" type="number" class="form-control" placeholder="Enter Padding" @bind="SchemeFormModel.SequencePadding" />
+                <label for="sequence-padding" class="font-weight-bold">@L["PaddingLabel"]</label>
+                <input id="sequence-padding" type="number" min="1" step="1" class="form-control" placeholder="@L["PaddingPlaceholder"]" @bind="SchemeFormModel.SequencePadding" />
                 <ValidationMessage For="@(() => SchemeFormModel.SequencePadding)" />
             </div>
 
             <div class="col">
-                <label for="sequence-pos" class="font-weight-bold">Sequence Number Position</label>
+                <label for="sequence-pos" class="font-weight-bold">@L["SequencePositionLabel"]</label>
                 <select id="sequence-pos" class="form-select" @bind="SchemeFormModel.SequencePosition">
-                    @foreach (object value in Enum.GetValues(typeof(Position)))
+                    @foreach (Position value in Enum.GetValues(typeof(Position)))
                     {
                         <option value="@value">@value</option>
                     }
@@ -66,9 +68,9 @@
             </div>
 
             <div class="col">
-                <label for="reset-frequency" class="font-weight-bold">Reset Frequency</label>
+                <label for="reset-frequency" class="font-weight-bold">@L["ResetFrequencyLabel"]</label>
                 <select id="reset-frequency" class="form-select" @bind="SchemeFormModel.ResetFrequency">
-                    @foreach (object value in Enum.GetValues(typeof(ResetFrequency)))
+                    @foreach (ResetFrequency value in Enum.GetValues(typeof(ResetFrequency)))
                     {
                         <option value="@value">@value</option>
                     }
@@ -79,9 +81,9 @@
 
         <div class="row">
             <div class="col">
-                <label for="year-format" class="font-weight-bold">Year Format</label>
+                <label for="year-format" class="font-weight-bold">@L["YearFormatLabel"]</label>
                 <select id="year-format" class="form-select" @bind="SchemeFormModel.InvoiceNumberYearFormat">
-                    @foreach (object value in Enum.GetValues(typeof(YearFormat)))
+                    @foreach (YearFormat value in Enum.GetValues(typeof(YearFormat)))
                     {
                         <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                     }
@@ -92,13 +94,13 @@
             <div class="col">
                 <div class="form-check mt-4">
                     <input id="include-month" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IncludeMonth" />
-                    <label class="form-check-label" for="include-month">Include Month</label>
+                    <label class="form-check-label" for="include-month">@L["IncludeMonthLabel"]</label>
                 </div>
                 <ValidationMessage For="@(() => SchemeFormModel.IncludeMonth)" />
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">Submit Scheme</button>
+        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">@L["SubmitButtonText"]</button>
     </EditForm>
 </div>
 

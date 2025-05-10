@@ -7,6 +7,8 @@ namespace Domain.Enums
 	{
 		Pending,
 		Paid,
-		Overdue
+		Overdue,
+		Cancelled,
+		Draft
 	}
 }

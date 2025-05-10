@@ -1,15 +1,17 @@
 ﻿@page "/"
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Home> L
 
-<h1>Welcome to Invoicer</h1>
+<h1>@L["WelcomeTitle"]</h1>
 
-<p>Your ultimate, easy-to-use invoicing solution.</p>
+<p>@L["WelcomeSubtitle"]</p>
 
-<p>Invoicer transforms your accounting tasks into a breeze, offering:</p>
+<p>@L["DescriptionIntro"]</p>
 
 <ul>
-    <li>Automated invoice generation</li>
-    <li>Effortless client management</li>
-    <li>Detailed, comprehensive reports</li>
+    <li>@L["FeatureAutomation"]</li>
+    <li>@L["FeatureClients"]</li>
+    <li>@L["FeatureReports"]</li>
 </ul>
 
-<p>Experience the simplicity and efficiency of Invoicer, where invoicing is just a few clicks away.</p>
+<p>@L["ClosingStatement"]</p>

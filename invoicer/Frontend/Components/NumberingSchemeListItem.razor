@@ -1,6 +1,8 @@
-﻿@using Domain.Enums;
-@using Application.DTOs;
-@using Application.Extensions;
+﻿@using Domain.Enums
+@using Application.DTOs
+@using Application.Extensions
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<NumberingSchemeListItem> L
 
 <div class="card border-1 shadow-sm">
     <div class="card-body row align-items-center">
@@ -9,13 +11,13 @@
                 <span class="fw-bold">@NumberingScheme.ShowNumberingSchemePreview()</span>
             </div>
             <div class="d-flex flex-grow-1 justify-content-around">
-                <span class="text-muted pe-lg-5">Default: @(NumberingScheme.IsDefault ? "Yes" : "No")</span>
+                <span class="text-muted pe-lg-5">@L["DefaultLabel"] @(NumberingScheme.IsDefault ? L["YesOption"] : L["NoOption"])</span>
             </div>
         </div>
     </div>
     <div class="card-footer bg-white border-0 d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm w-25" @onclick="() => OnEditNumberingScheme.InvokeAsync(NumberingScheme)">Edit</button>
-        <button class="btn btn-outline-danger btn-sm w-25" @onclick="() => OnDeleteNumberingScheme.InvokeAsync(NumberingScheme)">Delete</button>
+        <button class="btn btn-outline-primary btn-sm w-25" @onclick="() => OnEditNumberingScheme.InvokeAsync(NumberingScheme)">@L["EditButton"]</button>
+        <button class="btn btn-outline-danger btn-sm w-25" @onclick="() => OnDeleteNumberingScheme.InvokeAsync(NumberingScheme)">@L["DeleteButton"]</button>
     </div>
 </div>
 

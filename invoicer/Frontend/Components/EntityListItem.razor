@@ -1,37 +1,39 @@
-﻿@using Application.DTOs;
+﻿@using Application.DTOs
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<EntityListItem> L
 
 <div class="card border-2 shadow-sm @(IsSelected ? "border border-primary" : "")" style="max-width: 300px;">
     <div class="card-body" style="cursor: pointer;" @onclick="() => OnSelectEntity.InvokeAsync(Entity)">
         <h5 class="card-title mb-2">@Entity.Name</h5>
-        
+
         <p class="mb-1">
-            <span class="fw-bold">Bank:</span> 
+            <span class="fw-bold">@L["BankLabel"]</span>
             <span class="text-muted">@Entity.BankAccount!.BankName (@Entity.BankAccount.AccountNumber/@Entity.BankAccount.BankCode)</span>
         </p>
-        
+
         <p class="mb-0">
-            <span class="fw-bold">Address:</span> 
+            <span class="fw-bold">@L["AddressLabel"]</span>
             <span class="text-muted">@Entity.Address!.Street, @Entity.Address.City</span>
         </p>
     </div>
 
     <div class="card-footer bg-white border-0 d-flex gap-2">
-       <button class="btn btn-outline-primary btn-sm flex-fill" @onclick="() => OnEditEntity.InvokeAsync(Entity)">Edit</button>
-       <button class="btn btn-outline-danger btn-sm flex-fill" @onclick="() => OnDeleteEntity.InvokeAsync(Entity)">Delete</button>
+       <button class="btn btn-outline-primary btn-sm flex-fill" @onclick="() => OnEditEntity.InvokeAsync(Entity)">@L["EditButton"]</button>
+       <button class="btn btn-outline-danger btn-sm flex-fill" @onclick="() => OnDeleteEntity.InvokeAsync(Entity)">@L["DeleteButton"]</button>
     </div>
 </div>
 
 @code {
-    [Parameter, EditorRequired] 
+    [Parameter, EditorRequired]
     public EntityDto Entity { get; set; } = null!;
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<EntityDto> OnSelectEntity { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<EntityDto> OnDeleteEntity { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<EntityDto> OnEditEntity { get; set; }
 
     [Parameter]

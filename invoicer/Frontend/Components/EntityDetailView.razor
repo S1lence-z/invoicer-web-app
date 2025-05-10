@@ -1,36 +1,37 @@
-﻿@using Application.DTOs;
+﻿@using Application.DTOs
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<EntityDetailView> L
 
 <div class="d-flex flex-column p-4 bg-light flex-grow-1">
     @*Entity*@
     <h4>@SelectedEntity.Name</h4>
     <div class="d-flex flex-row gap-5">
-        <p><strong>ICO: </strong>@SelectedEntity.Ico</p>
-        <p><strong>Email: </strong>@SelectedEntity.Email</p>
-        <p><strong>Phone: </strong>@SelectedEntity.PhoneNumber</p>
+        <p><strong>@L["IcoLabel"]</strong> @SelectedEntity.Ico</p>
+        <p><strong>@L["EmailLabel"]</strong> @SelectedEntity.Email</p>
+        <p><strong>@L["PhoneLabel"]</strong> @SelectedEntity.PhoneNumber</p>
     </div>
     @* Address and Bank Account*@
     <div class="d-flex flex-row gap-5">
-        <div class="d-flex flex-column border border-black p-3 rounded flex-grow-1 bg-white"
-            <h5 class="text-primary">Bank Account</h5>
-            <p><strong>Bank Name: </strong>@SelectedEntity.BankAccount!.BankName</p>
+        <div class="d-flex flex-column border border-black p-3 rounded flex-grow-1 bg-white">
+            <h5 class="text-primary">@L["BankAccountSectionTitle"]</h5>
+            <p><strong>@L["BankNameLabel"]</strong> @SelectedEntity.BankAccount!.BankName</p>
             <p>
-                <strong>Account Number: </strong>
-                @SelectedEntity.BankAccount.AccountNumber
+                <strong>@L["AccountNumberLabel"]</strong> @SelectedEntity.BankAccount.AccountNumber
             </p>
-            <p><strong>Bank Code: </strong>@SelectedEntity.BankAccount.BankCode</p>
-            <p><strong>IBAN: </strong>@SelectedEntity.BankAccount.IBAN</p>
+            <p><strong>@L["BankCodeLabel"]</strong> @SelectedEntity.BankAccount.BankCode</p>
+            <p><strong>@L["IBANLabel"]</strong> @SelectedEntity.BankAccount.IBAN</p>
         </div>
         <div class="d-flex flex-column border border-black p-3 rounded flex-grow-1 bg-white">
-            <h5 class="text-primary">Address</h5>
-            <p><strong>Street: </strong>@SelectedEntity.Address!.Street</p>
-            <p><strong>City: </strong>@SelectedEntity.Address!.City</p>
-            <p><strong>Zip Code: </strong>@SelectedEntity.Address!.ZipCode</p>
-            <p><strong>Country: </strong>@SelectedEntity.Address!.Country</p>
+            <h5 class="text-primary">@L["AddressSectionTitle"]</h5>
+            <p><strong>@L["StreetLabel"]</strong> @SelectedEntity.Address!.Street</p>
+            <p><strong>@L["CityLabel"]</strong> @SelectedEntity.Address!.City</p>
+            <p><strong>@L["ZipCodeLabel"]</strong> @SelectedEntity.Address!.ZipCode</p>
+            <p><strong>@L["CountryLabel"]</strong> @SelectedEntity.Address!.Country</p>
         </div>
     </div>
 </div>
 
 @code {
-    [Parameter] 
+    [Parameter]
     public EntityDto SelectedEntity { get; set; } = null!;
 }
