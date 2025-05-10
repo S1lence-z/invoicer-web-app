@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{2CC472FE-767C-4914-91E9-5227F80B80C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceNumberUtilsTests", "InvoiceNumberUtilsTests\InvoiceNumberUtilsTests.csproj", "{9B07C545-F0F0-4735-85B6-2DEF0BECBF41}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{2CC472FE-767C-4914-91E9-5227F80B80C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CC472FE-767C-4914-91E9-5227F80B80C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CC472FE-767C-4914-91E9-5227F80B80C7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B07C545-F0F0-4735-85B6-2DEF0BECBF41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B07C545-F0F0-4735-85B6-2DEF0BECBF41}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B07C545-F0F0-4735-85B6-2DEF0BECBF41}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B07C545-F0F0-4735-85B6-2DEF0BECBF41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
