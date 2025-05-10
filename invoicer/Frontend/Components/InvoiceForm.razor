@@ -1,15 +1,17 @@
-﻿@using Application.DTOs;
-@using Application.Extensions;
-@using Application.ServiceInterfaces;
-@using Domain.Enums;
-@using Domain.Interfaces;
+﻿@using Application.DTOs
+@using Application.Extensions
+@using Application.ServiceInterfaces
+@using Domain.Enums
+@using Domain.Interfaces
 @using Frontend.Models
 @using Frontend.Services
-@using Frontend.Utils;
-@inject IInvoiceService invoiceService;
-@inject IEntityService entityService;
-@inject ErrorService errorService;
-@inject LoadingService loadingService;
+@using Frontend.Utils
+@using Microsoft.Extensions.Localization
+@inject IInvoiceService invoiceService
+@inject IEntityService entityService
+@inject ErrorService errorService
+@inject LoadingService loadingService
+@inject IStringLocalizer<InvoiceForm> L
 
 <EditForm Model="@invoiceFormModel" OnValidSubmit="SubmitForm">
     <DataAnnotationsValidator />
@@ -19,21 +21,20 @@
         <div class="col">
             <div class="d-flex flex-row gap-4 align-items-end">
                 <div class="d-flex flex-column">
-                    <label for="invoice-number" class="font-weight-bold">Invoice Number</label>
+                    <label for="invoice-number" class="font-weight-bold">@L["InvoiceNumberLabel"]</label>
                     <input type="text" class="form-control" id="invoice-number"
-                    value="@((isFetchingNextInvoiceNumber ? LOADING_MESSAGE : invoiceFormModel.InvoiceNumber))"
-                    @oninput="e => invoiceFormModel.InvoiceNumber = e.Value?.ToString()!" 
-                    disabled="@(!isCustomInvoiceNumber)"
-                    />
+                    value="@((isFetchingNextInvoiceNumber ? L["LoadingMessage"] : invoiceFormModel.InvoiceNumber))"
+                    @oninput="e => invoiceFormModel.InvoiceNumber = e.Value?.ToString()!"
+                    disabled="@(!isCustomInvoiceNumber)" />
                 </div>
                 <button type="button" class="btn btn-outline-secondary align-self-end" @onclick="ToggleCustomInvoiceNumber">
                     @if (isCustomInvoiceNumber)
                     {
-                        <span>Use Default</span>
+                        <span>@L["InvoiceNumberUseDefaultButton"]</span>
                     }
                     else
                     {
-                        <span>Customize</span>
+                        <span>@L["InvoiceNumberCustomizeButton"]</span>
                     }
                 </button>
             </div>
@@ -43,17 +44,17 @@
 
     <div class="row mb-4">
         <div class="col">
-            <label for="issue-date" class="font-weight-bold">Issue Date</label>
+            <label for="issue-date" class="font-weight-bold">@L["IssueDateLabel"]</label>
             <input type="date" class="form-control" id="issue-date" @bind="invoiceFormModel.IssueDate" />
             <ValidationMessage For="@(() => invoiceFormModel.IssueDate)" />
         </div>
         <div class="col">
-            <label for="due-date" class="font-weight-bold">Due Date</label>
+            <label for="due-date" class="font-weight-bold">@L["DueDateLabel"]</label>
             <input type="date" class="form-control" id="due-date" @bind="invoiceFormModel.DueDate" />
             <ValidationMessage For="@(() => invoiceFormModel.DueDate)" />
         </div>
         <div class="col">
-            <label for="vate-date" class="font-weight-bold">Vat Date</label>
+            <label for="vate-date" class="font-weight-bold">@L["VatDateLabel"]</label>
             <input type="date" class="form-control" id="vat-date" @bind="invoiceFormModel.VatDate" />
             <ValidationMessage For="@(() => invoiceFormModel.VatDate)" />
         </div>
@@ -61,12 +62,9 @@
 
     <div class="row mb-4">
         <div class="col">
-            <label for="seller" class="font-weight-bold">Seller</label>
+            <label for="seller" class="font-weight-bold">@L["SellerLabel"]</label>
             <select class="form-control" id="seller" @bind="invoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind" disabled="@(InvoiceInstance is not null)">
-                @if (invoiceFormModel.SellerId == 0)
-                {
-                    <option value="0">Select a seller</option>
-                }
+                <option value="0">@L["SellerSelectOption"]</option>
                 @foreach (var entity in allEntities)
                 {
                     <option value="@entity.Id">@entity.Name</option>
@@ -75,9 +73,9 @@
             <ValidationMessage For="@(() => invoiceFormModel.SellerId)" />
         </div>
         <div class="col">
-            <label for="buyer" class="font-weight-bold">Buyer</label>
+            <label for="buyer" class="font-weight-bold">@L["BuyerLabel"]</label>
             <select class="form-control" id="buyer" @bind="invoiceFormModel.BuyerId">
-                <option value="0">Select a buyer</option>
+                <option value="0">@L["BuyerSelectOption"]</option>
                 @foreach (var entity in allBuyers)
                 {
                     <option value="@entity.Id">@entity.Name</option>
@@ -89,9 +87,9 @@
 
     <div class="row mb-4">
         <div class="col">
-            <label for="currency" class="font-weight-bold">Currency</label>
+            <label for="currency" class="font-weight-bold">@L["CurrencyLabel"]</label>
             <select class="form-control" id="currency" @bind="invoiceFormModel.Currency">
-                @foreach (object value in Enum.GetValues(typeof(Currency)))
+                @foreach (Currency value in Enum.GetValues(typeof(Currency)))
                 {
                     <option value="@value">@value</option>
                 }
@@ -99,9 +97,9 @@
             <ValidationMessage For="@(() => invoiceFormModel.Currency)" />
         </div>
         <div class="col">
-            <label for="payment-method" class="font-weight-bold">Payment Method</label>
+            <label for="payment-method" class="font-weight-bold">@L["PaymentMethodLabel"]</label>
             <select class="form-control" id="payment-method" @bind="invoiceFormModel.PaymentMethod">
-                @foreach (object value in Enum.GetValues(typeof(PaymentMethod)))
+                @foreach (PaymentMethod value in Enum.GetValues(typeof(PaymentMethod)))
                 {
                     <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                 }
@@ -109,9 +107,9 @@
             <ValidationMessage For="@(() => invoiceFormModel.PaymentMethod)" />
         </div>
         <div class="col">
-            <label for="delivery-method" class="font-weight-bold">Delivery Method</label>
+            <label for="delivery-method" class="font-weight-bold">@L["DeliveryMethodLabel"]</label>
             <select class="form-control" id="delivery-method" @bind="invoiceFormModel.DeliveryMethod">
-                @foreach (object value in Enum.GetValues(typeof(DeliveryMethod)))
+                @foreach (DeliveryMethod value in Enum.GetValues(typeof(DeliveryMethod)))
                 {
                     <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                 }
@@ -122,9 +120,9 @@
 
     <div class="row mb-4">
         <div class="col">
-            <label for="status" class="font-weight-bold">Status</label>
+            <label for="status" class="font-weight-bold">@L["StatusLabel"]</label>
             <select class="form-control" id="status" @bind="invoiceFormModel.Status">
-                @foreach (object value in Enum.GetValues(typeof(InvoiceStatus)))
+                @foreach (InvoiceStatus value in Enum.GetValues(typeof(InvoiceStatus)))
                 {
                     <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                 }
@@ -134,13 +132,10 @@
     </div>
 
     <hr class="my-4" />
-    <h4>Invoice Items</h4>
-    <button type="button" class="btn btn-success mb-2" @onclick="AddInvoiceItem">
-        Add Item
-    </button>
+    <h4>@L["InvoiceItemsHeader"]</h4>
     @if (!invoiceFormModel.Items.Any())
     {
-        <p class="text-muted">No items added yet.</p>
+        <p class="text-muted">@L["NoItemsAddedMessage"]</p>
         <ValidationMessage For="@(() => invoiceFormModel.Items)" />
     }
     @foreach (var item in invoiceFormModel.Items)
@@ -148,30 +143,30 @@
         var itemUniqueSuffix = item.GetHashCode();
         <div class="row g-2 mb-3 pb-3 border-bottom align-items-start">
             <div class="col-md-4">
-                <label for="item-description-@itemUniqueSuffix" class="form-label small">Description</label>
-                <input id="item-description-@itemUniqueSuffix" type="text" class="form-control form-control-sm" placeholder="Description" @bind="item.Description" />
+                <label for="item-description-@itemUniqueSuffix" class="form-label small">@L["ItemDescriptionLabel"]</label>
+                <input id="item-description-@itemUniqueSuffix" type="text" class="form-control form-control-sm" placeholder="@L["ItemDescriptionPlaceholder"]" @bind="item.Description" />
                 <ValidationMessage For="@(() => item.Description)" />
             </div>
             <div class="col-md-1 col-6">
-                <label for="item-quantity-@itemUniqueSuffix" class="form-label small">Quantity</label>
-                <input id="item-quantity-@itemUniqueSuffix" type="number" min="1" class="form-control form-control-sm" placeholder="Qty" @bind="item.Quantity" />
+                <label for="item-quantity-@itemUniqueSuffix" class="form-label small">@L["ItemQuantityLabel"]</label>
+                <input id="item-quantity-@itemUniqueSuffix" type="number" min="1" class="form-control form-control-sm" placeholder="@L["ItemQuantityPlaceholder"]" @bind="item.Quantity" />
                 <ValidationMessage For="@(() => item.Quantity)" />
             </div>
             <div class="col-md-2 col-6">
-                <label for="item-unit-@itemUniqueSuffix" class="form-label small">Unit</label>
-                <input id="item-unit-@itemUniqueSuffix" type="text" class="form-control form-control-sm" placeholder="kg, ml, ..." @bind="item.Unit" />
+                <label for="item-unit-@itemUniqueSuffix" class="form-label small">@L["ItemUnitLabel"]</label>
+                <input id="item-unit-@itemUniqueSuffix" type="text" class="form-control form-control-sm" placeholder="@L["ItemUnitPlaceholder"]" @bind="item.Unit" />
                 <ValidationMessage For="@(() => item.Unit)" />
             </div>
             <div class="col-md-2">
-                <label for="item-unit-price-@itemUniqueSuffix" class="form-label small">Unit Price</label>
-                <input id="item-unit-price-@itemUniqueSuffix" type="number" min="0" step="any" class="form-control form-control-sm" placeholder="Price" @bind="item.UnitPrice" />
+                <label for="item-unit-price-@itemUniqueSuffix" class="form-label small">@L["ItemUnitPriceLabel"]</label>
+                <input id="item-unit-price-@itemUniqueSuffix" type="number" min="0" step="any" class="form-control form-control-sm" placeholder="@L["ItemUnitPricePlaceholder"]" @bind="item.UnitPrice" />
                 <ValidationMessage For="@(() => item.UnitPrice)" />
             </div>
             <div class="col-md-2">
-                <label for="item-vat-rate-@itemUniqueSuffix" class="form-label small">VAT Rate</label>
+                <label for="item-vat-rate-@itemUniqueSuffix" class="form-label small">@L["ItemVatRateLabel"]</label>
                 <input id="item-vat-rate-@itemUniqueSuffix" type="number" min="0" class="form-control form-control-sm" @bind="item.VatRate" step="0.01" />
                 <ValidationMessage For="@(() => item.VatRate)" />
-                <div class="btn-group btn-group-sm mt-1" role="group" aria-label="VAT Rate Presets">
+                <div class="btn-group btn-group-sm mt-1" role="group" aria-label="@L["VatPresetAriaLabel"]">
                     <button type="button" class="btn btn-outline-secondary" @onclick="() => SetVatRate(item, 0)">0 %</button>
                     <button type="button" class="btn btn-outline-secondary" @onclick="() => SetVatRate(item, 15)">15 %</button>
                     <button type="button" class="btn btn-outline-secondary" @onclick="() => SetVatRate(item, 18)">18 %</button>
@@ -179,14 +174,17 @@
                 </div>
             </div>
             <div class="col-md-1 text-end">
-                <label class="form-label small d-block invisible">Actions</label>
-                <button type="button" title="Remove item" class="btn btn-danger btn-sm" @onclick="() => RemoveInvoiceItem(item)">
-                    Remove
+                <label class="form-label small d-block invisible">@L["RemoveItemButtonTitle"]</label>
+                <button type="button" title="@L["RemoveItemButtonTitle"]" class="btn btn-danger btn-sm" @onclick="() => RemoveInvoiceItem(item)">
+                    @L["RemoveItemButtonText"]
                 </button>
             </div>
         </div>
     }
-    <button type="submit" class="btn btn-primary float-end">Submit Invoice</button>
+    <button type="button" class="btn btn-success float-start" @onclick="AddInvoiceItem">
+        @L["AddItemButtonText"]
+    </button>
+    <button type="submit" class="btn btn-primary float-end">@L["SubmitInvoiceButtonText"]</button>
 </EditForm>
 
 @code {
@@ -203,7 +201,7 @@
     // Variables
     private bool isCustomInvoiceNumber = false;
     private bool isFetchingNextInvoiceNumber = false;
-    private string nextFetchedInvoiceNumber = string.Empty;
+    private string defaultFetchedInvoiceNumber = string.Empty;
 
     // Constants
     private const string LOADING_MESSAGE = "Loading...";
@@ -212,7 +210,10 @@
     protected override void OnParametersSet()
     {
         if (InvoiceInstance is not null)
+        {
             invoiceFormModel = InvoiceFormModel.FromInvoice(InvoiceInstance);
+            defaultFetchedInvoiceNumber = InvoiceInstance.InvoiceNumber;
+        }
         if (!isActive)
             ResetForm();
     }
@@ -226,7 +227,7 @@
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            errorService.ShowError(e.Message);
         }
     }
 
@@ -235,7 +236,7 @@
         isCustomInvoiceNumber = !isCustomInvoiceNumber;
         invoiceFormModel.IsCustomInvoiceNumber = isCustomInvoiceNumber;
         if (!isCustomInvoiceNumber)
-            invoiceFormModel.InvoiceNumber = nextFetchedInvoiceNumber;
+            invoiceFormModel.InvoiceNumber = defaultFetchedInvoiceNumber;
     }
 
     private async Task SubmitForm() {
@@ -305,7 +306,7 @@
     private void ResetForm()
     {
         isCustomInvoiceNumber = false;
-        nextFetchedInvoiceNumber = string.Empty;
+        defaultFetchedInvoiceNumber = string.Empty;
         invoiceFormModel = new();
     }
 
@@ -325,7 +326,8 @@
         InvoiceDto? newInvoice = await GetNewOrUpdatedInvoiceInitialData(sellerId);
         if (newInvoice is null)
             return;
-        invoiceFormModel.InvoiceNumber = newInvoice.InvoiceNumber;
+        defaultFetchedInvoiceNumber = newInvoice.InvoiceNumber;
+        invoiceFormModel.InvoiceNumber = defaultFetchedInvoiceNumber;
         UpdateBuyers(sellerId);
     }
 

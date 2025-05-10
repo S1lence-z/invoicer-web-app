@@ -1,22 +1,24 @@
 ﻿@page "/invoices";
-@using System.Collections.ObjectModel;
-@using Application.DTOs;
+@using System.Collections.ObjectModel
+@using Application.DTOs
 @using Application.PdfGenerator
-@using Application.ServiceInterfaces;
-@using Domain.Interfaces;
-@using Frontend.Components;
+@using Application.ServiceInterfaces
+@using Domain.Interfaces
+@using Frontend.Components
 @using Frontend.Services
-@inject IInvoiceService invoiceService;
-@inject IJSRuntime jsRuntime;
-@inject ErrorService errorService;
+@using Microsoft.Extensions.Localization
+@inject IInvoiceService invoiceService
+@inject IJSRuntime jsRuntime
+@inject ErrorService errorService
+@inject IStringLocalizer<Invoices> L
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3">
     @* HEADER *@
     <div class="d-flex justify-content-between align-items-center px-4 pt-4">
-        <h3>Invoices</h3>
+        <h3>@L["PageTitle"]</h3>
         <button class="btn btn-primary" @onclick="ShowAddInvoiceModal">
-            Add New Invoice
+            @L["AddNewInvoiceButton"]
         </button>
     </div>
     <hr />
@@ -27,12 +29,12 @@
             <div class="row g-2">
                 <div class="col-md-6">
                     <div class="input-group">
-                       <input type="text" class="form-control" placeholder="Search invoices..." @oninput="SearchInvoices" />
-                       <select class="form-select" @bind="searchType">
-                           <option value="InvoiceNumber">Invoice Number</option>
-                           <option value="Buyer">Buyer</option>
-                           <option value="Seller">Seller</option>
-                       </select>
+                        <input type="text" class="form-control" placeholder="@L["SearchPlaceholder"]" @oninput="SearchInvoices" />
+                        <select class="form-select" @bind="searchType">
+                            <option value="InvoiceNumber">@L["SearchOptionInvoiceNumber"]</option>
+                            <option value="Buyer">@L["SearchOptionBuyer"]</option>
+                            <option value="Seller">@L["SearchOptionSeller"]</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -40,24 +42,24 @@
         @* LIST HEADER *@
         <div class="card border-1 shadow-sm mx-4 my-4">
             <div class="card-body row">
-                <div class="col fw-bold">Invoice Number</div>
-                <div class="col fw-bold">Seller</div>
-                <div class="col fw-bold">Buyer</div>
-                <div class="col fw-bold">Due Date</div>
-                <div class="col fw-bold">Status</div>
-                <div class="col fw-bold">Total with VAT</div>
-                <div class="col fw-bold">Actions</div>
+                <div class="col fw-bold">@L["ListHeaderInvoiceNumber"]</div>
+                <div class="col fw-bold">@L["ListHeaderSeller"]</div>
+                <div class="col fw-bold">@L["ListHeaderBuyer"]</div>
+                <div class="col fw-bold">@L["ListHeaderDueDate"]</div>
+                <div class="col fw-bold">@L["ListHeaderStatus"]</div>
+                <div class="col fw-bold">@L["ListHeaderTotalWithVAT"]</div>
+                <div class="col fw-bold">@L["ListHeaderActions"]</div>
             </div>
         </div>
         @* INVOICES LIST *@
         <div class="d-flex flex-column overflow-auto px-4 gap-2">
             @if (shownInvoices is null)
             {
-                <p>Loading...</p>
+                <p>@L["LoadingMessage"]</p>
             }
             else if (shownInvoices.Count == 0)
             {
-                <p>No invoices found</p>
+                <p>@L["NoInvoicesFoundMessage"]</p>
             }
             else
             {
@@ -70,18 +72,18 @@
     </div>
 </div>
 @* ADD NEW INVOICE MODAL *@
-<Modal Title="Add New Invoice" IsVisible="isAddingNewInvoice" OnClose="ShowAddInvoiceModal" Size="xl">
+<Modal Title="@L["AddModalTitle"]" IsVisible="isAddingNewInvoice" OnClose="ShowAddInvoiceModal" Size="xl">
     <InvoiceForm SubmitCallback="ShowAddInvoiceModal" isActive="isAddingNewInvoice" />
 </Modal>
 @* EDIT INVOICE MODAL *@
-<Modal Title="Edit Invoice" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal" Size="xl">
+<Modal Title="@L["EditModalTitle"]" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal" Size="xl">
     @if (invoiceToEdit is not null)
     {
-        <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isEditingInvoice" InvoiceInstance="invoiceToEdit"/>
+        <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isEditingInvoice" InvoiceInstance="invoiceToEdit" />
     }
 </Modal>
 @* PREVIEW MODAL *@
-<Modal Title="Invoice Preview" IsVisible="isPreviewingInvoice" OnClose="ShowInvoicePreviewModal">
+<Modal Title="@L["PreviewModalTitle"]" IsVisible="isPreviewingInvoice" OnClose="ShowInvoicePreviewModal">
     @if (invoiceToPreview is not null)
     {
         <InvoicePreview Invoice="invoiceToPreview" />
@@ -145,7 +147,7 @@
         string search = searchTerm.ToLower();
         switch (searchType) {
             case SearchType.InvoiceNumber:
-                PopulateShownInvoices(allInvoices.Where(i => i.InvoiceNumber.Contains(search)).ToList());
+                PopulateShownInvoices(allInvoices.Where(i => i.InvoiceNumber.ToLower().Contains(search)).ToList());
                 break;
             case SearchType.Buyer:
                 PopulateShownInvoices(allInvoices.Where(i => i.Buyer!.Name.ToLower().Contains(search)).ToList());
@@ -154,6 +156,7 @@
                 PopulateShownInvoices(allInvoices.Where(i => i.Seller!.Name.ToLower().Contains(search)).ToList());
                 break;
             default:
+                PopulateShownInvoices(allInvoices);
                 break;
         }
     }
@@ -179,7 +182,6 @@
             if (status)
             {
                 await LoadInvoices();
-                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -228,7 +230,10 @@
     {
         isEditingInvoice = !isEditingInvoice;
         if (!isEditingInvoice)
+        {
+            invoiceToEdit = null;
             await LoadInvoices();
+        }
         StateHasChanged();
     }
 

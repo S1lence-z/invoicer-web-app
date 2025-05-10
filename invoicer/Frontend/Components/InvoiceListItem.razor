@@ -1,6 +1,8 @@
-﻿@using Domain.Enums;
-@using Application.DTOs;
-@using Application.Extensions;
+﻿@using Domain.Enums
+@using Application.DTOs
+@using Application.Extensions
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<InvoiceListItem> L
 
 <div class="card border-1 shadow-sm">
     <div class="card-body row align-items-center" style="cursor: pointer;">
@@ -17,7 +19,7 @@
             <span class="text-muted">@Invoice.DueDate.ToString("d")</span>
         </div>
         <div class="col">
-            <span class="@GetStatusColorClass(Invoice.Status) fw-bold">@Invoice.Status.ToString()</span>
+            <span class="@GetStatusColorClass(Invoice.Status) fw-bold">@L[Invoice.Status.ToString()]</span>
         </div>
         <div class="col">
             <span class="fw-bold">
@@ -27,16 +29,16 @@
         <div class="col">
             <div class="row gx-1 gy-1">
                 <div class="col-6">
-                    <button class="btn btn-outline-primary btn-sm w-100" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">Edit</button>
+                    <button class="btn btn-outline-primary btn-sm w-100" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">@L["EditButton"]</button>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-outline-danger btn-sm w-100" @onclick="() => OnDeleteInvoice.InvokeAsync(Invoice)">Delete</button>
+                    <button class="btn btn-outline-danger btn-sm w-100" @onclick="() => OnDeleteInvoice.InvokeAsync(Invoice)">@L["DeleteButton"]</button>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-outline-dark btn-sm w-100" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">Preview</button>
+                    <button class="btn btn-outline-dark btn-sm w-100" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">@L["PreviewButton"]</button>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-outline-success btn-sm w-100" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">Export</button>
+                    <button class="btn btn-outline-success btn-sm w-100" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">@L["ExportButton"]</button>
                 </div>
             </div>
         </div>
@@ -66,6 +68,8 @@
             InvoiceStatus.Pending => "text-warning",
             InvoiceStatus.Paid => "text-success",
             InvoiceStatus.Overdue => "text-danger",
+            InvoiceStatus.Draft => "text-secondary",
+            InvoiceStatus.Cancelled => "text-muted",
             _ => "text-muted"
         };
     }
