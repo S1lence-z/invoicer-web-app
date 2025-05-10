@@ -7,6 +7,9 @@ namespace Backend.Utils
 	{
 		public static string ExtractSequenceNumber(string invoiceNumber, NumberingScheme scheme)
 		{
+			if (!IsValidAgainstScheme(invoiceNumber, scheme))
+				throw new ArgumentException($"Invoice number {invoiceNumber} does not match the numbering scheme.");
+
 			if (scheme == null || string.IsNullOrEmpty(invoiceNumber))
 				throw new ArgumentNullException("Invoice number or scheme cannot be null or empty.", nameof(invoiceNumber));
 
@@ -25,7 +28,7 @@ namespace Backend.Utils
 		}
 
 
-		public static bool IsValidAgainstScheme(string invoiceNumber, NumberingScheme scheme)
+		private static bool IsValidAgainstScheme(string invoiceNumber, NumberingScheme scheme)
 		{
 			if (string.IsNullOrEmpty(invoiceNumber) || scheme is null)
 				return false;

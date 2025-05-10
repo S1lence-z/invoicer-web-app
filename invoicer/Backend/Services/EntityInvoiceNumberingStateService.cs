@@ -67,9 +67,6 @@ namespace Backend.Services
 
 		private async Task HandleCreatingOrUpdatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice newInvoice, NumberingScheme numberingScheme)
 		{
-			if (isUsingUserDefinedState && !InvoiceNumberUtils.IsValidAgainstScheme(newInvoice.InvoiceNumber, numberingScheme))
-				throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} does not match the numbering scheme");
-
 			if (isUsingUserDefinedState)
 			{
 				string customSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(newInvoice.InvoiceNumber, numberingScheme);
@@ -93,9 +90,6 @@ namespace Backend.Services
 
 		private async Task HandleDeletingAsync(EntityInvoiceNumberingSchemeState state, int entityId, Invoice newInvoice, NumberingScheme numberingScheme)
 		{
-			if (!InvoiceNumberUtils.IsValidAgainstScheme(newInvoice.InvoiceNumber, numberingScheme))
-				throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} does not match the numbering scheme");
-
 			// Find the last invoice for this entity excluding the one being deleted
 			Invoice? lastInvoice = await context.Invoice
 				.AsNoTracking()
