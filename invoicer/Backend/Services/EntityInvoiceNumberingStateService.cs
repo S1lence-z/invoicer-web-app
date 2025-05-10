@@ -3,7 +3,7 @@ using Backend.Database;
 using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Application.Enums;
+using Domain.Enums;
 using Backend.Utils;
 
 namespace Backend.Services

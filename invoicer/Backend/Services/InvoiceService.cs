@@ -5,7 +5,7 @@ using Application.ServiceInterfaces;
 using Application.Mappers;
 using Domain.Models;
 using Application.PdfGenerator;
-using Application.Enums;
+using Domain.Enums;
 
 namespace Backend.Services
 {
