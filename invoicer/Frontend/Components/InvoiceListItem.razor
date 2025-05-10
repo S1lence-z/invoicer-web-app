@@ -5,7 +5,7 @@
 @inject IStringLocalizer<InvoiceListItem> L
 
 <div class="card border-1 shadow-sm">
-    <div class="card-body row align-items-center" style="cursor: pointer;">
+    <div class="card-body row align-items-center">
         <div class="col">
             <span class="fw-bold">@Invoice.InvoiceNumber</span>
         </div>
@@ -19,7 +19,14 @@
             <span class="text-muted">@Invoice.DueDate.ToString("d")</span>
         </div>
         <div class="col">
-            <span class="@GetStatusColorClass(Invoice.Status) fw-bold">@L[Invoice.Status.ToString()]</span>
+            <select class="form-select form-select-sm w-75" @onchange="(e) => OnInvoiceStatusUpdate.InvokeAsync(Invoice with { Status = (InvoiceStatus)Enum.Parse(typeof(InvoiceStatus), e.Value?.ToString()!) })">
+                @foreach (InvoiceStatus status in Enum.GetValues(typeof(InvoiceStatus)))
+                {
+                    <option selected="@(Invoice.Status == status)" class="@GetStatusColorClass(status)" value="@status">
+                        @L[status.ToString()]
+                    </option>
+                }
+            </select>
         </div>
         <div class="col">
             <span class="fw-bold">
@@ -61,6 +68,9 @@
     [Parameter]
     public EventCallback<InvoiceDto> OnPreviewInvoice { get; set; }
 
+    [Parameter]
+    public EventCallback<InvoiceDto> OnInvoiceStatusUpdate { get; set; }
+
     private string GetStatusColorClass(InvoiceStatus status)
     {
         return status switch
@@ -68,8 +78,8 @@
             InvoiceStatus.Pending => "text-warning",
             InvoiceStatus.Paid => "text-success",
             InvoiceStatus.Overdue => "text-danger",
-            InvoiceStatus.Draft => "text-secondary",
-            InvoiceStatus.Cancelled => "text-muted",
+            InvoiceStatus.Draft => "text-dark",
+            InvoiceStatus.Cancelled => "text-dark",
             _ => "text-muted"
         };
     }

@@ -65,7 +65,7 @@
             {
                 @foreach (var invoice in shownInvoices)
                 {
-                    <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" OnExportInvoice="ExportInvoice" OnPreviewInvoice="ShowInvoicePreview" />
+                    <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" OnExportInvoice="ExportInvoice" OnPreviewInvoice="ShowInvoicePreview" OnInvoiceStatusUpdate="UpdateInvoiceStatus" />
                 }
             }
         </div>
@@ -187,6 +187,25 @@
         catch (Exception ex)
         {
             errorService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task<bool> UpdateInvoiceStatus(InvoiceDto invToUpdate)
+    {
+        try
+        {
+            InvoiceDto updatedInvoice = await invoiceService.UpdateAsync(invToUpdate.Id, invToUpdate);
+            int index = shownInvoices.IndexOf(shownInvoices.FirstOrDefault(i => i.Id == invToUpdate.Id)!);
+            if (index != -1)
+                shownInvoices[index].Status = updatedInvoice.Status;
+            else
+                throw new Exception("Invoice not found in the list.");
+            return true;
+        }
+        catch (Exception e)
+        {
+            errorService.ShowError(e.Message);
+            return false;
         }
     }
 
