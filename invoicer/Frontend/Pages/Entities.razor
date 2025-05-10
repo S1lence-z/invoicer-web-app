@@ -54,11 +54,17 @@
 
 @* ADD NEW ENTITY MODAL *@
 <Modal Title="@L["AddModalTitle"]" IsVisible="isAddingNewEntity" OnClose="ShowNewEntityModal">
-    <EntityForm SubmitCallback="ShowNewEntityModal" isActive="isAddingNewEntity" />
+    @if (isAddingNewEntity)
+    {
+        <EntityForm SubmitCallback="HandleAddSubmit" isActive="isAddingNewEntity" />
+    }
 </Modal>
 @* EDIT ENTITY MODAL *@
 <Modal Title="@L["EditModalTitle"]" IsVisible="isEditingEntity" OnClose="ShowEditEntityModal">
-    <EntityForm SubmitCallback="ShowEditEntityModal" EntityInstance="entityToEdit" isActive="isEditingEntity" />
+    @if (isEditingEntity && entityToEdit is not null)
+    {
+        <EntityForm SubmitCallback="HandleEditSubmit" EntityInstance="entityToEdit" isActive="isEditingEntity" />
+    }
 </Modal>
 
 @code {
@@ -133,5 +139,18 @@
             entityToEdit = null;
             await LoadEntities();
         }
+    }
+
+    private async Task HandleAddSubmit()
+    {
+        isEditingEntity = false;
+        await LoadEntities();
+    }
+
+    private async Task HandleEditSubmit()
+    {
+        isAddingNewEntity = false;
+        entityToEdit = null;
+        await LoadEntities();
     }
 }

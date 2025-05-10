@@ -44,12 +44,18 @@
 
 @* ADD NEW NUMBERING SCHEME MODAL *@
 <Modal Title="@L["AddModalTitle"]" IsVisible="isAddingNewNumberingScheme" OnClose="ShowNewNumberingSchemeModal">
-    <NumberingSchemeForm SubmitCallback="ShowNewNumberingSchemeModal" isActive="isAddingNewNumberingScheme" />
+    @if (isAddingNewNumberingScheme)
+    {
+        <NumberingSchemeForm SubmitCallback="HandleAddSubmit" isActive="isAddingNewNumberingScheme" />
+    }
 </Modal>
 
 @* EDIT NUMBERING SCHEME MODAL *@
 <Modal Title="@L["EditModalTitle"]" IsVisible="isEditingNumberingScheme" OnClose="ShowEditNumberingSchemeModal">
-    <NumberingSchemeForm SubmitCallback="ShowEditNumberingSchemeModal" NumberingSchemeInstance="numberingSchemeToEdit" isActive="isEditingNumberingScheme" />
+    @if (isEditingNumberingScheme && numberingSchemeToEdit is not null)
+    {
+        <NumberingSchemeForm SubmitCallback="HandleEditSubmit" NumberingSchemeInstance="numberingSchemeToEdit" isActive="isEditingNumberingScheme" />
+    }
 </Modal>
 
 @code {
@@ -109,5 +115,18 @@
         isEditingNumberingScheme = !isEditingNumberingScheme;
         if (!isEditingNumberingScheme)
             await LoadNumberingSchemes();
+    }
+
+    private async Task HandleAddSubmit()
+    {
+        isAddingNewNumberingScheme = false;
+        await LoadNumberingSchemes();
+    }
+
+    private async Task HandleEditSubmit()
+    {
+        isEditingNumberingScheme = false;
+        numberingSchemeToEdit = null;
+        await LoadNumberingSchemes();
     }
 }
