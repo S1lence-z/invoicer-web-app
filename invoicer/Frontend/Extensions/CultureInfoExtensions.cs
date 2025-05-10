@@ -9,7 +9,7 @@ namespace Frontend.Extensions
 			return culture.Name switch
 			{
 				"en-US" => "English (US)",
-				"cs-CZ" => "Czech",
+				"cs-CZ" => "Čeština",
 				_ => culture.DisplayName
 			};
 		}
