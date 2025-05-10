@@ -186,7 +186,7 @@ namespace Backend.Services
 			return true;
 		}
 
-		public async Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id)
+		public async Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id, string lang)
 		{
 			Invoice? invoiceToExport = await context.Invoice
 				.Include(i => i.Seller)
@@ -204,7 +204,7 @@ namespace Backend.Services
 			if (invoiceToExport is null)
 				throw new ArgumentException($"Invoice with id {id} not found");
 
-			IPdfGenerationResult pdfFile = invoicePdfGenerator.ExportInvoicePdf(invoiceToExport);
+			IPdfGenerationResult pdfFile = invoicePdfGenerator.ExportInvoicePdf(invoiceToExport, lang);
 
 			return pdfFile;
 		}

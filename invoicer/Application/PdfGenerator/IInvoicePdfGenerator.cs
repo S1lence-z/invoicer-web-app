@@ -4,6 +4,6 @@ namespace Application.PdfGenerator
 {
 	public interface IInvoicePdfGenerator
 	{
-		IPdfGenerationResult ExportInvoicePdf(Invoice invoice);
+		IPdfGenerationResult ExportInvoicePdf(Invoice invoice, string lang);
 	}
 }

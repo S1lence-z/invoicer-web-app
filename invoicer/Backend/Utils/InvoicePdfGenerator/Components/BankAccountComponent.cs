@@ -4,7 +4,7 @@ using QuestPDF.Infrastructure;
 
 namespace Backend.Utils.InvoicePdfGenerator.Components
 {
-	public class BankAccountComponent(BankAccount bankAccModel) : IComponent
+	public class BankAccountComponent(BankAccount bankAccModel, string languageTag) : ComponentBase, IComponent
 	{
 		public void Compose(IContainer container)
 		{
@@ -12,12 +12,11 @@ namespace Backend.Utils.InvoicePdfGenerator.Components
 			{
 				col.Item().Row(row =>
 				{
-					row.RelativeItem().Text($"Bank: {bankAccModel.BankName}");
+					row.RelativeItem().Text(GetLocalizedText("Bank: ", "Banka: ", languageTag) + bankAccModel.BankName);
 				});
 				col.Item().Row(row =>
 				{
-					row.RelativeItem().Text($"Account/Bank Code: {bankAccModel.AccountNumber}/{bankAccModel.BankCode}");
-
+					row.RelativeItem().Text(GetLocalizedText("Account/Bank Code: ", "Číslo účtu/Kód banky: ", languageTag) + $"{bankAccModel.AccountNumber}/{ bankAccModel.BankCode}");
 				});
 				col.Item().Row(row =>
 				{

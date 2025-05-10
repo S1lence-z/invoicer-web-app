@@ -9,14 +9,15 @@ namespace Backend.Utils.InvoicePdfGenerator
 {
 	public class InvoicePdfGenerator : IInvoicePdfGenerator
 	{
-		public IPdfGenerationResult ExportInvoicePdf(Invoice invoice)
+		public IPdfGenerationResult ExportInvoicePdf(Invoice invoice, string lang)
 		{
 			try
 			{
 				QuestPDF.Settings.License = LicenseType.Community;
-				InvoicePdfDocument newDoc = new(invoice);
+				string languageTag = ExtractLanguageTag(lang);
+				InvoicePdfDocument newDoc = new(invoice, languageTag);
 				byte[] pdfFile = newDoc.GeneratePdf();
-				string fileName = CreateInvoiceName(invoice);
+				string fileName = CreateInvoiceName(invoice, languageTag);
 				return PdfGenerationResult.Success(pdfFile, fileName);
 			}
 			catch (Exception e)
@@ -25,9 +26,20 @@ namespace Backend.Utils.InvoicePdfGenerator
 			}
 		}
 
-		private static string CreateInvoiceName(Invoice invoice)
+		private static string CreateInvoiceName(Invoice invoice, string languageTag)
 		{
-			return $"{invoice.Seller!.Name}_{invoice.InvoiceNumber}";
+			return $"{invoice.Seller!.Name}_{invoice.InvoiceNumber}_{languageTag}";
+		}
+
+		private static string ExtractLanguageTag(string lang)
+		{
+			if (string.IsNullOrEmpty(lang))
+				return "en-US";
+			string[] parts = lang.Split('-');
+			if (parts.Length == 0)
+				return "en-US";
+			string language = parts[0];
+			return language;
 		}
 	}
 }

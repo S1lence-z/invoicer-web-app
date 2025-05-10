@@ -6,7 +6,7 @@ namespace Application.ServiceInterfaces
 {
 	public interface IInvoiceService : IService<int, InvoiceDto> 
 	{
-		public Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id);
+		public Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id, string lang);
 
 		public Task<InvoiceDto> GetNewInvoiceInformationAsync(int entityId);
 	}

@@ -139,11 +139,11 @@ namespace Backend.Controllers
 		[ProducesResponseType(typeof(ApiErrorResponse), 404)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 400)]
 		[ProducesResponseType(typeof(ApiErrorResponse), 500)]
-		public async Task<IActionResult> ExportPdf(int id)
+		public async Task<IActionResult> ExportPdf(int id, string lang)
 		{
 			try
 			{
-				IPdfGenerationResult invoiceResult = await invoiceService.ExportInvoicePdfAsync(id);
+				IPdfGenerationResult invoiceResult = await invoiceService.ExportInvoicePdfAsync(id, lang);
 				if (!invoiceResult.IsSuccess)
 				{
 					return StatusCode(500, ApiErrorResponse.Create("An error occurred while exporting the invoice to PDF", invoiceResult.ErrorMessage!, invoiceResult.StatusCode));
