@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Application.ServiceInterfaces;
 using Frontend.Services;
 using Microsoft.JSInterop;
-using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 
 namespace Frontend
