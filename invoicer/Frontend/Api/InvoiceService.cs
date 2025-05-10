@@ -49,10 +49,9 @@ namespace Frontend.Api
 			}
 		}
 
-		public async Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id)
+		public async Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id, string lang)
 		{
-			HttpResponseMessage response = await _httpClient.GetAsync($"{_urlPath}/{id}/export-pdf");
-
+			HttpResponseMessage response = await _httpClient.GetAsync($"{_urlPath}/{id}/export-pdf?lang={Uri.UnescapeDataString(lang)}");
 			if (!response.IsSuccessStatusCode)
 				return PdfGenerationResult.Failure("Failed to generate PDF", (int)response.StatusCode);
 

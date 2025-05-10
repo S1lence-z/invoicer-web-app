@@ -7,6 +7,7 @@
 @using Frontend.Components
 @using Frontend.Services
 @using Microsoft.Extensions.Localization
+@using System.Globalization
 @inject IInvoiceService invoiceService
 @inject IJSRuntime jsRuntime
 @inject ErrorService errorService
@@ -216,7 +217,11 @@
     {
         try
         {
-            IPdfGenerationResult response = await invoiceService.ExportInvoicePdfAsync(invToExport.Id);
+            string currentCultureName = CultureInfo.CurrentCulture.Name;
+            if (string.IsNullOrEmpty(currentCultureName))
+                currentCultureName = "en-US";
+
+            IPdfGenerationResult response = await invoiceService.ExportInvoicePdfAsync(invToExport.Id, currentCultureName);
             if (!response.IsSuccess)
             {
                 errorService.ShowError(response.ErrorMessage!);
