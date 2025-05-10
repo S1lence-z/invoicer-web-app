@@ -67,12 +67,12 @@ namespace Backend.Services
 
 		private async Task HandleCreatingOrUpdatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice newInvoice, NumberingScheme numberingScheme)
 		{
-			if (isUsingUserDefinedState && !EntityInvoiceNumberingStateUpdater.IsValidAgainstScheme(newInvoice.InvoiceNumber, numberingScheme))
+			if (isUsingUserDefinedState && !InvoiceNumberUtils.IsValidAgainstScheme(newInvoice.InvoiceNumber, numberingScheme))
 				throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} does not match the numbering scheme");
 
 			if (isUsingUserDefinedState)
 			{
-				string customSequenceNumber = EntityInvoiceNumberingStateUpdater.ExtractSequenceNumber(newInvoice.InvoiceNumber, numberingScheme);
+				string customSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(newInvoice.InvoiceNumber, numberingScheme);
 				if (!int.TryParse(customSequenceNumber, out int newSequenceNumber))
 					throw new ArgumentException($"Invalid sequence number in invoice number: {newInvoice.InvoiceNumber}");
 
@@ -93,7 +93,7 @@ namespace Backend.Services
 
 		private async Task HandleDeletingAsync(EntityInvoiceNumberingSchemeState state, int entityId, Invoice newInvoice, NumberingScheme numberingScheme)
 		{
-			if (!EntityInvoiceNumberingStateUpdater.IsValidAgainstScheme(newInvoice.InvoiceNumber, numberingScheme))
+			if (!InvoiceNumberUtils.IsValidAgainstScheme(newInvoice.InvoiceNumber, numberingScheme))
 				throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} does not match the numbering scheme");
 
 			// Find the last invoice for this entity excluding the one being deleted
@@ -111,7 +111,7 @@ namespace Backend.Services
 			}
 
 			// Extract the sequence number from the last invoice
-			string extractedSequenceNumber = EntityInvoiceNumberingStateUpdater.ExtractSequenceNumber(lastInvoice.InvoiceNumber, numberingScheme);
+			string extractedSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(lastInvoice.InvoiceNumber, numberingScheme);
 			if (!int.TryParse(extractedSequenceNumber, out int lastSequenceNumber))
 				throw new ArgumentException($"Invalid sequence number in invoice number: {lastInvoice.InvoiceNumber}");
 

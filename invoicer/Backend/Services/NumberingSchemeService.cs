@@ -30,11 +30,14 @@ namespace Backend.Services
 		public async Task<NumberingSchemeDto> CreateAsync(NumberingSchemeDto newNumberingSchemeDto)
 		{
 			NumberingScheme scheme = NumberingSchemeMapper.MapToDomain(newNumberingSchemeDto);
-			await context.NumberingScheme.AddAsync(scheme);
 
 			if (scheme.IsDefault)
 				await SetDefaultSchemeAsync(scheme);
 
+			if (scheme.SequencePadding < 1)
+				throw new ArgumentException("Sequence padding must be at least 1");
+
+			await context.NumberingScheme.AddAsync(scheme);
 			await context.SaveChangesAsync();
 			return NumberingSchemeMapper.MapToDto(scheme);
 		}
@@ -46,6 +49,9 @@ namespace Backend.Services
 
 			if (existingScheme is null)
 				throw new KeyNotFoundException($"Invoice Numbering Scheme with id {id} not found");
+
+			if (udpatedSchemeDto.SequencePadding < 1)
+				throw new ArgumentException("Sequence padding must be at least 1");
 
 			existingScheme.Prefix = udpatedSchemeDto.Prefix;
 			existingScheme.UseSeperator = udpatedSchemeDto.UseSeperator;
