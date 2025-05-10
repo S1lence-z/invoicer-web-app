@@ -52,7 +52,7 @@
         <div class="row mb-4">
             <div class="col">
                 <label for="sequence-padding" class="font-weight-bold">@L["PaddingLabel"]</label>
-                <input id="sequence-padding" type="number" class="form-control" placeholder="@L["PaddingPlaceholder"]" @bind="SchemeFormModel.SequencePadding" />
+                <input id="sequence-padding" type="number" min="1" step="1" class="form-control" placeholder="@L["PaddingPlaceholder"]" @bind="SchemeFormModel.SequencePadding" />
                 <ValidationMessage For="@(() => SchemeFormModel.SequencePadding)" />
             </div>
 
