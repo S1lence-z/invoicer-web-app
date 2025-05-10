@@ -3,30 +3,32 @@
 @using Application.DTOs;
 @using Frontend.Components;
 @using Frontend.Services;
+@using Microsoft.Extensions.Localization;
 @inject IEntityService entityService;
 @inject ErrorService errorService;
+@inject IStringLocalizer<Entities> L;
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3" style="height:90vh;">
     @* HEADER *@
     <div class="d-flex flex-row justify-content-between align-content-center px-4 pt-4">
-        <h3>Economic Entites</h3>
+        <h3>@L["PageTitle"]</h3>
         <button class="btn btn-primary" @onclick="ShowNewEntityModal">
-            Add New Entity
+            @L["AddNewEntityButton"]
         </button>
     </div>
     <hr/>
     @* CONTENT *@
     <div class="d-flex flex-row px-4 pb-4" style="height: calc(100% - 120px);">
-        @if (allEntities is null) 
+        @if (allEntities is null)
         {
-            <p>Loading...</p>
-        } 
-        else if (allEntities.Count == 0) 
+            <p>@L["LoadingMessage"]</p>
+        }
+        else if (allEntities.Count == 0)
         {
-            <p>No entities found</p>
-        } 
-        else 
+            <p>@L["NoEntitiesFoundMessage"]</p>
+        }
+        else
         {
             @* ENTITIES LIST*@
             <div class="d-flex flex-column gap-2" style="overflow-y:auto;">
@@ -38,11 +40,11 @@
         }
         @* DETAILS OF THE SELECTED ENTITY *@
         <div class="d-flex flex-column border border-black rounded ms-2 flex-grow-1">
-            @if (selectedEntity is null) 
+            @if (selectedEntity is null)
             {
-                <p class="px-4 pt-4 text-black">Select an entity...</p>
-            } 
-            else 
+                <p class="px-4 pt-4 text-black">@L["SelectEntityPrompt"]</p>
+            }
+            else
             {
                 <EntityDetailView SelectedEntity="selectedEntity" />
             }
@@ -51,11 +53,11 @@
 </div>
 
 @* ADD NEW ENTITY MODAL *@
-<Modal Title="Add New Entity" IsVisible="isAddingNewEntity" OnClose="ShowNewEntityModal">
+<Modal Title="@L["AddModalTitle"]" IsVisible="isAddingNewEntity" OnClose="ShowNewEntityModal">
     <EntityForm SubmitCallback="ShowNewEntityModal" isActive="isAddingNewEntity" />
 </Modal>
 @* EDIT ENTITY MODAL *@
-<Modal Title="Edit Entity" IsVisible="isEditingEntity" OnClose="ShowEditEntityModal">
+<Modal Title="@L["EditModalTitle"]" IsVisible="isEditingEntity" OnClose="ShowEditEntityModal">
     <EntityForm SubmitCallback="ShowEditEntityModal" EntityInstance="entityToEdit" isActive="isEditingEntity" />
 </Modal>
 
@@ -76,13 +78,13 @@
     }
 
     private async Task LoadEntities() {
-        try 
+        try
         {
             allEntities = (await entityService.GetAllAsync()).ToList();
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            errorService.ShowError($"Failed to load entities: {ex.Message}");
         }
     }
 
@@ -104,7 +106,6 @@
             if (status) {
                 selectedEntity = null;
                 await LoadEntities();
-                StateHasChanged();
             }
         } catch (Exception ex)
         {
@@ -116,19 +117,21 @@
     {
         this.entityToEdit = entityToEdit;
         await ShowEditEntityModal();
-        StateHasChanged();
     }
 
     private async Task ShowNewEntityModal()
     {
         isAddingNewEntity = !isAddingNewEntity;
-        await LoadEntities();
-        StateHasChanged();
+        if (!isAddingNewEntity)
+            await LoadEntities();
     }
 
     private async Task ShowEditEntityModal() {
         isEditingEntity = !isEditingEntity;
-        await LoadEntities();
-        StateHasChanged();
+        if (!isEditingEntity)
+        {
+            entityToEdit = null;
+            await LoadEntities();
+        }
     }
 }
