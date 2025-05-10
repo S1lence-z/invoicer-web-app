@@ -73,13 +73,16 @@
 </div>
 @* ADD NEW INVOICE MODAL *@
 <Modal Title="@L["AddModalTitle"]" IsVisible="isAddingNewInvoice" OnClose="ShowAddInvoiceModal" Size="xl">
-    <InvoiceForm SubmitCallback="ShowAddInvoiceModal" isActive="isAddingNewInvoice" />
+    @if (isAddingNewInvoice)
+    {
+        <InvoiceForm SubmitCallback="HandleAddSubmit" isActive="isAddingNewInvoice" />
+    }
 </Modal>
 @* EDIT INVOICE MODAL *@
 <Modal Title="@L["EditModalTitle"]" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal" Size="xl">
     @if (invoiceToEdit is not null)
     {
-        <InvoiceForm SubmitCallback="ShowEditInvoiceModal" isActive="isEditingInvoice" InvoiceInstance="invoiceToEdit" />
+        <InvoiceForm SubmitCallback="HandleEditSubmit" isActive="isEditingInvoice" InvoiceInstance="invoiceToEdit" />
     }
 </Modal>
 @* PREVIEW MODAL *@
@@ -245,6 +248,19 @@
         StateHasChanged();
     }
 
+    private async Task HandleAddSubmit()
+    {
+        isAddingNewInvoice = false;
+        await LoadInvoices();
+    }
+
+    private async Task HandleEditSubmit()
+    {
+        isEditingInvoice = false;
+        invoiceToEdit = null;
+        await LoadInvoices();
+    }
+
     private async Task ShowEditInvoiceModal()
     {
         isEditingInvoice = !isEditingInvoice;
@@ -253,7 +269,6 @@
             invoiceToEdit = null;
             await LoadInvoices();
         }
-        StateHasChanged();
     }
 
     private void ShowInvoicePreviewModal()
