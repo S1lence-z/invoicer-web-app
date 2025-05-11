@@ -1,11 +1,12 @@
 ﻿using Backend.Database;
 using Microsoft.EntityFrameworkCore;
-using Application.DTOs;
-using Application.ServiceInterfaces;
 using Application.Mappers;
 using Domain.Models;
-using Application.PdfGenerator;
-using Domain.Enums;
+using Shared.DTOs;
+using Shared.Enums;
+using Shared.ServiceInterfaces;
+using Application.Interfaces;
+using Shared.Interfaces;
 
 namespace Backend.Services
 {
