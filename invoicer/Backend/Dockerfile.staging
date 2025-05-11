@@ -7,15 +7,13 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copy .csproj files for all relevant projects
-COPY ["Backend/Backend.csproj", "Backend/"]
-COPY ["Application/Application.csproj", "Application/"]
-COPY ["Domain/Domain.csproj", "Domain/"]
+COPY ["Backend/", "Backend/"]
+COPY ["Application/", "Application/"]
+COPY ["Domain/", "Domain/"]
+COPY ["Shared/", "Shared/"]
 
 # Else, restore the main project which will pull its dependencies:
 RUN dotnet restore "./Backend/Backend.csproj"
-
-# Copy all the source code
-COPY . .
 
 # Build the project
 WORKDIR "/src/Backend"

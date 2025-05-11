@@ -24,7 +24,7 @@ services:
         DOTNET_VERSION: "8.0"
         BUILD_CONFIGURATION: Release
     ports:
-      - "5180:5000"
+      - "5180:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
     depends_on:  
