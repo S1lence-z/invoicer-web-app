@@ -9,19 +9,13 @@ using System.Net.Http.Headers;
 
 namespace Frontend.Api
 {
-	public class InvoiceService : IInvoiceService
+	public class InvoiceService(HttpClient httpClient) : IInvoiceService
 	{
-		private readonly HttpClient _httpClient;
 		private readonly string _urlPath = "api/Invoice";
-
-		public InvoiceService(EnvironmentConfig config)
-		{
-			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
-		}
 
 		public async Task<InvoiceDto> CreateAsync(InvoiceDto obj)
 		{
-			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
+			var response = await httpClient.PostAsJsonAsync(_urlPath, obj);
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<InvoiceDto>() ?? throw new Exception("Failed to deserialize InvoiceDto");
 			else
@@ -36,7 +30,7 @@ namespace Frontend.Api
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			var response = await _httpClient.DeleteAsync($"{_urlPath}/{id}");
+			var response = await httpClient.DeleteAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
 				return true;
 			else
@@ -51,7 +45,7 @@ namespace Frontend.Api
 
 		public async Task<IPdfGenerationResult> ExportInvoicePdfAsync(int id, string lang)
 		{
-			HttpResponseMessage response = await _httpClient.GetAsync($"{_urlPath}/{id}/export-pdf?lang={Uri.UnescapeDataString(lang)}");
+			HttpResponseMessage response = await httpClient.GetAsync($"{_urlPath}/{id}/export-pdf?lang={Uri.UnescapeDataString(lang)}");
 			if (!response.IsSuccessStatusCode)
 				return PdfGenerationResult.Failure("Failed to generate PDF", (int)response.StatusCode);
 
@@ -71,7 +65,7 @@ namespace Frontend.Api
 
 		public async Task<IList<InvoiceDto>> GetAllAsync()
 		{
-			var response = await _httpClient.GetAsync(_urlPath);
+			var response = await httpClient.GetAsync(_urlPath);
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<IList<InvoiceDto>>() ?? new List<InvoiceDto>();
 			else
@@ -86,7 +80,7 @@ namespace Frontend.Api
 
 		public async Task<InvoiceDto> GetByIdAsync(int id)
 		{
-			var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
+			var response = await httpClient.GetAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<InvoiceDto>() ?? throw new Exception("Failed to deserialize InvoiceDto");
 			else
@@ -101,7 +95,7 @@ namespace Frontend.Api
 
 		public async Task<InvoiceDto> GetNewInvoiceInformationAsync(int entityId)
 		{
-			var response = await _httpClient.GetAsync($"{_urlPath}/entity/{entityId}/new");
+			var response = await httpClient.GetAsync($"{_urlPath}/entity/{entityId}/new");
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<InvoiceDto>() ?? throw new Exception("Failed to deserialize InvoiceDto");
 			else
@@ -116,7 +110,7 @@ namespace Frontend.Api
 
 		public async Task<InvoiceDto> UpdateAsync(int id, InvoiceDto obj)
 		{
-			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
+			var response = await httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<InvoiceDto>() ?? throw new Exception("Failed to deserialize InvoiceDto");
 			else

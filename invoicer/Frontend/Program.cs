@@ -7,6 +7,9 @@ using Application.ServiceInterfaces;
 using Frontend.Services;
 using Microsoft.JSInterop;
 using System.Globalization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Frontend
 {
@@ -18,22 +21,35 @@ namespace Frontend
 			builder.RootComponents.Add<App>("#app");
 			builder.RootComponents.Add<HeadOutlet>("head::after");
 
+			// Load the environment-specific configuration
+			builder.Services.AddOptions<EnvironmentConfig>();
+			builder.Services.Configure<EnvironmentConfig>(options =>
+			{
+				builder.Configuration.GetSection("AppSpecificSettings").Bind(options);
+			});
+
 			// Create a new http client
-			var httpClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
+			builder.Services.AddScoped(sp =>
+			{
+				var envConfigOptions = sp.GetRequiredService<IOptions<EnvironmentConfig>>();
+				var envConfig = envConfigOptions.Value;
+
+				if (string.IsNullOrEmpty(envConfig.ApiBaseUrl))
+					throw new InvalidOperationException("ApiBaseUrl is not configured in appsettings.json or its environment-specific override.");
+
+				return new HttpClient { BaseAddress = new Uri(envConfig.ApiBaseUrl) };
+			});
 
 			// Add localization services
 			builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-			// Load config files
-			var envConfig = await httpClient.GetFromJsonAsync<EnvironmentConfig>("./Data/env.json");
-			var navMenuItemsList = await httpClient.GetFromJsonAsync<IEnumerable<NavLinkItem>>("./Data/NavMenuContent.json");
-
-			// Register config files
-			builder.Services.AddScoped(sp => httpClient);
-			if (envConfig is not null)
-				builder.Services.AddSingleton(envConfig);
+			// Get the nav menu
+			using var localContentClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
+			var navMenuItemsList = await localContentClient.GetFromJsonAsync<IEnumerable<NavLinkItem>>("./Data/NavMenuContent.json");
 			if (navMenuItemsList is not null)
 				builder.Services.AddSingleton(new NavMenuItemsProvider(navMenuItemsList));
+			else
+				throw new InvalidOperationException("NavMenuContent.json file not found or invalid.");
 
 			// Register api services
 			builder.Services.AddScoped<IAresApiService, AresApiService>();

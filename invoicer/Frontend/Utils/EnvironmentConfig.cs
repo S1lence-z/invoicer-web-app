@@ -2,6 +2,6 @@
 {
 	public class EnvironmentConfig
 	{
-		public string ApiBaseUrl { get; set; } = string.Empty;
+		public string? ApiBaseUrl { get; set; }
 	}
 }

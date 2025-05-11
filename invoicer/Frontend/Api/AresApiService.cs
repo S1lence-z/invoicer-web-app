@@ -6,20 +6,14 @@ using Frontend.Utils;
 
 namespace Frontend.Api
 {
-	public class AresApiService : IAresApiService
+	public class AresApiService(HttpClient httpClient) : IAresApiService
 	{
-		private readonly HttpClient _httpClient;
 		private readonly string _urlPath = "api/ares";
 		private static readonly JsonSerializerOptions jsonSerializeOptions = new() { PropertyNameCaseInsensitive = true, IncludeFields = true };
 
-		public AresApiService(EnvironmentConfig config)
-		{
-			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
-		}
-
 		public async Task<IResult<IAresApiResponse>> GetEntityInformationByIcoAsync(string ico)
 		{
-			var response = await _httpClient.GetAsync($"{_urlPath}/{ico}");	
+			var response = await httpClient.GetAsync($"{_urlPath}/{ico}");	
 			if (response.IsSuccessStatusCode)
 			{
 				var content = await response.Content.ReadAsStringAsync();

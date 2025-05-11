@@ -6,19 +6,13 @@ using Application.Api;
 
 namespace Frontend.Api
 {
-	public class AddressService : IAddressService
+	public class AddressService(HttpClient httpClient) : IAddressService
 	{
-		private readonly HttpClient _httpClient;
 		private readonly string _urlPath = "api/Address";
-
-		public AddressService(EnvironmentConfig config)
-		{
-			_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiBaseUrl) };
-		}
 
 		public async Task<AddressDto> CreateAsync(AddressDto obj)
 		{
-			var response = await _httpClient.PostAsJsonAsync(_urlPath, obj);
+			var response = await httpClient.PostAsJsonAsync(_urlPath, obj);
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<AddressDto>() ?? throw new Exception("Failed to deserialize AddressDto");
 			else
@@ -33,7 +27,7 @@ namespace Frontend.Api
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			var response = await _httpClient.DeleteAsync($"{_urlPath}/{id}");
+			var response = await httpClient.DeleteAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
 				return true;
 			else
@@ -48,7 +42,7 @@ namespace Frontend.Api
 
 		public async Task<IList<AddressDto>> GetAllAsync()
 		{
-			var response = await _httpClient.GetAsync(_urlPath);
+			var response = await httpClient.GetAsync(_urlPath);
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<IList<AddressDto>>() ?? [];
 			else
@@ -63,7 +57,7 @@ namespace Frontend.Api
 
 		public async Task<AddressDto> GetByIdAsync(int id)
 		{
-			var response = await _httpClient.GetAsync($"{_urlPath}/{id}");
+			var response = await httpClient.GetAsync($"{_urlPath}/{id}");
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<AddressDto>() ?? throw new Exception("Failed to deserialize AddressDto");
 			else
@@ -78,7 +72,7 @@ namespace Frontend.Api
 
 		public async Task<AddressDto> UpdateAsync(int id, AddressDto obj)
 		{
-			var response = await _httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
+			var response = await httpClient.PutAsJsonAsync($"{_urlPath}/{id}", obj);
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadFromJsonAsync<AddressDto>() ?? throw new Exception("Failed to deserialize AddressDto");
 			else
