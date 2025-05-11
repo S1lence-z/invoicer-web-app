@@ -1,4 +1,3 @@
-using Application.ServiceInterfaces;
 using Backend.Database;
 using Backend.Services;
 using Backend.Services.AresApiService;
@@ -6,7 +5,8 @@ using Domain.Interfaces;
 using Domain.Services;
 using Backend.Utils.InvoicePdfGenerator;
 using Microsoft.EntityFrameworkCore;
-using Application.PdfGenerator;
+using Shared.ServiceInterfaces;
+using Application.Interfaces;
 
 namespace Backend
 {

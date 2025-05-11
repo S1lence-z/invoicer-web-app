@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using Application.ServiceInterfaces;
-using Application.DTOs;
-using Application.PdfGenerator;
-using Application.Api;
+using Shared.Api;
+using Shared.DTOs;
+using Shared.Interfaces;
+using Shared.ServiceInterfaces;
 
 namespace Backend.Controllers
 {

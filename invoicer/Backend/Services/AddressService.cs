@@ -1,9 +1,9 @@
 ﻿using Backend.Database;
-using Application.ServiceInterfaces;
-using Application.DTOs;
 using Application.Mappers;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.DTOs;
+using Shared.ServiceInterfaces;
 
 namespace Backend.Services
 {

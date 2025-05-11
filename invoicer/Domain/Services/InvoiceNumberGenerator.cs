@@ -1,6 +1,6 @@
 ﻿using Domain.Models;
-using Domain.Enums;
 using Domain.Interfaces;
+using Shared.Enums;
 
 namespace Domain.Services
 {

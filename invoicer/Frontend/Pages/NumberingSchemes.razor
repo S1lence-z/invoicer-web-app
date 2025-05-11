@@ -1,10 +1,10 @@
 ﻿@page "/numberingschemes"
-@using Application.DTOs
 @using Frontend.Api;
-@using Application.ServiceInterfaces;
 @using Frontend.Components;
 @using Frontend.Services;
 @using Microsoft.Extensions.Localization
+@using Shared.DTOs
+@using Shared.ServiceInterfaces
 @inject INumberingSchemeService numberingSchemeService;
 @inject ErrorService errorService;
 @inject IStringLocalizer<NumberingSchemes> L;

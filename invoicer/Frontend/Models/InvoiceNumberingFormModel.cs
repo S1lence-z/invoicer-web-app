@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Domain.Enums;
-using Application.DTOs;
+using Shared.DTOs;
+using Shared.Enums;
 
 namespace Frontend.Models
 {

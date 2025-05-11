@@ -1,11 +1,11 @@
 ﻿using System.Net.Http.Json;
-using Application.ServiceInterfaces;
-using Application.DTOs;
-using Application.InvoicePdfGenerator;
-using Application.PdfGenerator;
 using Frontend.Utils;
-using Application.Api;
 using System.Net.Http.Headers;
+using Shared.Api;
+using Shared.DTOs;
+using Shared.Interfaces;
+using Shared.ServiceInterfaces;
+using Shared.PdfGenerator;
 
 namespace Frontend.Api
 {

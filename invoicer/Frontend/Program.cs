@@ -3,13 +3,11 @@ using Frontend.Utils;
 using Frontend.Api;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Application.ServiceInterfaces;
 using Frontend.Services;
 using Microsoft.JSInterop;
 using System.Globalization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Shared.ServiceInterfaces;
 
 namespace Frontend
 {

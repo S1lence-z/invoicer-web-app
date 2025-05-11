@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Json;
-using Application.DTOs;
-using Application.ServiceInterfaces;
 using Frontend.Utils;
-using Application.Api;
+using Shared.Api;
+using Shared.DTOs;
+using Shared.ServiceInterfaces;
 
 namespace Frontend.Api
 {

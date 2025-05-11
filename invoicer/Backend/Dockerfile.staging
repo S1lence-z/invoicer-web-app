@@ -1,0 +1,39 @@
+# Backend/Dockerfile.staging
+ARG DOTNET_VERSION=8.0 # Keep your version ARG if you want to easily change it later
+
+# This stage is used to build the service project
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+
+# Copy .csproj files for all relevant projects
+COPY ["Backend/", "Backend/"]
+COPY ["Application/", "Application/"]
+COPY ["Domain/", "Domain/"]
+COPY ["Shared/", "Shared/"]
+
+# Else, restore the main project which will pull its dependencies:
+RUN dotnet restore "./Backend/Backend.csproj"
+
+# Build the project
+WORKDIR "/src/Backend"
+RUN dotnet build "./Backend.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
+
+# This stage is used to publish the service project
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./Backend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+# This stage is the final runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+# Copy over the sqlite database
+COPY --from=build /src/Backend/Database/Invoicer.db .
+
+ENTRYPOINT ["dotnet", "Backend.dll"]
+
+# Expose the necessary port(s)
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080

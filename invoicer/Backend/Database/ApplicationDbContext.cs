@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Domain.Models;
-using Domain.Enums;
+using Shared.Enums;
 
 namespace Backend.Database
 {

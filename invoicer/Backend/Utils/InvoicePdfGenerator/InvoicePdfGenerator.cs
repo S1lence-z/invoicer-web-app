@@ -1,9 +1,10 @@
 ﻿using Domain.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
-using Application.InvoicePdfGenerator;
 using Backend.Utils.InvoicePdfGenerator.Components;
-using Application.PdfGenerator;
+using Application.Interfaces;
+using Shared.Interfaces;
+using Shared.PdfGenerator;
 
 namespace Backend.Utils.InvoicePdfGenerator
 {

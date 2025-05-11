@@ -11,6 +11,7 @@ services:
       - ./Backend:/src/Backend
       - ./Application:/src/Application
       - ./Domain:/src/Domain
+      - ./Shared:/src/Shared
 
       # 2. Use named volumes to isolate ALL build artifacts inside the container
       - backend_obj:/src/Backend/obj
@@ -20,6 +21,8 @@ services:
       - backend_app_bin:/src/Application/bin
       - backend_domain_obj:/src/Domain/obj
       - backend_domain_bin:/src/Domain/bin
+      - backend_shared_obj:/src/Shared/obj
+      - backend_shared_bin:/src/Shared/bin
 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -43,23 +46,18 @@ services:
     volumes:
       # 1. Mount project source directories from host to container
       - ./Frontend:/src/Frontend
-      - ./Application:/src/Application
-      - ./Domain:/src/Domain
+      - ./Shared:/src/Shared
 
       # 2. Use named volumes to isolate ALL build artifacts inside the container
       - frontend_obj:/src/Frontend/obj
       - frontend_bin:/src/Frontend/bin
-      # Add isolation for shared libs specific to frontend:
-      - frontend_app_obj:/src/Application/obj
-      - frontend_app_bin:/src/Application/bin
-      - frontend_domain_obj:/src/Domain/obj
-      - frontend_domain_bin:/src/Domain/bin
+      - frontend_shared_obj:/src/Shared/obj
+      - frontend_shared_bin:/src/Shared/bin
 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
       - DOTNET_USE_POLLING_FILE_WATCHER=true
-      - BackendApiUrl=http://backend:8080
     command: sh -c "cd Frontend && dotnet watch run --non-interactive --no-launch-profile --no-hot-reload"
     depends_on:
       backend:
@@ -71,11 +69,11 @@ volumes:
   backend_bin:
   frontend_obj:
   frontend_bin:
-  backend_domain_obj:
-  backend_domain_bin:
   backend_app_obj:
   backend_app_bin:
-  frontend_domain_obj:
-  frontend_domain_bin:
-  frontend_app_obj:
-  frontend_app_bin:
+  backend_domain_obj:
+  backend_domain_bin:
+  backend_shared_obj:
+  backend_shared_bin:
+  frontend_shared_obj:
+  frontend_shared_bin:

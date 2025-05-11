@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Application.AresApiModels;
-using Application.ServiceInterfaces;
-using Domain.Interfaces;
 using Refit;
+using Shared.AresApiModels;
+using Shared.Interfaces;
+using Shared.ServiceInterfaces;
 
 namespace Backend.Services.AresApiService
 {

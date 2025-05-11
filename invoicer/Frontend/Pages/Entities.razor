@@ -1,9 +1,9 @@
 ﻿@page "/entities";
-@using Application.ServiceInterfaces;
-@using Application.DTOs;
 @using Frontend.Components;
 @using Frontend.Services;
 @using Microsoft.Extensions.Localization;
+@using Shared.DTOs
+@using Shared.ServiceInterfaces
 @inject IEntityService entityService;
 @inject ErrorService errorService;
 @inject IStringLocalizer<Entities> L;

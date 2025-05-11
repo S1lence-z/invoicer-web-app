@@ -1,9 +1,9 @@
-﻿using Domain.Enums;
-using Application.Extensions;
-using Domain.Models;
+﻿using Domain.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using Shared.Extensions;
+using Shared.Enums;
 
 namespace Backend.Utils.InvoicePdfGenerator.Components
 {

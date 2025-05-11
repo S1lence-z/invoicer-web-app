@@ -1,0 +1,45 @@
+# Frontend/Dockerfile.staging
+ARG DOTNET_VERSION=8.0 # Your .NET SDK version for building
+ARG NGINX_VERSION=alpine # Or a specific version like 1.25-alpine
+
+# --- Build Stage (to compile and publish Blazor WASM assets) ---
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+
+# 1. Copy project files (.csproj) for Frontend and Shared
+COPY ["Frontend/Frontend.csproj", "Frontend/"]
+COPY ["Shared/Shared.csproj", "Shared/"]
+
+# 2. Restore dependencies
+RUN dotnet restore "Frontend/Frontend.csproj"
+
+# 3. Copy the rest of the source code for these projects
+COPY ["Frontend/", "Frontend/"]
+COPY ["Shared/", "Shared/"]
+
+# 4. Publish Blazor WASM app. The key output is the 'wwwroot' folder.
+WORKDIR "/src/Frontend"
+RUN dotnet publish "Frontend.csproj" -c $BUILD_CONFIGURATION -o /app/publish --no-restore
+# The above command populates /app/publish/wwwroot with all static assets
+
+# --- Final Stage (Nginx to serve the static files) ---
+FROM nginx:${NGINX_VERSION} AS final
+
+# 1. Define where Nginx will serve files from (can be default or custom)
+WORKDIR /usr/share/nginx/html
+
+# 2. Remove default Nginx welcome page (optional but clean)
+RUN rm -rf ./*
+
+# 3. Copy the published Blazor WASM static assets (from the wwwroot of the publish output)
+COPY --from=build /app/publish/wwwroot .
+# The '.' copies the contents of /app/publish/wwwroot into the current WORKDIR (/usr/share/nginx/html)
+
+# 4. Copy your custom Nginx configuration
+COPY Frontend/nginx.conf /etc/nginx/nginx.conf
+
+# 5. (Optional) Set correct permissions for Nginx if needed (often not for official images)
+# RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
+
+EXPOSE 80

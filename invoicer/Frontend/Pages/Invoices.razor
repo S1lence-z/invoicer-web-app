@@ -1,13 +1,12 @@
 ﻿@page "/invoices";
 @using System.Collections.ObjectModel
-@using Application.DTOs
-@using Application.PdfGenerator
-@using Application.ServiceInterfaces
-@using Domain.Interfaces
+@using System.Globalization
 @using Frontend.Components
 @using Frontend.Services
 @using Microsoft.Extensions.Localization
-@using System.Globalization
+@using Shared.DTOs
+@using Shared.Interfaces
+@using Shared.ServiceInterfaces
 @inject IInvoiceService invoiceService
 @inject IJSRuntime jsRuntime
 @inject ErrorService errorService
