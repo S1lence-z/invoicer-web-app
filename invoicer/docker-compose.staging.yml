@@ -1,0 +1,37 @@
+services:
+  backend-staging:
+    image: myapp/backend-staging:${TAG:-latest}
+    container_name: backend-staging
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile.staging
+      args:
+        DOTNET_VERSION: "8.0"
+    ports:
+      - "8180:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  frontend-staging:
+    image: myapp/frontend-staging:${TAG:-latest}
+    container_name: frontend-staging
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile.staging
+      args:
+        DOTNET_VERSION: "8.0"
+    ports:
+      - "5180:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+    depends_on:
+      backend-staging:
+        condition: service_healthy
+    restart: unless-stopped

@@ -1,0 +1,43 @@
+# Backend/Dockerfile.staging
+ARG DOTNET_VERSION=8.0
+
+# --- Build Stage ---
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
+WORKDIR /src
+
+# Copy .csproj files for solution/projects
+COPY ["Backend/Backend.csproj", "Backend/"]
+COPY ["Application/Application.csproj", "Application/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
+# If you have a .sln file, you can copy that and restore the solution:
+# COPY YourSolution.sln .
+# RUN dotnet restore "YourSolution.sln"
+# Otherwise, restore the main project which should pull dependencies:
+RUN dotnet restore "Backend/Backend.csproj"
+
+# Copy the rest of the application source code
+COPY . .
+
+# Build the Backend project (and its dependencies)
+# Output will go to standard paths like Backend/bin/Release/net8.0, Application/bin/Release/net8.0 etc.
+# relative to /src
+RUN dotnet build "Backend/Backend.csproj" -c Release --no-restore
+
+# Publish the Backend project
+# The publish command will use the artifacts from the build step
+# The WORKDIR is still /src here if we don't change it for publish, which is fine.
+# Or, we can be explicit for the publish command's context.
+WORKDIR /src/Backend 
+RUN dotnet publish "Backend.csproj" -c Release -o /app/publish --no-build /p:UseAppHost=false
+# Note: Removed --no-restore from publish as it's often implied by --no-build, 
+# but more importantly, restore was done globally before. If publish needs specific restore
+# actions not covered by the global one, it might be needed, but usually not with --no-build.
+
+# --- Final Stage ---
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS final
+WORKDIR /app
+COPY --from=build /app/publish . # Correct: Copy from the output directory of the publish step
+
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+ENTRYPOINT ["dotnet", "Backend.dll"]

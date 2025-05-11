@@ -1,0 +1,37 @@
+# Frontend/Dockerfile.staging
+ARG DOTNET_VERSION=8.0
+
+# --- Build Stage ---
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
+WORKDIR /src
+
+# Copy .csproj files and restore as distinct layers
+COPY ["Frontend/Frontend.csproj", "Frontend/"]
+COPY ["Application/Application.csproj", "Application/"]
+COPY ["Domain/Domain.csproj", "Domain/"]         # If Frontend references Domain directly
+RUN dotnet restore "Frontend/Frontend.csproj"
+
+# Copy the rest of the application code
+# Note: Ensure wwwroot/appsettings.Staging.json exists for the build if needed by build process
+# but it's mainly for runtime. The important part is that it's in wwwroot for the final image.
+COPY . .
+WORKDIR "/src/Frontend"
+RUN dotnet publish "Frontend.csproj" -c Release -o /app/publish --no-restore /p:UseAppHost=false
+
+# --- Final Stage ---
+# For Blazor WASM, we still need an ASP.NET Core host to serve the files
+# and to correctly set the blazor-environment header based on ASPNETCORE_ENVIRONMENT.
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS final
+WORKDIR /app
+
+# Copy the published Blazor WASM output
+COPY --from=build /app/publish/wwwroot .
+
+# Expose the port Kestrel will listen on (same as in dev, but can be different)
+EXPOSE 5000
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:5000
+
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Frontend.dll"]
