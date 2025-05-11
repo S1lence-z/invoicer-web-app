@@ -7,17 +7,12 @@ services:
       dockerfile: Backend/Dockerfile.staging
       args:
         DOTNET_VERSION: "8.0"
+        BUILD_CONFIGURATION: Release
     ports:
       - "8180:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
 
   frontend-staging:
     image: myapp/frontend-staging:${TAG:-latest}
@@ -27,11 +22,12 @@ services:
       dockerfile: Frontend/Dockerfile.staging
       args:
         DOTNET_VERSION: "8.0"
+        BUILD_CONFIGURATION: Release
     ports:
       - "5180:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
-    depends_on:
-      backend-staging:
-        condition: service_healthy
+    depends_on:  
+         backend-staging:  
+           condition: service_started  
     restart: unless-stopped

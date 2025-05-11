@@ -7,8 +7,6 @@ using Application.ServiceInterfaces;
 using Frontend.Services;
 using Microsoft.JSInterop;
 using System.Globalization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Frontend

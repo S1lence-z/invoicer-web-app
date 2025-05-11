@@ -1,43 +1,39 @@
 # Backend/Dockerfile.staging
-ARG DOTNET_VERSION=8.0
+ARG DOTNET_VERSION=8.0 # Keep your version ARG if you want to easily change it later
 
-# --- Build Stage ---
+# This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Copy .csproj files for solution/projects
+# Copy .csproj files for all relevant projects
 COPY ["Backend/Backend.csproj", "Backend/"]
 COPY ["Application/Application.csproj", "Application/"]
 COPY ["Domain/Domain.csproj", "Domain/"]
-# If you have a .sln file, you can copy that and restore the solution:
-# COPY YourSolution.sln .
-# RUN dotnet restore "YourSolution.sln"
-# Otherwise, restore the main project which should pull dependencies:
-RUN dotnet restore "Backend/Backend.csproj"
 
-# Copy the rest of the application source code
+# Else, restore the main project which will pull its dependencies:
+RUN dotnet restore "./Backend/Backend.csproj"
+
+# Copy all the source code
 COPY . .
 
-# Build the Backend project (and its dependencies)
-# Output will go to standard paths like Backend/bin/Release/net8.0, Application/bin/Release/net8.0 etc.
-# relative to /src
-RUN dotnet build "Backend/Backend.csproj" -c Release --no-restore
+# Build the project
+WORKDIR "/src/Backend"
+RUN dotnet build "./Backend.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
 
-# Publish the Backend project
-# The publish command will use the artifacts from the build step
-# The WORKDIR is still /src here if we don't change it for publish, which is fine.
-# Or, we can be explicit for the publish command's context.
-WORKDIR /src/Backend 
-RUN dotnet publish "Backend.csproj" -c Release -o /app/publish --no-build /p:UseAppHost=false
-# Note: Removed --no-restore from publish as it's often implied by --no-build, 
-# but more importantly, restore was done globally before. If publish needs specific restore
-# actions not covered by the global one, it might be needed, but usually not with --no-build.
+# This stage is used to publish the service project
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+# WORKDIR is inherited from the previous WORKDIR "/src/Backend" in the 'build' stage
+# if not explicitly changed. This is fine for the publish command.
+RUN dotnet publish "./Backend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# --- Final Stage ---
+# This stage is the final runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS final
 WORKDIR /app
-COPY --from=build /app/publish . # Correct: Copy from the output directory of the publish step
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Backend.dll"]
 
+# Expose the necessary port(s)
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
-ENTRYPOINT ["dotnet", "Backend.dll"]
