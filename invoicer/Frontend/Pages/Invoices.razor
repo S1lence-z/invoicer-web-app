@@ -126,7 +126,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            errorService.ShowError($"Failed to load invoices. Error message: {ex.Message}");
         }
     }
 

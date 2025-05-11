@@ -88,9 +88,9 @@
         {
             allEntities = (await entityService.GetAllAsync()).ToList();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            errorService.ShowError($"Failed to load entities: {ex.Message}");
+            errorService.ShowError($"Failed to load entities");
         }
     }
 

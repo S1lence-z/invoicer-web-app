@@ -77,7 +77,7 @@
         }
         catch (Exception e)
         {
-            errorService.ShowError(e.Message);
+            errorService.ShowError($"Failed to load numbering schemes. Error message: {e.Message}");
         }
     }
 

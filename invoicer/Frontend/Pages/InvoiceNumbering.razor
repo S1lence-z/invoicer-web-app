@@ -70,10 +70,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        allEntities = null!;
-        allNumberingSchemes = null!;
         await LoadEntities();
         await LoadNumberingSchemes();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            await LoadEntities();
+            await LoadNumberingSchemes();
+        }
+        catch (Exception e)
+        {
+            errorService.ShowError($"Failed to fetch necessary data. Error message: {e.Message}");
+        }
     }
 
     private async Task LoadEntities()
@@ -82,10 +93,10 @@
         {
             allEntities = (await entityService.GetAllAsync()).ToList();
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            errorService.ShowError(e.Message);
             allEntities = new List<EntityDto>();
+            throw;
         }
     }
 
@@ -95,10 +106,10 @@
         {
             allNumberingSchemes = (await numberingService.GetAllAsync()).ToList();
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            errorService.ShowError(e.Message);
             allNumberingSchemes = new List<NumberingSchemeDto>();
+            throw;
         }
     }
 
