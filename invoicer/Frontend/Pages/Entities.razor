@@ -143,14 +143,15 @@
 
     private async Task HandleAddSubmit()
     {
-        isEditingEntity = false;
+        isAddingNewEntity = false;
         await LoadEntities();
     }
 
     private async Task HandleEditSubmit()
     {
-        isAddingNewEntity = false;
+        isEditingEntity = false;
         entityToEdit = null;
         await LoadEntities();
+        StateHasChanged();
     }
 }
