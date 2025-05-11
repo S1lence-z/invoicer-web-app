@@ -24,14 +24,16 @@ RUN dotnet build "./Backend.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-r
 # This stage is used to publish the service project
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-# WORKDIR is inherited from the previous WORKDIR "/src/Backend" in the 'build' stage
-# if not explicitly changed. This is fine for the publish command.
 RUN dotnet publish "./Backend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is the final runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Copy over the sqlite database
+COPY --from=build /src/Backend/Database/Invoicer.db .
+
 ENTRYPOINT ["dotnet", "Backend.dll"]
 
 # Expose the necessary port(s)
