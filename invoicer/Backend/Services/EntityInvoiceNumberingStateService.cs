@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Utils;
 using Shared.Enums;
 using Application.Interfaces;
+using System.Xml;
 
 namespace Backend.Services
 {
@@ -97,15 +98,21 @@ namespace Backend.Services
 				.Where(i => i.Id != newInvoice.Id)
 				.OrderByDescending(i => i.Id)
 				.FirstOrDefaultAsync();
-
 			if (lastInvoice is null)
 			{
 				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, 0);
 				return;
 			}
 
+			// Find the numbering scheme for the last invoice
+			NumberingScheme? lastInvoiceNumberingScheme = await context.NumberingScheme
+				.AsNoTracking()
+				.FirstOrDefaultAsync(ins => ins.Id == lastInvoice.NumberingSchemeId);
+			if (lastInvoiceNumberingScheme is null)
+				throw new ArgumentException($"Invoice Numbering Scheme with id {lastInvoice.NumberingSchemeId} not found");
+
 			// Extract the sequence number from the last invoice
-			string extractedSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(lastInvoice.InvoiceNumber, numberingScheme);
+			string extractedSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(lastInvoice.InvoiceNumber, lastInvoiceNumberingScheme);
 			if (!int.TryParse(extractedSequenceNumber, out int lastSequenceNumber))
 				throw new ArgumentException($"Invalid sequence number in invoice number: {lastInvoice.InvoiceNumber}");
 
@@ -132,6 +139,7 @@ namespace Backend.Services
 				.FirstOrDefault(ins => ins.Id == entityNumberingSchemeId);
 			if (entityNumberingScheme is null)
 				throw new ArgumentException($"Invoice Numbering Scheme with id {entityNumberingSchemeId} not found");
+			Console.WriteLine($"Entity Numbering Scheme: {entityNumberingScheme.Id}");
 
 			// Get the invoice numbering scheme
 			int invoiceNumberingSchemeId = newInvoice.NumberingSchemeId;
@@ -140,6 +148,7 @@ namespace Backend.Services
 				.FirstOrDefault(ins => ins.Id == invoiceNumberingSchemeId);
 			if (invoiceNumberingScheme is null)
 				throw new ArgumentException($"Invoice Numbering Scheme with id {invoiceNumberingSchemeId} not found");
+			Console.WriteLine(invoiceNumberingSchemeId);
 
 			// Get the state
 			EntityInvoiceNumberingSchemeState? state = context.EntityInvoiceNumberingSchemeState
@@ -150,10 +159,8 @@ namespace Backend.Services
 			switch (updateStatus)
 			{
 				case EntityInvoiceNumberingStateUpdateStatus.Creating:
-					await HandleCreatingOrUpdatingAsync(state, isUsingUserDefinedState, newInvoice, entityNumberingScheme);
-					break;
 				case EntityInvoiceNumberingStateUpdateStatus.Updating:
-					await HandleCreatingOrUpdatingAsync(state, isUsingUserDefinedState, newInvoice, invoiceNumberingScheme);
+					await HandleCreatingOrUpdatingAsync(state, isUsingUserDefinedState, newInvoice, entityNumberingScheme);
 					break;
 				case EntityInvoiceNumberingStateUpdateStatus.Deleting:
 					Invoice invoiceBeingDeleted = newInvoice;
