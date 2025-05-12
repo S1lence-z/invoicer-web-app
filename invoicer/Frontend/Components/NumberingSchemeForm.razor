@@ -20,16 +20,25 @@
             <div class="col">
                 <div class="form-check mt-4">
                     <label class="form-check-label" for="use-seperator">@L["UseSeparatorLabel"]</label>
-                    <input id="use-seperator" type="checkbox" class="form-check-input" @bind="SchemeFormModel.UseSeperator" />
+                    <input id="use-seperator" type="checkbox" class="form-check-input" @bind="SchemeFormModel.UseSeperator" @bind:after="AfterSeperatorChange" />
                 </div>
                 <ValidationMessage For="@(() => SchemeFormModel.UseSeperator)" />
             </div>
             <div class="col">
-                <div class="form-check mt-4">
-                    <label class="form-check-label" for="new-default">@L["SetAsDefaultLabel"]</label>
-                    <input id="new-default" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IsDefault" />
-                </div>
-                <ValidationMessage For="@(() => SchemeFormModel.IsDefault)" />
+                @if (NumberingSchemeInstance is not null && NumberingSchemeInstance.IsDefault)
+                {
+                    <div class="form-check mt-4">
+                        <label class="form-check-label" for="new-default">@L["IsDefaultInformationLabel"]: @(SchemeFormModel.IsDefault ? L["Yes"] : L["No"])</label>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-check mt-4">
+                        <label class="form-check-label" for="new-default">@L["SetAsDefaultLabel"]</label>
+                        <input id="new-default" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IsDefault" />
+                    </div>
+                    <ValidationMessage For="@(() => SchemeFormModel.IsDefault)" />
+                }
             </div>
         </div>
 
@@ -43,7 +52,7 @@
             {
                 <div class="col">
                     <label for="seperator" class="font-weight-bold">@L["SeparatorLabel"]</label>
-                    <input id="seperator" type="text" class="form-control" placeholder="@L["SeparatorPlaceholder"]" @bind="SchemeFormModel.Seperator" />
+                    <input id="seperator" type="text" class="form-control" placeholder="@L["SeparatorPlaceholder"]" @bind="SchemeFormModel.Seperator" @bind:after="AfterSeperatorChange" />
                     <ValidationMessage For="@(() => SchemeFormModel.Seperator)" />
                 </div>
             }
@@ -175,5 +184,16 @@
         {
             errorService.ShowError(e.Message);
         }
+    }
+
+    private void AfterSeperatorChange()
+    {
+        if (string.IsNullOrEmpty(SchemeFormModel.Seperator))
+        {
+            SchemeFormModel.UseSeperator = false;
+            SchemeFormModel.Seperator = NumberingSchemeDto.DefaultSeparator;
+        }
+        else
+            SchemeFormModel.Seperator = SchemeFormModel.Seperator.Trim();
     }
 }
