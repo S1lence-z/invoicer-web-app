@@ -61,9 +61,15 @@ The application aims to provide functionality for creating, managing, and potent
 
 ## 3. Project Architecture Overview
 
-The solution follows a multi-project structure, currently organized as follows:
+### Database Structure
+![Database Structure](../assets/invocier-db-model.jpg)
 
-### 3.1. `Invoicer.Domain`
+### Layered Architecture
+
+The solution follows a multi-project structure, currently organized as follows:
+![Project Structure](../assets/invoicer-project-structure.jpg)
+
+#### 3.1. `Invoicer.Domain`
 
 *   **Purpose:** Contains the core business logic, models (entities), and domain-specific rules, independent of other layers.
 *   **Key Contents:**
@@ -71,7 +77,7 @@ The solution follows a multi-project structure, currently organized as follows:
     *   `Services/`: Contains domain services encapsulating logic that doesn't naturally belong to a single entity (e.g., `InvoiceNumberGenerator.cs`).
     *   `Interfaces/`: Defines interfaces for domain services or abstractions needed *within* the domain itself (e.g., `IInvoiceNumberGenerator.cs`).
 
-### 3.2. `Invoicer.Application`
+#### 3.2. `Invoicer.Application`
 
 *   **Purpose:** Intended to orchestrate application use cases/features. It defines interfaces for infrastructure concerns and contains application-specific logic like mapping.
 *   **Key Contents:**
@@ -79,7 +85,7 @@ The solution follows a multi-project structure, currently organized as follows:
     *   `Mappers/`: Contains logic (e.g., using AutoMapper profiles or manual mapping) to convert between Domain entities and Data Transfer Objects (DTOs) or other models (e.g., `InvoiceMapper.cs`).
     *   *(Future)* This layer should ideally contain Command/Query handlers, DTOs, validation logic, and application-specific exceptions after refactoring.
 
-### 3.3. `Invoicer.Backend`
+#### 3.3. `Invoicer.Backend`
 
 *   **Purpose:** Currently serves multiple roles:
     1.  **API Layer:** Exposes HTTP endpoints for the `Frontend` or other clients.
@@ -93,7 +99,7 @@ The solution follows a multi-project structure, currently organized as follows:
     *   `appsettings.json`: Configuration files.
     *   `Program.cs`: Application entry point and service configuration.
 
-### 3.4. `Invoicer.Frontend`
+#### 3.4. `Invoicer.Frontend`
 
 *   **Purpose:** The user interface layer, built using Blazor WebAssembly. It interacts with the `Backend` via HTTP API calls.
 *   **Key Contents:**
@@ -107,7 +113,7 @@ The solution follows a multi-project structure, currently organized as follows:
     *   `Validators/`: Custom validation attributes used in forms.
     *   `Program.cs`: Frontend application entry point and service configuration.
 
-### 3.5. `Invoicer.Shared`
+#### 3.5. `Invoicer.Shared`
 
 *   **Purpose:** A library for code shared across multiple projects, primarily `Frontend` and `Backend`.
 *   **Key Contents:**
