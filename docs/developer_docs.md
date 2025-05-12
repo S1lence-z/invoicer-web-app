@@ -62,12 +62,13 @@ The application aims to provide functionality for creating, managing, and potent
 ## 3. Project Architecture Overview
 
 ### Database Structure
-![Database Structure](../assets/invocier-db-model.jpg)
+![Database Structure](../assets/db_model.jpg)
 
 ### Layered Architecture
 
 The solution follows a multi-project structure, currently organized as follows:
-![Project Structure](../assets/invoicer-project-structure.jpg)
+
+![Project Structure](../assets/project_architecture.jpg)
 
 #### 3.1. `Invoicer.Domain`
 
