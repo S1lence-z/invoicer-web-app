@@ -20,9 +20,9 @@
     <hr/>
     @* CONTENT *@
     <div class="d-flex flex-row px-4 pb-4" style="height: calc(100% - 120px);">
-        @if (allEntities is null)
+        @if (isLoadingData)
         {
-            <p>@L["LoadingMessage"]</p>
+            <Spinner />
         }
         else if (allEntities.Count == 0)
         {
@@ -73,6 +73,7 @@
     private EntityDto? entityToEdit = null;
     private bool isAddingNewEntity = false;
     private bool isEditingEntity = false;
+    private bool isLoadingData = true;
 
     protected override async Task OnInitializedAsync() {
         await LoadEntities();
@@ -86,11 +87,17 @@
     private async Task LoadEntities() {
         try
         {
+            isLoadingData = true;
             allEntities = (await entityService.GetAllAsync()).ToList();
         }
         catch (Exception)
         {
+            allEntities = new List<EntityDto>();
             errorService.ShowError($"Failed to load entities");
+        }
+        finally
+        {
+            isLoadingData = false;
         }
     }
 

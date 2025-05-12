@@ -23,9 +23,9 @@
     <div class="d-flex flex-column pb-4">
         @* NUMBERING SCHEMES LIST *@
         <div class="d-flex flex-column overflow-auto px-4 gap-2">
-            @if (allNumberingSchemes is null)
+            @if (isLoadingData)
             {
-                <p>@L["LoadingMessage"]</p>
+                <Spinner />
             }
             else if (allNumberingSchemes.Count == 0)
             {
@@ -59,10 +59,11 @@
 </Modal>
 
 @code {
-    private IList<NumberingSchemeDto> allNumberingSchemes = new List<NumberingSchemeDto>();
+    private List<NumberingSchemeDto> allNumberingSchemes = null!;
     private NumberingSchemeDto? numberingSchemeToEdit = null;
     private bool isAddingNewNumberingScheme = false;
     private bool isEditingNumberingScheme = false;
+    private bool isLoadingData = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,11 +74,17 @@
     {
         try
         {
+            isLoadingData = true;
             allNumberingSchemes = (await numberingSchemeService.GetAllAsync()).ToList();
         }
         catch (Exception e)
         {
+            allNumberingSchemes = new();
             errorService.ShowError($"Failed to load numbering schemes. Error message: {e.Message}");
+        }
+        finally
+        {
+            isLoadingData = false;
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿@page "/invoicenumbering"
 @using Frontend.Api
 @using Frontend.Services
+@using Frontend.Components
 @using Microsoft.Extensions.Localization
 @using Shared.DTOs
 @using Shared.Extensions
@@ -20,17 +21,24 @@
     <div class="d-flex flex-column pb-4">
         @* NUMBERING SCHEMES LIST *@
         <div class="d-flex flex-column overflow-auto px-4 gap-2">
-            @if (allEntities is null || allNumberingSchemes is null) // Combined check for loading state
+            @if (isLoadingData)
+            {
+                <Spinner />
+            }
+            else if (allEntities is null || allNumberingSchemes is null)
             {
                 <p>@L["LoadingMessage"]</p>
             }
-            else if (allEntities.Count == 0)
+            else if (allEntities.Count == 0 || allNumberingSchemes.Count == 0)
             {
-                <p>@L["NoEntitiesFound"]</p>
-            }
-            else if (allNumberingSchemes.Count == 0)
-            {
-                <p>@L["NoNumberingSchemesFound"]</p>
+                @if (allEntities.Count == 0)
+                {
+                    <p>@L["NoEntitiesFound"]</p>
+                }
+                @if (allNumberingSchemes.Count == 0)
+                {
+                    <p>@L["NoNumberingSchemesFound"]</p>
+                }
             }
             else
             {
@@ -67,78 +75,83 @@
 @code {
     private IList<EntityDto> allEntities = new List<EntityDto>();
     private IList<NumberingSchemeDto> allNumberingSchemes = new List<NumberingSchemeDto>();
+    private bool isLoadingData = true;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadEntities();
-        await LoadNumberingSchemes();
+        await LoadData();
     }
 
     private async Task LoadData()
     {
         try
         {
+            isLoadingData = true;
             await LoadEntities();
             await LoadNumberingSchemes();
         }
-        catch (Exception e)
-        {
-            errorService.ShowError($"Failed to fetch necessary data. Error message: {e.Message}");
-        }
-    }
+       catch (Exception e)
+       {
+           errorService.ShowError($"Failed to fetch necessary data. Error message: {e.Message}");
+       }
+       finally
+       {
+           isLoadingData = false;
+       }
+   }
 
-    private async Task LoadEntities()
-    {
-        try
-        {
-            allEntities = (await entityService.GetAllAsync()).ToList();
-        }
-        catch (Exception)
-        {
-            allEntities = new List<EntityDto>();
-            throw;
-        }
-    }
+   private async Task LoadEntities()
+   {
+       try
+       {
+           allEntities = (await entityService.GetAllAsync()).ToList();
+       }
+       catch (Exception)
+       {
+           allEntities = new List<EntityDto>();
+           throw;
+       }
+   }
 
-    private async Task LoadNumberingSchemes()
-    {
-        try
-        {
-            allNumberingSchemes = (await numberingService.GetAllAsync()).ToList();
-        }
-        catch (Exception)
-        {
-            allNumberingSchemes = new List<NumberingSchemeDto>();
-            throw;
-        }
-    }
+   private async Task LoadNumberingSchemes()
+   {
+       try
+       {
+           allNumberingSchemes = (await numberingService.GetAllAsync()).ToList();
+       }
+       catch (Exception)
+       {
+           allNumberingSchemes = new List<NumberingSchemeDto>();
+           throw;
+       }
+   }
 
-    private async Task OnNumberingSchemeChange(EntityDto entity, int updatedNumberingSchemeId)
-    {
-        int previousNumberingSchemeId = entity.CurrentNumberingSchemeId;
-        EntityDto updatedEntity = entity with { CurrentNumberingSchemeId = updatedNumberingSchemeId };
-        bool updateStatus = await UpdateEntityNumberingScheme(updatedEntity.Id, updatedEntity);
-        if (updateStatus)
-        {
-            entity.CurrentNumberingSchemeId = updatedEntity.CurrentNumberingSchemeId;
-            StateHasChanged();
-        }
-        else
-            errorService.ShowError(L["UpdateFailed"]);
+   private async Task OnNumberingSchemeChange(EntityDto entity, int updatedNumberingSchemeId)
+   {
+       int previousNumberingSchemeId = entity.CurrentNumberingSchemeId;
+       EntityDto updatedEntity = entity with { CurrentNumberingSchemeId = updatedNumberingSchemeId };
+       bool updateStatus = await UpdateEntityNumberingScheme(updatedEntity.Id, updatedEntity);
+       if (updateStatus)
+       {
+           entity.CurrentNumberingSchemeId = updatedEntity.CurrentNumberingSchemeId;
+           StateHasChanged();
+       }
+       else
+           errorService.ShowError(L["UpdateFailed"]);
 
-    }
+   }
 
-    private async Task<bool> UpdateEntityNumberingScheme(int entityId, EntityDto updatedEntity)
-    {
-        try
-        {
-            await entityService.UpdateAsync(entityId, updatedEntity);
-            return true;
-        }
-        catch (Exception e)
-        {
-            errorService.ShowError(e.Message);
-            return false;
-        }
-    }
+   private async Task<bool> UpdateEntityNumberingScheme(int entityId, EntityDto updatedEntity)
+   {
+       try
+       {
+           await entityService.UpdateAsync(entityId, updatedEntity);
+           return true;
+       }
+       catch (Exception e)
+       {
+           errorService.ShowError(e.Message);
+           return false;
+       }
+   }
 }

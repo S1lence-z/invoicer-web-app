@@ -53,9 +53,9 @@
         </div>
         @* INVOICES LIST *@
         <div class="d-flex flex-column overflow-auto px-4 gap-2">
-            @if (shownInvoices is null)
+            @if (isLoadingData)
             {
-                <p>@L["LoadingMessage"]</p>
+                <Spinner />
             }
             else if (shownInvoices.Count == 0)
             {
@@ -94,16 +94,16 @@
 </Modal>
 
 @code {
-    private IList<InvoiceDto> allInvoices = new List<InvoiceDto>();
-    private IList<InvoiceDto> shownInvoices = new List<InvoiceDto>();
+    private List<InvoiceDto> allInvoices = null!;
+    private List<InvoiceDto> shownInvoices = new();
     private InvoiceDto? invoiceToEdit = null;
     private InvoiceDto? invoiceToPreview = null;
     private string searchTerm = string.Empty;
     private SearchType searchType = SearchType.InvoiceNumber;
-    // Modal related
     private bool isAddingNewInvoice = false;
     private bool isEditingInvoice = false;
     private bool isPreviewingInvoice = false;
+    private bool isLoadingData = false;
 
     private enum SearchType {
         InvoiceNumber,
@@ -120,12 +120,19 @@
     {
         try
         {
+            isLoadingData = true;
             allInvoices = (await invoiceService.GetAllAsync()).ToList();
             PopulateShownInvoices(allInvoices);
         }
         catch (Exception ex)
         {
+            allInvoices = new();
+            shownInvoices = new();
             errorService.ShowError($"Failed to load invoices. Error message: {ex.Message}");
+        }
+        finally
+        {
+            isLoadingData = false;
         }
     }
 
@@ -249,7 +256,6 @@
         isAddingNewInvoice = !isAddingNewInvoice;
         if(!isAddingNewInvoice)
             await LoadInvoices();
-        StateHasChanged();
     }
 
     private async Task HandleAddSubmit()
@@ -278,6 +284,5 @@
     private void ShowInvoicePreviewModal()
     {
         isPreviewingInvoice = !isPreviewingInvoice;
-        StateHasChanged();
     }
 }
