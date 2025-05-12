@@ -121,8 +121,8 @@ For a detailed breakdown, see the [Developer Documentation](./docs/developer_doc
 
 ## Documentation
 
-*   **User Documentation:** [Click here](./docs/user_docs.md) (Explains how to use the application features)
-*   **Developer Documentation:** [Click here](./docs/developer_docs.md) (Covers architecture, setup, code structure)
+*   **User Documentation:** [English](./docs/user_docs.md) (Explains how to use the application features)
+*   **Developer Documentation:** [English](./docs/developer_docs.md) (Covers architecture, setup, code structure)
 *   **Specification:** [English](./docs/specification_en.md) | [Czech](./docs/specification_cz.md)
 
 ## License
