@@ -53,6 +53,7 @@ namespace Backend.Services
 			if (udpatedSchemeDto.SequencePadding < 1)
 				throw new ArgumentException("Sequence padding must be at least 1");
 
+			bool wasDefault = existingScheme.IsDefault;
 			existingScheme.Prefix = udpatedSchemeDto.Prefix;
 			existingScheme.UseSeperator = udpatedSchemeDto.UseSeperator;
 			existingScheme.Seperator = udpatedSchemeDto.Seperator;
@@ -62,6 +63,9 @@ namespace Backend.Services
 			existingScheme.IncludeMonth = udpatedSchemeDto.IncludeMonth;
 			existingScheme.ResetFrequency = udpatedSchemeDto.ResetFrequency;
 			existingScheme.IsDefault = udpatedSchemeDto.IsDefault;
+
+			if (wasDefault && !existingScheme.IsDefault)
+				throw new InvalidOperationException("Cannot unset the default numbering scheme. You can set a different scheme as default.");
 
 			if (existingScheme.IsDefault)
 				await SetDefaultSchemeAsync(existingScheme);

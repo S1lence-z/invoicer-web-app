@@ -81,6 +81,14 @@ namespace Backend.Controllers
 				NumberingSchemeDto? existingScheme = await numberingService.UpdateAsync(id, scheme);
 				return Ok(existingScheme);
 			}
+			catch (ArgumentException e)
+			{
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
+			}
+			catch (InvalidOperationException e)
+			{
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
+			}
 			catch (KeyNotFoundException e)
 			{
 				return NotFound(ApiErrorResponse.Create("Invoice numbering scheme not found", e.Message, 404));
