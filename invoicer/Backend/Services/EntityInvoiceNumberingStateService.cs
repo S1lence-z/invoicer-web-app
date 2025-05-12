@@ -89,7 +89,7 @@ namespace Backend.Services
 			}
 		}
 
-		private async Task HandleDeletingAsync(EntityInvoiceNumberingSchemeState state, int entityId, Invoice newInvoice, NumberingScheme numberingScheme)
+		private async Task HandleDeletingAsync(EntityInvoiceNumberingSchemeState state, int entityId, Invoice newInvoice)
 		{
 			// Find the last invoice for this entity excluding the one being deleted
 			Invoice? lastInvoice = await context.Invoice
@@ -163,8 +163,7 @@ namespace Backend.Services
 					await HandleCreatingOrUpdatingAsync(state, isUsingUserDefinedState, newInvoice, entityNumberingScheme);
 					break;
 				case EntityInvoiceNumberingStateUpdateStatus.Deleting:
-					Invoice invoiceBeingDeleted = newInvoice;
-					await HandleDeletingAsync(state, entityId, invoiceBeingDeleted, invoiceNumberingScheme);
+					await HandleDeletingAsync(state, entityId, newInvoice);
 					break;
 				default:
 					throw new ArgumentException($"Invalid update status: {updateStatus}");
