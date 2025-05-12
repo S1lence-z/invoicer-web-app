@@ -103,6 +103,10 @@ namespace Backend.Controllers
 				}
 				return Ok($"Entity with ID {id} was deleted.");
 			}
+			catch (InvalidOperationException e)
+			{
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
+			}
 			catch (Exception e)
 			{
 				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));

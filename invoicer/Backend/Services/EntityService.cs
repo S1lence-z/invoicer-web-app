@@ -2,6 +2,7 @@
 using Backend.Database;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Shared.DTOs;
 using Shared.ServiceInterfaces;
 
@@ -99,9 +100,15 @@ namespace Backend.Services
 			Entity? entity = await context.Entity
 			   .Include(e => e.BankAccount)
 			   .Include(e => e.Address)
+			   .Include(e => e.SoldInvoices)
 			   .FirstOrDefaultAsync(e => e.Id == id);
+
 			if (entity is null)
 				return false;
+
+			if (entity.SoldInvoices.Count > 0)
+				throw new InvalidOperationException($"{entity.Name} cannot be deleted because it has existing invoices.");
+
 			context.Entity.Remove(entity);
 			context.Address.Remove(entity.Address!);
 			context.BankAccount.Remove(entity.BankAccount!);
