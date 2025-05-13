@@ -4,8 +4,10 @@
 @using Microsoft.Extensions.Localization;
 @using Shared.DTOs
 @using Shared.ServiceInterfaces
+@using System.Net
 @inject IEntityService entityService;
 @inject ErrorService errorService;
+@inject NavigationManager navigationManager;
 @inject IStringLocalizer<Entities> L;
 
 @* PAGE CONTAINER *@
@@ -13,7 +15,7 @@
     @* HEADER *@
     <div class="d-flex flex-row justify-content-between align-content-center px-4 pt-4">
         <h3>@L["PageTitle"]</h3>
-        <button class="btn btn-primary" @onclick="ShowNewEntityModal">
+        <button class="btn btn-primary" @onclick="AddNewEntity">
             @L["AddNewEntityButton"]
         </button>
     </div>
@@ -52,27 +54,9 @@
     </div>
 </div>
 
-@* ADD NEW ENTITY MODAL *@
-<Modal Title="@L["AddModalTitle"]" IsVisible="isAddingNewEntity" OnClose="ShowNewEntityModal">
-    @if (isAddingNewEntity)
-    {
-        <EntityForm SubmitCallback="HandleAddSubmit" isActive="isAddingNewEntity" />
-    }
-</Modal>
-@* EDIT ENTITY MODAL *@
-<Modal Title="@L["EditModalTitle"]" IsVisible="isEditingEntity" OnClose="ShowEditEntityModal">
-    @if (isEditingEntity && entityToEdit is not null)
-    {
-        <EntityForm SubmitCallback="HandleEditSubmit" EntityInstance="entityToEdit" isActive="isEditingEntity" />
-    }
-</Modal>
-
 @code {
-    private IList<EntityDto> allEntities = new List<EntityDto>();
+    private List<EntityDto> allEntities = new();
     private EntityDto? selectedEntity = null;
-    private EntityDto? entityToEdit = null;
-    private bool isAddingNewEntity = false;
-    private bool isEditingEntity = false;
     private bool isLoadingData = true;
 
     protected override async Task OnInitializedAsync() {
@@ -90,10 +74,10 @@
             isLoadingData = true;
             allEntities = (await entityService.GetAllAsync()).ToList();
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            allEntities = new List<EntityDto>();
-            errorService.ShowError($"Failed to load entities");
+            allEntities = new();
+            errorService.ShowError($"Failed to load entities {e.Message}");
         }
         finally
         {
@@ -117,48 +101,26 @@
         {
             var status = await entityService.DeleteAsync(entityToDelete.Id);
             if (status) {
-                selectedEntity = null;
+                if (selectedEntity?.Id == entityToDelete.Id)
+                    selectedEntity = null;
                 await LoadEntities();
             }
-        } catch (Exception ex)
+        } 
+        catch (Exception ex)
         {
             errorService.ShowError(ex.Message);
         }
     }
 
-    private async Task EditEntity(EntityDto entityToEdit)
+    private void EditEntity(EntityDto entityToEdit)
     {
-        this.entityToEdit = entityToEdit;
-        await ShowEditEntityModal();
+        string currentUrl = navigationManager.Uri;
+        string encodedReturnUrl = WebUtility.UrlEncode(currentUrl);
+        navigationManager.NavigateTo($"/entities/edit/{entityToEdit.Id}?returnUrl={encodedReturnUrl}");
     }
 
-    private async Task ShowNewEntityModal()
+    private void AddNewEntity()
     {
-        isAddingNewEntity = !isAddingNewEntity;
-        if (!isAddingNewEntity)
-            await LoadEntities();
-    }
-
-    private async Task ShowEditEntityModal() {
-        isEditingEntity = !isEditingEntity;
-        if (!isEditingEntity)
-        {
-            entityToEdit = null;
-            await LoadEntities();
-        }
-    }
-
-    private async Task HandleAddSubmit()
-    {
-        isAddingNewEntity = false;
-        await LoadEntities();
-    }
-
-    private async Task HandleEditSubmit()
-    {
-        isEditingEntity = false;
-        entityToEdit = null;
-        await LoadEntities();
-        StateHasChanged();
+        navigationManager.NavigateTo("/entities/add");
     }
 }

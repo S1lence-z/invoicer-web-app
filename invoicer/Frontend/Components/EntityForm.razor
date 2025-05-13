@@ -109,7 +109,7 @@
 
 @code {
     // Parameters
-    [Parameter] public EventCallback SubmitCallback { get; set; }
+    [Parameter] public EventCallback OnSubmitCallback { get; set; }
     [Parameter] public EntityDto? EntityInstance { get; set; } = null;
     [Parameter, EditorRequired] public bool isActive { get; set; }
 
@@ -118,7 +118,7 @@
     private string aresApiErrorMessage { get; set; } = string.Empty;
 
     // Entity Form Model
-    private EntityFormModel entityFormModel { get; set; } = new EntityFormModel();
+    private EntityFormModel entityFormModel { get; set; } = new();
 
     // Methods
     protected override void OnParametersSet()
@@ -192,7 +192,7 @@
                 await SubmitNewEntity();
             else
                 await SubmitEditEntity();
-            await SubmitCallback.InvokeAsync();
+            await OnSubmitCallback.InvokeAsync();
             ResetForm();
         }
         catch (Exception e)

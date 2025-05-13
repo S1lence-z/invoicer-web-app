@@ -1,0 +1,101 @@
+﻿@page "/entities/add"
+@page "/entities/edit/{entityId:int}"
+
+@using Frontend.Components
+@using Frontend.Services
+@using Shared.DTOs
+@using Shared.ServiceInterfaces
+@using Microsoft.Extensions.Localization
+@using static System.Web.HttpUtility
+
+@inject IEntityService entityService
+@inject ErrorService errorService
+@inject NavigationManager navigationManager
+@inject IStringLocalizer<EntitiesEdit> L
+
+<div class="w-75 mx-auto">
+    @if (IsLoadingData)
+    {
+        <Spinner />
+    }
+    else if (LoadingFailed)
+    {
+        <div class="alert alert-danger">@L["LoadEntityFailedError"]</div>
+        <button class="btn btn-secondary" @onclick="NavigateBack">@L["BackButton"]</button>
+    }
+    else
+    {
+        @if (IsEditingMode)
+        {
+            <h3>@L["EditEntityTitle"]</h3>
+            <EntityForm OnSubmitCallback="OnEntityFormSubmit" EntityInstance="EntityInstance" isActive="IsEditingMode" />
+        }
+        else
+        {
+            <h3>@L["AddNewEntityTitle"]</h3>
+            <EntityForm OnSubmitCallback="OnEntityFormSubmit" isActive="!IsEditingMode" />
+        } 
+        <button class="btn btn-outline-secondary mt-3" @onclick="NavigateBack" disabled="@(IsLoadingData)">
+            @L["BackButton"]
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter] 
+    public int? EntityId { get; set; } = null;
+
+    private EntityDto? EntityInstance { get; set; } = null;
+    private bool IsLoadingData { get; set; } = true;
+    private bool LoadingFailed { get; set; } = false;
+    private string ReturnUrl { get; set; } = "/entities";
+
+    private bool IsEditingMode => EntityId.HasValue;
+
+    protected override void OnInitialized()
+    {
+        Uri uri = new(navigationManager.Uri);
+        string? query = uri.Query;
+        if (query.Contains("returnUrl"))
+        {
+            var queryParams = ParseQueryString(query);
+            ReturnUrl = queryParams["returnUrl"] ?? "/entities";
+        }
+        base.OnInitialized();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsLoadingData = true;
+        LoadingFailed = false;
+        try
+        {
+            if (IsEditingMode)
+            {
+                EntityInstance = await entityService.GetByIdAsync(EntityId!.Value);
+            }
+            else
+            {
+                EntityInstance = new();
+            }
+        } 
+        catch (Exception)
+        {
+            LoadingFailed = true;
+        }
+        finally
+        {
+            IsLoadingData = false;
+        }
+    }
+
+    private void OnEntityFormSubmit()
+    {
+        navigationManager.NavigateTo(ReturnUrl);
+    }
+
+    private void NavigateBack()
+    {
+        navigationManager.NavigateTo(ReturnUrl);
+    }
+}
