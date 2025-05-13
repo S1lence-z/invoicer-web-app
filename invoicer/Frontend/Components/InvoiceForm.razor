@@ -6,13 +6,17 @@
 @using Shared.Enums
 @using Shared.Extensions
 @using Shared.ServiceInterfaces
+@using System.Net
+@using static System.Web.HttpUtility
+
 @inject IInvoiceService invoiceService
 @inject IEntityService entityService
 @inject ErrorService errorService
 @inject LoadingService loadingService
+@inject NavigationManager navigationManager
 @inject IStringLocalizer<InvoiceForm> L
 
-<EditForm Model="@invoiceFormModel" OnValidSubmit="SubmitForm">
+<EditForm Model="@InvoiceFormModel" OnValidSubmit="SubmitForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -22,8 +26,8 @@
                 <div class="d-flex flex-column">
                     <label for="invoice-number" class="font-weight-bold">@L["InvoiceNumberLabel"]</label>
                     <input type="text" class="form-control" id="invoice-number"
-                    value="@((isFetchingNextInvoiceNumber ? L["LoadingMessage"] : invoiceFormModel.InvoiceNumber))"
-                    @oninput="e => invoiceFormModel.InvoiceNumber = e.Value?.ToString()!"
+                    value="@((isFetchingNextInvoiceNumber ? L["LoadingMessage"] : InvoiceFormModel.InvoiceNumber))"
+                    @oninput="e => InvoiceFormModel.InvoiceNumber = e.Value?.ToString()!"
                     disabled="@(!isCustomInvoiceNumber)" />
                 </div>
                 <button type="button" class="btn btn-outline-secondary align-self-end" @onclick="ToggleCustomInvoiceNumber">
@@ -37,107 +41,113 @@
                     }
                 </button>
             </div>
-            <ValidationMessage For="@(() => invoiceFormModel.InvoiceNumber)" />
+            <ValidationMessage For="@(() => InvoiceFormModel.InvoiceNumber)" />
         </div>
     </div>
 
     <div class="row mb-4">
         <div class="col">
             <label for="issue-date" class="font-weight-bold">@L["IssueDateLabel"]</label>
-            <input type="date" class="form-control" id="issue-date" @bind="invoiceFormModel.IssueDate" />
-            <ValidationMessage For="@(() => invoiceFormModel.IssueDate)" />
+            <input type="date" class="form-control" id="issue-date" @bind="InvoiceFormModel.IssueDate" />
+            <ValidationMessage For="@(() => InvoiceFormModel.IssueDate)" />
         </div>
         <div class="col">
             <label for="due-date" class="font-weight-bold">@L["DueDateLabel"]</label>
-            <input type="date" class="form-control" id="due-date" @bind="invoiceFormModel.DueDate" />
-            <ValidationMessage For="@(() => invoiceFormModel.DueDate)" />
+            <input type="date" class="form-control" id="due-date" @bind="InvoiceFormModel.DueDate" />
+            <ValidationMessage For="@(() => InvoiceFormModel.DueDate)" />
         </div>
         <div class="col">
             <label for="vate-date" class="font-weight-bold">@L["VatDateLabel"]</label>
-            <input type="date" class="form-control" id="vat-date" @bind="invoiceFormModel.VatDate" />
-            <ValidationMessage For="@(() => invoiceFormModel.VatDate)" />
+            <input type="date" class="form-control" id="vat-date" @bind="InvoiceFormModel.VatDate" />
+            <ValidationMessage For="@(() => InvoiceFormModel.VatDate)" />
         </div>
     </div>
 
     <div class="row mb-4">
         <div class="col">
             <label for="seller" class="font-weight-bold">@L["SellerLabel"]</label>
-            <select class="form-control" id="seller" @bind="invoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind" disabled="@(InvoiceInstance is not null)">
+            <select class="form-control" id="seller" @bind="InvoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind" disabled="@(InvoiceInstance is not null)">
                 <option value="0">@L["SellerSelectOption"]</option>
-                @foreach (var entity in allEntities)
+                @foreach (var entity in AllEntities)
                 {
                     <option value="@entity.Id">@entity.Name</option>
                 }
             </select>
-            <ValidationMessage For="@(() => invoiceFormModel.SellerId)" />
+            <ValidationMessage For="@(() => InvoiceFormModel.SellerId)" />
         </div>
-        <div class="col">
-            <label for="buyer" class="font-weight-bold">@L["BuyerLabel"]</label>
-            <select class="form-control" id="buyer" @bind="invoiceFormModel.BuyerId">
-                <option value="0">@L["BuyerSelectOption"]</option>
-                @foreach (var entity in allBuyers)
-                {
-                    <option value="@entity.Id">@entity.Name</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => invoiceFormModel.BuyerId)" />
+        <div class="col d-flex flex-row align-items-end gap-2">
+            <div class="flex-grow-1">
+                <label for="buyer" class="font-weight-bold">@L["BuyerLabel"]</label>
+                <select class="form-control" id="buyer" @bind="InvoiceFormModel.BuyerId">
+                    <option value="0">@L["BuyerSelectOption"]</option>
+                    @foreach (var entity in AllBuyers)
+                    {
+                        <option value="@entity.Id">@entity.Name</option>
+                    }
+                </select>
+                <ValidationMessage For="@(() => InvoiceFormModel.BuyerId)" />
+            </div>
+            @if (InvoiceInstance is null)
+            {
+                <button class="btn btn-success" @onclick="AddNewEntity">+</button>
+            }
         </div>
     </div>
 
     <div class="row mb-4">
         <div class="col">
             <label for="currency" class="font-weight-bold">@L["CurrencyLabel"]</label>
-            <select class="form-control" id="currency" @bind="invoiceFormModel.Currency">
+            <select class="form-control" id="currency" @bind="InvoiceFormModel.Currency">
                 @foreach (Currency value in Enum.GetValues(typeof(Currency)))
                 {
                     <option value="@value">@value</option>
                 }
             </select>
-            <ValidationMessage For="@(() => invoiceFormModel.Currency)" />
+            <ValidationMessage For="@(() => InvoiceFormModel.Currency)" />
         </div>
         <div class="col">
             <label for="payment-method" class="font-weight-bold">@L["PaymentMethodLabel"]</label>
-            <select class="form-control" id="payment-method" @bind="invoiceFormModel.PaymentMethod">
+            <select class="form-control" id="payment-method" @bind="InvoiceFormModel.PaymentMethod">
                 @foreach (PaymentMethod value in Enum.GetValues(typeof(PaymentMethod)))
                 {
                     <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                 }
             </select>
-            <ValidationMessage For="@(() => invoiceFormModel.PaymentMethod)" />
+            <ValidationMessage For="@(() => InvoiceFormModel.PaymentMethod)" />
         </div>
         <div class="col">
             <label for="delivery-method" class="font-weight-bold">@L["DeliveryMethodLabel"]</label>
-            <select class="form-control" id="delivery-method" @bind="invoiceFormModel.DeliveryMethod">
+            <select class="form-control" id="delivery-method" @bind="InvoiceFormModel.DeliveryMethod">
                 @foreach (DeliveryMethod value in Enum.GetValues(typeof(DeliveryMethod)))
                 {
                     <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                 }
             </select>
-            <ValidationMessage For="@(() => invoiceFormModel.DeliveryMethod)" />
+            <ValidationMessage For="@(() => InvoiceFormModel.DeliveryMethod)" />
         </div>
     </div>
 
     <div class="row mb-4">
         <div class="col">
             <label for="status" class="font-weight-bold">@L["StatusLabel"]</label>
-            <select class="form-control" id="status" @bind="invoiceFormModel.Status">
+            <select class="form-control" id="status" @bind="InvoiceFormModel.Status">
                 @foreach (InvoiceStatus value in Enum.GetValues(typeof(InvoiceStatus)))
                 {
                     <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                 }
             </select>
-            <ValidationMessage For="@(() => invoiceFormModel.Status)" />
+            <ValidationMessage For="@(() => InvoiceFormModel.Status)" />
         </div>
     </div>
 
     <hr class="my-4" />
     <h4>@L["InvoiceItemsHeader"]</h4>
-    @if (!invoiceFormModel.Items.Any())
+    @if (!InvoiceFormModel.Items.Any())
     {
         <p class="text-muted">@L["NoItemsAddedMessage"]</p>
-        <ValidationMessage For="@(() => invoiceFormModel.Items)" />
+        <ValidationMessage For="@(() => InvoiceFormModel.Items)" />
     }
-    @foreach (var item in invoiceFormModel.Items)
+    @foreach (var item in InvoiceFormModel.Items)
     {
         var itemUniqueSuffix = item.GetHashCode();
         <div class="row g-2 mb-3 pb-3 border-bottom align-items-start">
@@ -188,41 +198,46 @@
 
 @code {
     // Parameters
-    [Parameter] public EventCallback SubmitCallback { get; set; }
     [Parameter] public InvoiceDto? InvoiceInstance { get; set; } = null;
-    [Parameter, EditorRequired] public bool isActive { get; set; }
+    [Parameter] public EventCallback OnSubmitCallback { get; set; }
+    [Parameter, EditorRequired] public bool IsActive { get; set; }
+    [Parameter, EditorRequired] public EventCallback AddNewEntityCallback { get; set; }
 
     // Form Models
-    private InvoiceFormModel invoiceFormModel { get; set; } = new();
-    private IList<EntityDto> allEntities = new List<EntityDto>();
-    private IList<EntityDto> allBuyers = new List<EntityDto>();
+    private InvoiceFormModel InvoiceFormModel { get; set; } = new();
+    private IList<EntityDto> AllEntities = new List<EntityDto>();
+    private IList<EntityDto> AllBuyers = new List<EntityDto>();
 
     // Variables
     private bool isCustomInvoiceNumber = false;
     private bool isFetchingNextInvoiceNumber = false;
-    private string defaultFetchedInvoiceNumber = string.Empty;
+    private string defaultFetchedInvoiceNumber { get; set; } = string.Empty;
 
     // Constants
     private const string LOADING_MESSAGE = "Loading...";
 
-    // Methods
     protected override void OnParametersSet()
     {
         if (InvoiceInstance is not null)
         {
-            invoiceFormModel = InvoiceFormModel.FromInvoice(InvoiceInstance);
+            InvoiceFormModel = InvoiceFormModel.FromInvoice(InvoiceInstance);
             defaultFetchedInvoiceNumber = InvoiceInstance.InvoiceNumber;
         }
-        if (!isActive)
+        if (!IsActive)
             ResetForm();
     }
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadEntities();
+    }
+
+    private async Task LoadEntities()
+    {
         try
         {
-            allEntities = await entityService.GetAllAsync();
-            allBuyers = allEntities.Where(e => e.Id != invoiceFormModel.SellerId).ToList();
+            AllEntities = await entityService.GetAllAsync();
+            AllBuyers = AllEntities.Where(e => e.Id != InvoiceFormModel.SellerId).ToList();
         }
         catch (Exception e)
         {
@@ -230,12 +245,26 @@
         }
     }
 
+    private void UpdateBuyers(int newSellerId)
+    {
+        int buyerIdBeforeSellerChange = InvoiceFormModel.BuyerId;
+
+        AllBuyers = AllEntities
+            .Where(e => e.Id != newSellerId)
+            .ToList();
+
+        if (buyerIdBeforeSellerChange == 0)
+            InvoiceFormModel.BuyerId = 0;
+        else if (buyerIdBeforeSellerChange == newSellerId || !AllBuyers.Any(b => b.Id == buyerIdBeforeSellerChange))
+            InvoiceFormModel.BuyerId = AllBuyers.FirstOrDefault()?.Id ?? 0;
+    }
+
     private void ToggleCustomInvoiceNumber()
     {
         isCustomInvoiceNumber = !isCustomInvoiceNumber;
-        invoiceFormModel.IsCustomInvoiceNumber = isCustomInvoiceNumber;
+        InvoiceFormModel.IsCustomInvoiceNumber = isCustomInvoiceNumber;
         if (!isCustomInvoiceNumber)
-            invoiceFormModel.InvoiceNumber = defaultFetchedInvoiceNumber;
+            InvoiceFormModel.InvoiceNumber = defaultFetchedInvoiceNumber;
     }
 
     private async Task SubmitForm() {
@@ -246,7 +275,7 @@
                 await SubmitNewInvoice();
             else
                 await SubmitEditInvoice();
-            await SubmitCallback.InvokeAsync();
+            await OnSubmitCallback.InvokeAsync();
             ResetForm();
         } 
         catch (Exception e) 
@@ -263,18 +292,18 @@
     {
         InvoiceDto newInvoice = new()
             {
-                InvoiceNumber = invoiceFormModel.InvoiceNumber,
-                IsCustomInvoiceNumber = invoiceFormModel.IsCustomInvoiceNumber,
-                IssueDate = invoiceFormModel.IssueDate,
-                DueDate = invoiceFormModel.DueDate,
-                VatDate = invoiceFormModel.VatDate,
-                Status = invoiceFormModel.Status,
-                SellerId = invoiceFormModel.SellerId,
-                BuyerId = invoiceFormModel.BuyerId,
-                Currency = invoiceFormModel.Currency,
-                PaymentMethod = invoiceFormModel.PaymentMethod,
-                DeliveryMethod = invoiceFormModel.DeliveryMethod,
-                Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
+                InvoiceNumber = InvoiceFormModel.InvoiceNumber,
+                IsCustomInvoiceNumber = InvoiceFormModel.IsCustomInvoiceNumber,
+                IssueDate = InvoiceFormModel.IssueDate,
+                DueDate = InvoiceFormModel.DueDate,
+                VatDate = InvoiceFormModel.VatDate,
+                Status = InvoiceFormModel.Status,
+                SellerId = InvoiceFormModel.SellerId,
+                BuyerId = InvoiceFormModel.BuyerId,
+                Currency = InvoiceFormModel.Currency,
+                PaymentMethod = InvoiceFormModel.PaymentMethod,
+                DeliveryMethod = InvoiceFormModel.DeliveryMethod,
+                Items = InvoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
 
             };
         InvoiceDto createdInvoice = await invoiceService.CreateAsync(newInvoice);
@@ -286,18 +315,18 @@
             return;
         InvoiceDto editedInvoice = InvoiceInstance with
         {
-            InvoiceNumber = invoiceFormModel.InvoiceNumber,
-            IsCustomInvoiceNumber = invoiceFormModel.IsCustomInvoiceNumber,
-            IssueDate = invoiceFormModel.IssueDate,
-            DueDate = invoiceFormModel.DueDate,
-            VatDate = invoiceFormModel.VatDate,
-            Status = invoiceFormModel.Status,
-            SellerId = invoiceFormModel.SellerId,
-            BuyerId = invoiceFormModel.BuyerId,
-            Currency = invoiceFormModel.Currency,
-            PaymentMethod = invoiceFormModel.PaymentMethod,
-            DeliveryMethod = invoiceFormModel.DeliveryMethod,
-            Items = invoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
+            InvoiceNumber = InvoiceFormModel.InvoiceNumber,
+            IsCustomInvoiceNumber = InvoiceFormModel.IsCustomInvoiceNumber,
+            IssueDate = InvoiceFormModel.IssueDate,
+            DueDate = InvoiceFormModel.DueDate,
+            VatDate = InvoiceFormModel.VatDate,
+            Status = InvoiceFormModel.Status,
+            SellerId = InvoiceFormModel.SellerId,
+            BuyerId = InvoiceFormModel.BuyerId,
+            Currency = InvoiceFormModel.Currency,
+            PaymentMethod = InvoiceFormModel.PaymentMethod,
+            DeliveryMethod = InvoiceFormModel.DeliveryMethod,
+            Items = InvoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
         };
         InvoiceDto updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
     }
@@ -306,44 +335,28 @@
     {
         isCustomInvoiceNumber = false;
         defaultFetchedInvoiceNumber = string.Empty;
-        invoiceFormModel = new();
+        InvoiceFormModel = new();
     }
 
     private void AddInvoiceItem()
     {
-        invoiceFormModel.Items.Add(new());
+        InvoiceFormModel.Items.Add(new());
     }
 
     private void RemoveInvoiceItem(InvoiceItemFormModel item)
     {
-        invoiceFormModel.Items.Remove(item);
+        InvoiceFormModel.Items.Remove(item);
     }
 
     private async Task OnChosenSellerChangedAfterBind()
     {
-        int sellerId = invoiceFormModel.SellerId;
+        int sellerId = InvoiceFormModel.SellerId;
         InvoiceDto? newInvoice = await GetNewOrUpdatedInvoiceInitialData(sellerId);
         if (newInvoice is null)
             return;
         defaultFetchedInvoiceNumber = newInvoice.InvoiceNumber;
-        invoiceFormModel.InvoiceNumber = defaultFetchedInvoiceNumber;
+        InvoiceFormModel.InvoiceNumber = defaultFetchedInvoiceNumber;
         UpdateBuyers(sellerId);
-    }
-
-    private void UpdateBuyers(int newSellerId)
-    {
-        // Store the buyer ID that was selected *before* this seller change.
-        int buyerIdBeforeSellerChange = invoiceFormModel.BuyerId;
-
-        // Update the list of available buyers for the dropdown, excluding the new seller.
-        allBuyers = allEntities
-            .Where(e => e.Id != newSellerId)
-            .ToList();
-
-        if (buyerIdBeforeSellerChange == 0)
-            invoiceFormModel.BuyerId = 0;
-        else if (buyerIdBeforeSellerChange == newSellerId || !allBuyers.Any(b => b.Id == buyerIdBeforeSellerChange))
-            invoiceFormModel.BuyerId = allBuyers.FirstOrDefault()?.Id ?? 0;
     }
 
     private async Task<InvoiceDto?> GetNewOrUpdatedInvoiceInitialData(int sellerId)
@@ -369,5 +382,11 @@
     private void SetVatRate(InvoiceItemFormModel item, decimal ratePercentage)
     {
         item.VatRate = ratePercentage / 100.0m;
+    }
+
+    private async Task AddNewEntity()
+    {
+        await AddNewEntityCallback.InvokeAsync();
+        await LoadEntities();
     }
 }

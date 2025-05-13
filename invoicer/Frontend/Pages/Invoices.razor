@@ -7,8 +7,10 @@
 @using Shared.DTOs
 @using Shared.Interfaces
 @using Shared.ServiceInterfaces
+@using System.Net
 @inject IInvoiceService invoiceService
 @inject IJSRuntime jsRuntime
+@inject NavigationManager navigationManager
 @inject ErrorService errorService
 @inject IStringLocalizer<Invoices> L
 
@@ -17,7 +19,7 @@
     @* HEADER *@
     <div class="d-flex justify-content-between align-items-center px-4 pt-4">
         <h3>@L["PageTitle"]</h3>
-        <button class="btn btn-primary" @onclick="ShowAddInvoiceModal">
+        <button class="btn btn-primary" @onclick="AddNewInvoice">
             @L["AddNewInvoiceButton"]
         </button>
     </div>
@@ -71,22 +73,9 @@
         </div>
     </div>
 </div>
-@* ADD NEW INVOICE MODAL *@
-<Modal Title="@L["AddModalTitle"]" IsVisible="isAddingNewInvoice" OnClose="ShowAddInvoiceModal" Size="xl">
-    @if (isAddingNewInvoice)
-    {
-        <InvoiceForm SubmitCallback="HandleAddSubmit" isActive="isAddingNewInvoice" />
-    }
-</Modal>
-@* EDIT INVOICE MODAL *@
-<Modal Title="@L["EditModalTitle"]" IsVisible="isEditingInvoice" OnClose="ShowEditInvoiceModal" Size="xl">
-    @if (invoiceToEdit is not null)
-    {
-        <InvoiceForm SubmitCallback="HandleEditSubmit" isActive="isEditingInvoice" InvoiceInstance="invoiceToEdit" />
-    }
-</Modal>
+
 @* PREVIEW MODAL *@
-<Modal Title="@L["PreviewModalTitle"]" IsVisible="isPreviewingInvoice" OnClose="ShowInvoicePreviewModal">
+<Modal Title="@L["PreviewModalTitle"]" IsVisible="isPreviewingInvoice" OnClose="PreviewInvoice">
     @if (invoiceToPreview is not null)
     {
         <InvoicePreview Invoice="invoiceToPreview" />
@@ -96,16 +85,14 @@
 @code {
     private List<InvoiceDto> allInvoices = null!;
     private List<InvoiceDto> shownInvoices = new();
-    private InvoiceDto? invoiceToEdit = null;
     private InvoiceDto? invoiceToPreview = null;
     private string searchTerm = string.Empty;
     private SearchType searchType = SearchType.InvoiceNumber;
-    private bool isAddingNewInvoice = false;
-    private bool isEditingInvoice = false;
     private bool isPreviewingInvoice = false;
     private bool isLoadingData = false;
 
-    private enum SearchType {
+    private enum SearchType 
+    {
         InvoiceNumber,
         Buyer,
         Seller
@@ -118,9 +105,9 @@
 
     private async Task LoadInvoices()
     {
+        isLoadingData = true;
         try
         {
-            isLoadingData = true;
             allInvoices = (await invoiceService.GetAllAsync()).ToList();
             PopulateShownInvoices(allInvoices);
         }
@@ -174,14 +161,19 @@
     private void ShowInvoicePreview(InvoiceDto invToShow)
     {
         invoiceToPreview = invToShow;
-        ShowInvoicePreviewModal();
+        PreviewInvoice();
     }
 
-    private async Task EditInvoice(InvoiceDto invToEdit)
+    private void AddNewInvoice()
     {
-        invoiceToEdit = invToEdit;
-        await ShowEditInvoiceModal();
-        StateHasChanged();
+        navigationManager.NavigateTo("/invoice/add");
+    }
+
+    private void EditInvoice(InvoiceDto invToEdit)
+    {
+        string currentUrl = navigationManager.Uri;
+        string encodedReturnUrl = WebUtility.UrlEncode(currentUrl);
+        navigationManager.NavigateTo($"/invoice/edit/{invToEdit.Id}?returnUrl={encodedReturnUrl}");
     }
 
     private async Task DeleteInvoice(InvoiceDto invToDelete)
@@ -190,14 +182,17 @@
         {
             bool status = await invoiceService.DeleteAsync(invToDelete.Id);
             if (status)
-            {
                 await LoadInvoices();
-            }
         }
         catch (Exception ex)
         {
             errorService.ShowError(ex.Message);
         }
+    }
+
+    private void PreviewInvoice()
+    {
+        isPreviewingInvoice = !isPreviewingInvoice;
     }
 
     private async Task<bool> UpdateInvoiceStatus(InvoiceDto invToUpdate)
@@ -209,7 +204,7 @@
             if (index != -1)
                 shownInvoices[index].Status = updatedInvoice.Status;
             else
-                throw new Exception("Invoice not found in the list.");
+                throw new KeyNotFoundException("Invoice not found in the list.");
             return true;
         }
         catch (Exception e)
@@ -249,40 +244,5 @@
         {
             errorService.ShowError(ex.Message);
         }
-    }
-
-    private async Task ShowAddInvoiceModal()
-    {
-        isAddingNewInvoice = !isAddingNewInvoice;
-        if(!isAddingNewInvoice)
-            await LoadInvoices();
-    }
-
-    private async Task HandleAddSubmit()
-    {
-        isAddingNewInvoice = false;
-        await LoadInvoices();
-    }
-
-    private async Task HandleEditSubmit()
-    {
-        isEditingInvoice = false;
-        invoiceToEdit = null;
-        await LoadInvoices();
-    }
-
-    private async Task ShowEditInvoiceModal()
-    {
-        isEditingInvoice = !isEditingInvoice;
-        if (!isEditingInvoice)
-        {
-            invoiceToEdit = null;
-            await LoadInvoices();
-        }
-    }
-
-    private void ShowInvoicePreviewModal()
-    {
-        isPreviewingInvoice = !isPreviewingInvoice;
     }
 }

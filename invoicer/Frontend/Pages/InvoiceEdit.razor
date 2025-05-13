@@ -1,0 +1,108 @@
+﻿@page "/invoice/add"
+@page "/invoice/edit/{invoiceId:int}"
+
+@using Frontend.Components
+@using Frontend.Services
+@using Shared.DTOs
+@using Shared.ServiceInterfaces
+@using Microsoft.Extensions.Localization
+@using static System.Web.HttpUtility
+
+@inject IInvoiceService invoiceService
+@inject ErrorService errorService
+@inject NavigationManager navigationManager
+@inject IStringLocalizer<InvoiceEdit> L
+
+<div class="w-75 mx-auto">
+    @if (IsLoadingData)
+    {
+        <Spinner />
+    }
+    else if (LoadingFailed)
+    {
+        <div class="alert alert-danger">@L["LoadInvoiceFailedError"]</div>
+        <button class="btn btn-secondary" @onclick="NavigateBack">@L["BackButton"]</button>
+    }
+    else
+    {
+        @if (IsEditingMode)
+        {
+            <h3>@L["EditInvoiceTitle"]</h3>
+            <InvoiceForm OnSubmitCallback="OnInvoiceFormSubmit" AddNewEntityCallback="ShowAddEntityModal" InvoiceInstance="InvoiceInstance" IsActive="IsEditingMode" />
+        }
+        else
+        {
+            <h3>@L["AddNewInvoiceTitle"]</h3>
+            <InvoiceForm OnSubmitCallback="OnInvoiceFormSubmit" AddNewEntityCallback="ShowAddEntityModal" IsActive="!IsEditingMode" />
+        }
+        <button class="btn btn-outline-secondary mt-3" @onclick="NavigateBack" disabled="@(IsLoadingData)">
+            @L["BackButton"]
+        </button>
+    }
+</div>
+
+<Modal Title="@L["AddModalTitle"]" IsVisible="IsAddingNewEntity" OnClose="ShowAddEntityModal">
+    @if (IsAddingNewEntity)
+    {
+        <EntityForm OnSubmitCallback="ShowAddEntityModal" isActive="IsAddingNewEntity" />
+    }
+</Modal>
+
+@code {
+    [Parameter]
+    public int? InvoiceId { get; set; } = null;
+
+    private InvoiceDto? InvoiceInstance { get; set; } = null;
+    private bool IsLoadingData { get; set; } = true;
+    private bool LoadingFailed { get; set; } = false;
+    private string ReturnUrl { get; set; } = "/invoices";
+    private bool IsEditingMode => InvoiceId.HasValue;
+    private bool IsAddingNewEntity = false;
+
+    protected override void OnInitialized()
+    {
+        Uri uri = new(navigationManager.Uri);
+        string? query = uri.Query;
+        if (query.Contains("returnUrl"))
+        {
+            var queryParams = ParseQueryString(query);
+            ReturnUrl = queryParams["returnUrl"] ?? "/invoices";
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsLoadingData = true;
+        LoadingFailed = false;
+        try
+        {
+            if (IsEditingMode)
+                InvoiceInstance = await invoiceService.GetByIdAsync(InvoiceId!.Value);
+            else
+                InvoiceInstance = new();
+        }
+        catch (Exception)
+        {
+            LoadingFailed = true;
+        }
+        finally
+        {
+            IsLoadingData = false;
+        }
+    }
+
+    private void OnInvoiceFormSubmit()
+    {
+        NavigateBack();
+    }
+
+    private void NavigateBack()
+    {
+        navigationManager.NavigateTo(ReturnUrl);
+    }
+
+    private void ShowAddEntityModal()
+    {
+        IsAddingNewEntity = !IsAddingNewEntity;
+    }
+}
