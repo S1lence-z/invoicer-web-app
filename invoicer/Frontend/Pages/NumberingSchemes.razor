@@ -33,9 +33,10 @@
             }
             else
             {
-                foreach (var numberingScheme in allNumberingSchemes)
+                foreach (NumberingSchemeDto numberingScheme in allNumberingSchemes)
                 {
-                    <NumberingSchemeListItem NumberingScheme="numberingScheme" OnDeleteNumberingScheme="DeleteScheme" OnEditNumberingScheme="EditScheme" />
+                    int numberingSchemeHash = item.GetHashCode();
+                    <NumberingSchemeListItem @key="numberingSchemeHash" NumberingScheme="numberingScheme" OnDeleteNumberingScheme="DeleteScheme" OnEditNumberingScheme="EditScheme" />
                 }
             }
         </div>

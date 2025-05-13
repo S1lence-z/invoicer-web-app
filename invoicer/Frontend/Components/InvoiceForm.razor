@@ -147,33 +147,33 @@
         <p class="text-muted">@L["NoItemsAddedMessage"]</p>
         <ValidationMessage For="@(() => InvoiceFormModel.Items)" />
     }
-    @foreach (var item in InvoiceFormModel.Items)
+    @foreach (InvoiceItemFormModel item in InvoiceFormModel.Items)
     {
-        var itemUniqueSuffix = item.GetHashCode();
+        int uniqueItemHash = item.GetHashCode();
         <div class="row g-2 mb-3 pb-3 border-bottom align-items-start">
             <div class="col-md-4">
-                <label for="item-description-@itemUniqueSuffix" class="form-label small">@L["ItemDescriptionLabel"]</label>
-                <input id="item-description-@itemUniqueSuffix" type="text" class="form-control form-control-sm" placeholder="@L["ItemDescriptionPlaceholder"]" @bind="item.Description" />
+                <label for="item-description-@uniqueItemHash" class="form-label small">@L["ItemDescriptionLabel"]</label>
+                <input id="item-description-@uniqueItemHash" type="text" class="form-control form-control-sm" placeholder="@L["ItemDescriptionPlaceholder"]" @bind="item.Description" />
                 <ValidationMessage For="@(() => item.Description)" />
             </div>
             <div class="col-md-1 col-6">
-                <label for="item-quantity-@itemUniqueSuffix" class="form-label small">@L["ItemQuantityLabel"]</label>
-                <input id="item-quantity-@itemUniqueSuffix" type="number" min="1" class="form-control form-control-sm" placeholder="@L["ItemQuantityPlaceholder"]" @bind="item.Quantity" />
+                <label for="item-quantity-@uniqueItemHash" class="form-label small">@L["ItemQuantityLabel"]</label>
+                <input id="item-quantity-@uniqueItemHash" type="number" min="1" class="form-control form-control-sm" placeholder="@L["ItemQuantityPlaceholder"]" @bind="item.Quantity" />
                 <ValidationMessage For="@(() => item.Quantity)" />
             </div>
             <div class="col-md-2 col-6">
-                <label for="item-unit-@itemUniqueSuffix" class="form-label small">@L["ItemUnitLabel"]</label>
-                <input id="item-unit-@itemUniqueSuffix" type="text" class="form-control form-control-sm" placeholder="@L["ItemUnitPlaceholder"]" @bind="item.Unit" />
+                <label for="item-unit-@uniqueItemHash" class="form-label small">@L["ItemUnitLabel"]</label>
+                <input id="item-unit-@uniqueItemHash" type="text" class="form-control form-control-sm" placeholder="@L["ItemUnitPlaceholder"]" @bind="item.Unit" />
                 <ValidationMessage For="@(() => item.Unit)" />
             </div>
             <div class="col-md-2">
-                <label for="item-unit-price-@itemUniqueSuffix" class="form-label small">@L["ItemUnitPriceLabel"]</label>
-                <input id="item-unit-price-@itemUniqueSuffix" type="number" min="0" step="any" class="form-control form-control-sm" placeholder="@L["ItemUnitPricePlaceholder"]" @bind="item.UnitPrice" />
+                <label for="item-unit-price-@uniqueItemHash" class="form-label small">@L["ItemUnitPriceLabel"]</label>
+                <input id="item-unit-price-@uniqueItemHash" type="number" min="0" step="any" class="form-control form-control-sm" placeholder="@L["ItemUnitPricePlaceholder"]" @bind="item.UnitPrice" />
                 <ValidationMessage For="@(() => item.UnitPrice)" />
             </div>
             <div class="col-md-2">
-                <label for="item-vat-rate-@itemUniqueSuffix" class="form-label small">@L["ItemVatRateLabel"]</label>
-                <input id="item-vat-rate-@itemUniqueSuffix" type="number" min="0" class="form-control form-control-sm" @bind="item.VatRate" step="0.01" />
+                <label for="item-vat-rate-@uniqueItemHash" class="form-label small">@L["ItemVatRateLabel"]</label>
+                <input id="item-vat-rate-@uniqueItemHash" type="number" min="0" class="form-control form-control-sm" @bind="item.VatRate" step="0.01" />
                 <ValidationMessage For="@(() => item.VatRate)" />
                 <div class="btn-group btn-group-sm mt-1 d-flex flex-grow-1" role="group" aria-label="@L["VatPresetAriaLabel"]">
                     <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 0)">0</button>
