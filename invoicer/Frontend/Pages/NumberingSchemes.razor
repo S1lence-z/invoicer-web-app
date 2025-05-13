@@ -35,7 +35,7 @@
             {
                 foreach (NumberingSchemeDto numberingScheme in allNumberingSchemes)
                 {
-                    int numberingSchemeHash = item.GetHashCode();
+                    int numberingSchemeHash = numberingScheme.GetHashCode();
                     <NumberingSchemeListItem @key="numberingSchemeHash" NumberingScheme="numberingScheme" OnDeleteNumberingScheme="DeleteScheme" OnEditNumberingScheme="EditScheme" />
                 }
             }
