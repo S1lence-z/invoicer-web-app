@@ -1,5 +1,5 @@
-﻿@page "/entities/add"
-@page "/entities/edit/{entityId:int}"
+﻿@page "/entity/add"
+@page "/entity/edit/{entityId:int}"
 
 @using Frontend.Components
 @using Frontend.Services
@@ -11,7 +11,7 @@
 @inject IEntityService entityService
 @inject ErrorService errorService
 @inject NavigationManager navigationManager
-@inject IStringLocalizer<EntitiesEdit> L
+@inject IStringLocalizer<EntityEdit> L
 
 <div class="w-75 mx-auto">
     @if (IsLoadingData)
@@ -49,7 +49,6 @@
     private bool IsLoadingData { get; set; } = true;
     private bool LoadingFailed { get; set; } = false;
     private string ReturnUrl { get; set; } = "/entities";
-
     private bool IsEditingMode => EntityId.HasValue;
 
     protected override void OnInitialized()
@@ -91,7 +90,7 @@
 
     private void OnEntityFormSubmit()
     {
-        navigationManager.NavigateTo(ReturnUrl);
+        NavigateBack();
     }
 
     private void NavigateBack()

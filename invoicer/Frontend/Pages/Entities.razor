@@ -116,11 +116,11 @@
     {
         string currentUrl = navigationManager.Uri;
         string encodedReturnUrl = WebUtility.UrlEncode(currentUrl);
-        navigationManager.NavigateTo($"/entities/edit/{entityToEdit.Id}?returnUrl={encodedReturnUrl}");
+        navigationManager.NavigateTo($"/entity/edit/{entityToEdit.Id}?returnUrl={encodedReturnUrl}");
     }
 
     private void AddNewEntity()
     {
-        navigationManager.NavigateTo("/entities/add");
+        navigationManager.NavigateTo("/entity/add");
     }
 }
