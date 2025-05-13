@@ -35,7 +35,7 @@
             <h3>@L["AddNewEntityTitle"]</h3>
             <EntityForm OnSubmitCallback="OnEntityFormSubmit" isActive="!IsEditingMode" />
         } 
-        <button class="btn btn-outline-secondary mt-3" @onclick="NavigateBack" disabled="@(IsLoadingData)">
+        <button class="btn btn-outline-secondary" @onclick="NavigateBack" disabled="@(IsLoadingData)">
             @L["BackButton"]
         </button>
     }

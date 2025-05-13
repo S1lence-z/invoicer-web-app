@@ -35,7 +35,7 @@
             <h3>@L["AddNewInvoiceTitle"]</h3>
             <InvoiceForm OnSubmitCallback="OnInvoiceFormSubmit" AddNewEntityCallback="ShowAddEntityModal" IsActive="!IsEditingMode" />
         }
-        <button class="btn btn-outline-secondary mt-3" @onclick="NavigateBack" disabled="@(IsLoadingData)">
+        <button class="btn btn-outline-secondary float-end me-2" @onclick="NavigateBack" disabled="@(IsLoadingData)">
             @L["BackButton"]
         </button>
     }
