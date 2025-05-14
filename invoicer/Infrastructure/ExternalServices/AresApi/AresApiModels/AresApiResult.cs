@@ -1,7 +1,7 @@
 ﻿using Application.DTOs.AresApi;
 using Application.Interfaces;
 
-namespace Infrustructure.ExternalServices.AresApi.AresApiModels
+namespace Infrastructure.ExternalServices.AresApi.AresApiModels
 {
 	public class AresApiResult<TData> : IResult<TData> where TData : IAresApiResponse
 	{

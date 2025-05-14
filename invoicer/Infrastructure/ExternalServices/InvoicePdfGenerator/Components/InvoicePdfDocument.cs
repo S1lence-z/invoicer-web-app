@@ -6,7 +6,7 @@ using Shared.Extensions;
 using Shared.Enums;
 using Backend.Utils.InvoicePdfGenerator;
 
-namespace Infrustructure.ExternalServices.InvoicePdfGenerator.Components
+namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 {
 	public class InvoicePdfDocument(Invoice invoiceModel, string languageTag) : ComponentBase, IDocument
 	{

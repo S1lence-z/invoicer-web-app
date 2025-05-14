@@ -1,10 +1,10 @@
 ﻿using Application.RepositoryInterfaces;
 using Domain.Models;
-using Infrustructure.Persistance;
+using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Sqlite.Query.Internal;
 
-namespace Infrustructure.Repositories
+namespace Infrastructure.Repositories
 {
 	public class NumberingSchemeRepository(ApplicationDbContext context) : INumberingSchemeRepository
 	{

@@ -5,7 +5,7 @@ using QuestPDF.Infrastructure;
 using Shared.Enums;
 using Shared.Extensions;
 
-namespace Infrustructure.ExternalServices.InvoicePdfGenerator.Components
+namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 {
 	public class InvoiceItemsComponent(ICollection<InvoiceItem> items, Currency invoiceCurrency, string languageTag) : ComponentBase, IComponent
 	{

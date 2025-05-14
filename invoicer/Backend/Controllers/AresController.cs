@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Application.ExternalServiceInterfaces;
-using Infrustructure.ExternalServices.AresApi.AresApiModels;
+using Infrastructure.ExternalServices.AresApi.AresApiModels;
 using Application.Interfaces;
 using Application.DTOs.AresApi;
 

@@ -2,7 +2,7 @@
 using Domain.Models;
 using Shared.Enums;
 
-namespace Infrustructure.Persistance
+namespace Infrastructure.Persistance
 {
 	public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 	{

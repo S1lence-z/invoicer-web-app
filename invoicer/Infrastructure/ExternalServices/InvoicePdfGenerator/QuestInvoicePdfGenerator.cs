@@ -3,9 +3,9 @@ using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 using Application.ExternalServiceInterfaces;
 using Application.DTOs.Pdf;
-using Infrustructure.ExternalServices.InvoicePdfGenerator.Components;
+using Infrastructure.ExternalServices.InvoicePdfGenerator.Components;
 
-namespace Infrustructure.ExternalServices.InvoicePdfGenerator
+namespace Infrastructure.ExternalServices.InvoicePdfGenerator
 {
 	public class QuestInvoicePdfGenerator : IInvoicePdfGenerator
 	{

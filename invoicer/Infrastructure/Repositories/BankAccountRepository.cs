@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Application.RepositoryInterfaces;
 using Domain.Models;
-using Infrustructure.Persistance;
+using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrustructure.Repositories
+namespace Infrastructure.Repositories
 {
 	public class BankAccountRepository(ApplicationDbContext context) : IBankAccountRepository
 	{

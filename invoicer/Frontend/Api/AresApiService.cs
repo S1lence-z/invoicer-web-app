@@ -2,7 +2,7 @@
 using Application.Interfaces;
 using Application.DTOs.AresApi;
 using Application.ExternalServiceInterfaces;
-using Infrustructure.ExternalServices.AresApi.AresApiModels;
+using Infrastructure.ExternalServices.AresApi.AresApiModels;
 
 namespace Frontend.Api
 {

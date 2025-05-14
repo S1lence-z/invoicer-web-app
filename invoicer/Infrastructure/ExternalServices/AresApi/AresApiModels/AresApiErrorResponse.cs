@@ -1,6 +1,6 @@
 ﻿using Application.DTOs.AresApi;
 
-namespace Infrustructure.ExternalServices.AresApi.AresApiModels
+namespace Infrastructure.ExternalServices.AresApi.AresApiModels
 {
 	public class AresApiErrorResponse : IAresApiResponse
 	{

@@ -3,7 +3,7 @@ using Domain.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace Infrustructure.ExternalServices.InvoicePdfGenerator.Components
+namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 {
 	public class BankAccountComponent(BankAccount bankAccModel, string languageTag) : ComponentBase, IComponent
 	{

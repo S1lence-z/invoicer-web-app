@@ -1,12 +1,12 @@
 ﻿using System.Net;
 using System.Text.Json;
 using Application.ExternalServiceInterfaces;
-using Infrustructure.ExternalServices.AresApi.AresApiModels;
+using Infrastructure.ExternalServices.AresApi.AresApiModels;
 using Refit;
 using Application.Interfaces;
 using Application.DTOs.AresApi;
 
-namespace Infrustructure.ExternalServices.AresApi
+namespace Infrastructure.ExternalServices.AresApi
 {
 	public class AresApiService : IAresApiService
 	{
