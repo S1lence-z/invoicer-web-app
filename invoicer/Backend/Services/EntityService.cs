@@ -3,7 +3,6 @@ using Application.Mappers;
 using Application.RepositoryInterfaces;
 using Application.ServiceInterfaces;
 using Domain.Models;
-using Application.DTOs;
 
 namespace Backend.Services
 {
