@@ -7,28 +7,30 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      # 1. Mount project source directories from host to container
-      - ./Backend:/src/Backend
-      - ./Application:/src/Application
-      - ./Domain:/src/Domain
-      - ./Shared:/src/Shared
+      - ./Backend:/app/Backend
+      - ./Application:/app/Application
+      - ./Domain:/app/Domain
+      - ./Infrastructure:/app/Infrastructure
+      - ./Shared:/app/Shared
+      - nuget_cache:/root/.nuget/packages
 
-      # 2. Use named volumes to isolate ALL build artifacts inside the container
-      - backend_obj:/src/Backend/obj
-      - backend_bin:/src/Backend/bin
-      # Add isolation for shared libs specific to backend:
-      - backend_app_obj:/src/Application/obj
-      - backend_app_bin:/src/Application/bin
-      - backend_domain_obj:/src/Domain/obj
-      - backend_domain_bin:/src/Domain/bin
-      - backend_shared_obj:/src/Shared/obj
-      - backend_shared_bin:/src/Shared/bin
-
+      - backend_backend_obj:/app/Backend/obj
+      - backend_backend_bin:/app/Backend/bin
+      - backend_application_obj:/app/Application/obj
+      - backend_application_bin:/app/Application/bin
+      - backend_domain_obj:/app/Domain/obj
+      - backend_domain_bin:/app/Domain/bin
+      - backend_infrastructure_obj:/app/Infrastructure/obj
+      - backend_infrastructure_bin:/app/Infrastructure/bin
+      - backend_shared_obj:/app/Shared/obj
+      - backend_shared_bin:/app/Shared/bin
+    working_dir: /app/Backend
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - DOTNET_USE_POLLING_FILE_WATCHER=true
-    command: sh -c "cd Backend && dotnet watch run --non-interactive --no-launch-profile"
+      - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
+    command: dotnet watch run --non-interactive --no-launch-profile
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/swagger"]
       interval: 30s
@@ -44,36 +46,55 @@ services:
     ports:
       - "5100:5000"
     volumes:
-      # 1. Mount project source directories from host to container
-      - ./Frontend:/src/Frontend
-      - ./Shared:/src/Shared
+      - ./Frontend:/app/Frontend
+      - ./Application:/app/Application
+      - ./Domain:/app/Domain
+      - ./Infrastructure:/app/Infrastructure
+      - ./Shared:/app/Shared
+      - nuget_cache:/root/.nuget/packages
 
-      # 2. Use named volumes to isolate ALL build artifacts inside the container
-      - frontend_obj:/src/Frontend/obj
-      - frontend_bin:/src/Frontend/bin
-      - frontend_shared_obj:/src/Shared/obj
-      - frontend_shared_bin:/src/Shared/bin
-
+      - frontend_frontend_obj:/app/Frontend/obj
+      - frontend_frontend_bin:/app/Frontend/bin
+      - frontend_application_obj:/app/Application/obj
+      - frontend_application_bin:/app/Application/bin
+      - frontend_domain_obj:/app/Domain/obj
+      - frontend_domain_bin:/app/Domain/bin
+      - frontend_infrastructure_obj:/app/Infrastructure/obj
+      - frontend_infrastructure_bin:/app/Infrastructure/bin
+      - frontend_shared_obj:/app/Shared/obj
+      - frontend_shared_bin:/app/Shared/bin
+    working_dir: /app/Frontend
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
       - DOTNET_USE_POLLING_FILE_WATCHER=true
-    command: sh -c "cd Frontend && dotnet watch run --non-interactive --no-launch-profile --no-hot-reload"
+      - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
+    command: dotnet watch run --non-interactive --no-launch-profile
     depends_on:
       backend:
-          condition: service_healthy # Wait for backend to be ready
+        condition: service_healthy
 
-# Define the named volumes used above
 volumes:
-  backend_obj:
-  backend_bin:
-  frontend_obj:
-  frontend_bin:
-  backend_app_obj:
-  backend_app_bin:
+  nuget_cache:
+
+  backend_backend_obj:
+  backend_backend_bin:
+  backend_application_obj:
+  backend_application_bin:
   backend_domain_obj:
   backend_domain_bin:
+  backend_infrastructure_obj:
+  backend_infrastructure_bin:
   backend_shared_obj:
   backend_shared_bin:
+
+  frontend_frontend_obj:
+  frontend_frontend_bin:
+  frontend_application_obj:
+  frontend_application_bin:
+  frontend_domain_obj:
+  frontend_domain_bin:
+  frontend_infrastructure_obj:
+  frontend_infrastructure_bin:
   frontend_shared_obj:
   frontend_shared_bin:
