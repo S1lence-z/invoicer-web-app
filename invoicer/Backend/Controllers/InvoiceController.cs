@@ -1,7 +1,7 @@
 ﻿using Application.DTOs.Pdf;
 using Application.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
-using Backend.Utils;
+using Application.DTOs.Api;
 using Application.DTOs;
 
 namespace Backend.Controllers

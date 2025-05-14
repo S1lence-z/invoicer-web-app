@@ -1,7 +1,7 @@
 ﻿using Application.DTOs;
 using Application.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
-using Backend.Utils;
+using Application.DTOs.Api;
 
 namespace Backend.Controllers
 {
