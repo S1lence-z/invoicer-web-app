@@ -37,7 +37,7 @@ namespace Backend.Services
 			NumberingScheme numberingScheme = await numberingSchemeRepository.GetByIdAsync(numberingSchemeId, true);
 
 			// Get current state
-			EntityInvoiceNumberingSchemeState? state = await numberingStateRepository.GetByEntityIdAsync(entityId, true);
+			EntityInvoiceNumberingSchemeState state = await numberingStateRepository.GetByEntityIdAsync(entityId, true);
 
 			// Generate the next newInvoice number and update the state
 			string newInvoiceNumber = invoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, state, generationDate);
@@ -53,14 +53,20 @@ namespace Backend.Services
 			int entityNumberingSchemeId = existingEntity.CurrentNumberingSchemeId;
 			NumberingScheme entityNumberingScheme = await numberingSchemeRepository.GetByIdAsync(entityNumberingSchemeId, true);
 
+			// Get the invoice numbering scheme
+			int invoiceNumberingSchemeId = newInvoice.NumberingSchemeId;
+			NumberingScheme invoiceNumberingScheme = await numberingSchemeRepository.GetByIdAsync(invoiceNumberingSchemeId, true);
+
 			// Get the state
-			EntityInvoiceNumberingSchemeState? state = await numberingStateRepository.GetByEntityIdAsync(entityId, false);
+			EntityInvoiceNumberingSchemeState state = await numberingStateRepository.GetByEntityIdAsync(entityId, false);
 
 			switch (updateStatus)
 			{
 				case EntityInvoiceNumberingStateUpdateStatus.Creating:
+					await HandleCreatingAsync(state, isUsingUserDefinedState, newInvoice, entityNumberingScheme);
+					break;
 				case EntityInvoiceNumberingStateUpdateStatus.Updating:
-					await HandleCreatingOrUpdatingAsync(state, isUsingUserDefinedState, newInvoice, entityNumberingScheme);
+					await HandleUpdatingAsync(state, isUsingUserDefinedState, newInvoice, invoiceNumberingScheme);
 					break;
 				case EntityInvoiceNumberingStateUpdateStatus.Deleting:
 					await HandleDeletingAsync(state, entityId, newInvoice);
@@ -73,7 +79,7 @@ namespace Backend.Services
 			return true;
 		}
 
-		private async Task HandleCreatingOrUpdatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice newInvoice, NumberingScheme numberingScheme)
+		private async Task HandleCreatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice newInvoice, NumberingScheme numberingScheme)
 		{
 			if (isUsingUserDefinedState)
 			{
@@ -82,9 +88,48 @@ namespace Backend.Services
 					throw new ArgumentException($"Invalid sequence number in invoice number: {newInvoice.InvoiceNumber}");
 
 				// Check if the new sequence number does not already exist by looking at existing invoices for the current seller
-				bool invNumberAlreadyExists = await invoiceRepository.ExistsForEntityByInvoiceNumber(newInvoice.InvoiceNumber, newInvoice.SellerId, false);
-				if (!invNumberAlreadyExists)
+				if (!await IsInvoiceNumberUnique(newInvoice.InvoiceNumber, newInvoice.SellerId))
 					throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} already exists for this entity");
+
+				// Set the biggest sequence number as the last one for the state
+				IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesByEntityId(newInvoice.SellerId, true);
+				foreach (Invoice invoice in existingInvoices)
+				{
+					string extractedSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(invoice.InvoiceNumber, numberingScheme);
+					if (!int.TryParse(extractedSequenceNumber, out int existingSequenceNumber))
+						throw new ArgumentException($"Invalid sequence number in invoice number: {invoice.InvoiceNumber}");
+					if (existingSequenceNumber > newSequenceNumber)
+						newSequenceNumber = existingSequenceNumber;
+				}
+
+				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, newSequenceNumber);
+			}
+			else
+				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, state.LastSequenceNumber + 1);
+		}
+
+		private async Task HandleUpdatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice newInvoice, NumberingScheme numberingScheme)
+		{
+			if (isUsingUserDefinedState)
+			{
+				string customSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(newInvoice.InvoiceNumber, numberingScheme);
+				if (!int.TryParse(customSequenceNumber, out int newSequenceNumber))
+					throw new ArgumentException($"Invalid sequence number in invoice number: {newInvoice.InvoiceNumber}");
+
+				// Check if the new sequence number does not already exist by looking at existing invoices for the current seller
+				if (!await IsInvoiceNumberUnique(newInvoice.InvoiceNumber, newInvoice.SellerId))
+					throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} already exists for this entity");
+
+				// Set the biggest sequence number as the last one for the state
+				IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesByEntityId(newInvoice.SellerId, true);
+				foreach (Invoice invoice in existingInvoices)
+				{
+					string extractedSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(invoice.InvoiceNumber, numberingScheme);
+					if (!int.TryParse(extractedSequenceNumber, out int existingSequenceNumber))
+						throw new ArgumentException($"Invalid sequence number in invoice number: {invoice.InvoiceNumber}");
+					if (existingSequenceNumber > newSequenceNumber)
+						newSequenceNumber = existingSequenceNumber;
+				}
 
 				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, newSequenceNumber);
 			}
@@ -113,6 +158,17 @@ namespace Backend.Services
 			// Check how many invoices this entity has
 			int invoiceCount = await invoiceRepository.GetInvoiceCountByEntityId(entityId);
 			EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, lastSequenceNumber);
+		}
+
+		private async Task<bool> IsInvoiceNumberUnique(string invoiceNumber, int entityId)
+		{
+			IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesByEntityId(entityId, true);
+			foreach (Invoice invoice in existingInvoices)
+			{
+				if (invoice.InvoiceNumber == invoiceNumber)
+					return false;
+			}
+			return true;
 		}
 	}
 }

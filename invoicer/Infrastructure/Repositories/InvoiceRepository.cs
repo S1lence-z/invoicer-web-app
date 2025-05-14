@@ -20,17 +20,6 @@ namespace Infrastructure.Repositories
 			return true;
 		}
 
-		public Task<bool> ExistsForEntityByInvoiceNumber(string invoiceNumber, int entityId, bool isReadonly)
-		{
-			if (isReadonly)
-				return context.Invoice
-					.AsNoTracking()
-					.AnyAsync(i => i.InvoiceNumber == invoiceNumber && i.SellerId == entityId);
-			else
-				return context.Invoice
-					.AnyAsync(i => i.InvoiceNumber == invoiceNumber && i.SellerId == entityId);
-		}
-
 		public async Task<IEnumerable<Invoice>> GetAllAsync()
 		{
 			return await context.Invoice
@@ -45,6 +34,37 @@ namespace Infrastructure.Repositories
 				.Include(i => i.Items)
 				.AsNoTracking()
 				.ToListAsync();
+		}
+
+		public async Task<IEnumerable<Invoice>> GetAllInvoicesByEntityId(int entityId, bool isReadonly)
+		{
+			if (isReadonly)
+				return await context.Invoice
+					.Include(i => i.Seller)
+						.ThenInclude(s => s!.Address)
+					.Include(i => i.Seller)
+						.ThenInclude(s => s!.BankAccount)
+					.Include(i => i.Buyer)
+						.ThenInclude(b => b!.Address)
+					.Include(i => i.Buyer)
+						.ThenInclude(b => b!.BankAccount)
+					.Include(i => i.Items)
+					.AsNoTracking()
+					.Where(i => i.SellerId == entityId)
+					.ToListAsync() ?? throw new KeyNotFoundException($"No invoice found for entity with id {entityId}");
+			else
+				return await context.Invoice
+					.Where(i => i.SellerId == entityId)
+					.Include(i => i.Seller)
+						.ThenInclude(s => s!.Address)
+					.Include(i => i.Seller)
+						.ThenInclude(s => s!.BankAccount)
+					.Include(i => i.Buyer)
+						.ThenInclude(b => b!.Address)
+					.Include(i => i.Buyer)
+						.ThenInclude(b => b!.BankAccount)
+					.Include(i => i.Items)
+					.ToListAsync() ?? throw new KeyNotFoundException($"No invoice found for entity with id {entityId}");
 		}
 
 		public async Task<Invoice> GetByIdAsync(int id, bool isReadonly)

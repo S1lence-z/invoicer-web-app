@@ -65,7 +65,7 @@ namespace Backend.Controllers
 			}
 			catch (ArgumentException e)
 			{
-				return BadRequest(ApiErrorResponse.Create("Invalid request", e.Message, 400));
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
 			}
 			catch (KeyNotFoundException e)
 			{
