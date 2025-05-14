@@ -1,8 +1,8 @@
 ﻿using Application.Interfaces;
+using Application.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Api;
 using Shared.DTOs;
-using Shared.ServiceInterfaces;
 
 namespace Backend.Controllers
 {
@@ -18,7 +18,7 @@ namespace Backend.Controllers
 		{
 			try
 			{
-				EntityDto? entity = await entityService.GetByIdAsync(id);
+				EntityDto entity = await entityService.GetByIdAsync(id);
 				return Ok(entity);
 			}
 			catch (KeyNotFoundException e)

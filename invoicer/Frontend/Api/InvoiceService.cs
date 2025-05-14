@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using Shared.Api;
 using Shared.DTOs;
 using Shared.Interfaces;
-using Shared.ServiceInterfaces;
+using Application.ServiceInterfaces;
 using Shared.PdfGenerator;
 
 namespace Frontend.Api

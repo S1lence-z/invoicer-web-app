@@ -1,12 +1,14 @@
-using Backend.Database;
 using Backend.Services;
-using Backend.Services.AresApiService;
 using Domain.Interfaces;
 using Domain.Services;
 using Backend.Utils.InvoicePdfGenerator;
 using Microsoft.EntityFrameworkCore;
-using Shared.ServiceInterfaces;
 using Application.Interfaces;
+using Application.ServiceInterfaces;
+using Infrustructure.Persistance;
+using Application.RepositoryInterfaces;
+using Infrustructure.Repositories;
+using Infrustructure.ExternalServices.AresApi;
 
 namespace Backend
 {
@@ -16,21 +18,32 @@ namespace Backend
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
-			// Add services to the container.
+			// Add db context
 			builder.Services.AddDbContext<ApplicationDbContext>(options => 
 				options.UseSqlite(builder.Configuration.GetConnectionString("InvoicerDb"))
 			);
 
-			// Add custom services
+			// Add repositories
+			builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+			builder.Services.AddScoped<IBankAccountRepository, BankAccountRepository>();
+			builder.Services.AddScoped<IEntityRepository, EntityRepository>();
+			builder.Services.AddScoped<INumberingSchemeRepository, NumberingSchemeRepository>();
+			builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+			builder.Services.AddScoped<IInvoiceItemRepository, InvoiceItemRepository>();
+			builder.Services.AddScoped<IEntityInvoiceNumberingStateRepository, EntityInvoiceNumberingStateRepository>();
+
+			// Add services
 			builder.Services.AddScoped<IAddressService, AddressService>();
 			builder.Services.AddScoped<IBankAccountService, BankAccountService>();
 			builder.Services.AddScoped<IEntityService, EntityService>();
 			builder.Services.AddScoped<IInvoiceService, InvoiceService>();
-			builder.Services.AddScoped<IAresApiService, AresApiService>();
 			builder.Services.AddScoped<INumberingSchemeService, NumberingSchemeService>();
-			builder.Services.AddSingleton<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
-			builder.Services.AddScoped<IInvoicePdfGenerator, InvoicePdfGenerator>();
 			builder.Services.AddScoped<IEntityInvoiceNumberingStateService, EntityInvoiceNumberingStateService>();
+
+			// Add external services
+			builder.Services.AddScoped<IAresApiService, AresApiService>();
+			builder.Services.AddScoped<IInvoicePdfGenerator, InvoicePdfGenerator>();
+			builder.Services.AddSingleton<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();

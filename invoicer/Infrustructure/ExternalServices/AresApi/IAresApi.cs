@@ -1,6 +1,6 @@
 ﻿using Refit;
 
-namespace Backend.Services.AresApiService
+namespace Infrustructure.ExternalServices.AresApi
 {
 	public interface IAresApi
 	{

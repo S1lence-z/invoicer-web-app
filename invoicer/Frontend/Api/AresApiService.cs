@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Shared.AresApiModels;
 using Shared.Interfaces;
-using Shared.ServiceInterfaces;
+using Application.ServiceInterfaces;
 
 namespace Frontend.Api
 {

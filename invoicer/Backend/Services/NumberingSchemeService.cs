@@ -1,29 +1,23 @@
-﻿using Backend.Database;
-using Domain.Models;
+﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Application.Mappers;
 using Shared.DTOs;
-using Shared.ServiceInterfaces;
+using Application.ServiceInterfaces;
+using Application.RepositoryInterfaces;
 
 namespace Backend.Services
 {
-	public class NumberingSchemeService(ApplicationDbContext context) : INumberingSchemeService
+	public class NumberingSchemeService(INumberingSchemeRepository numberingSchemeRepository) : INumberingSchemeService
 	{
 		public async Task<NumberingSchemeDto> GetByIdAsync(int id)
 		{
-			NumberingScheme? foundScheme = await context.NumberingScheme
-				.AsNoTracking()
-				.FirstOrDefaultAsync(ins => ins.Id == id);
-			if (foundScheme is null)
-				throw new KeyNotFoundException($"Invoice Numbering Scheme with id {id} not found");
+			NumberingScheme foundScheme = await numberingSchemeRepository.GetByIdAsync(id, true);
 			return NumberingSchemeMapper.MapToDto(foundScheme);
 		}
 
 		public async Task<IList<NumberingSchemeDto>> GetAllAsync()
 		{
-			List<NumberingScheme> allSchemes = await context.NumberingScheme
-				.AsNoTracking()
-				.ToListAsync();
+			IEnumerable<NumberingScheme> allSchemes = await numberingSchemeRepository.GetAllAsync();
 			return allSchemes.Select(NumberingSchemeMapper.MapToDto).ToList();
 		}
 
@@ -32,24 +26,21 @@ namespace Backend.Services
 			NumberingScheme scheme = NumberingSchemeMapper.MapToDomain(newNumberingSchemeDto);
 
 			if (scheme.IsDefault)
-				await SetDefaultSchemeAsync(scheme);
+				await numberingSchemeRepository.SetDefaultSchemeAsync(scheme);
 
 			if (scheme.SequencePadding < 1)
 				throw new ArgumentException("Sequence padding must be at least 1");
 
-			await context.NumberingScheme.AddAsync(scheme);
-			await context.SaveChangesAsync();
-			return NumberingSchemeMapper.MapToDto(scheme);
+			await numberingSchemeRepository.CreateAsync(scheme);
+			await numberingSchemeRepository.SaveChangesAsync();
+
+			NumberingScheme createdScheme = await numberingSchemeRepository.GetByIdAsync(scheme.Id, true);
+			return NumberingSchemeMapper.MapToDto(createdScheme);
 		}
 
 		public async Task<NumberingSchemeDto> UpdateAsync(int id, NumberingSchemeDto udpatedSchemeDto)
 		{
-			NumberingScheme? existingScheme = await context.NumberingScheme
-				.FirstOrDefaultAsync(ins => ins.Id == id);
-
-			if (existingScheme is null)
-				throw new KeyNotFoundException($"Invoice Numbering Scheme with id {id} not found");
-
+			NumberingScheme existingScheme = await numberingSchemeRepository.GetByIdAsync(id, false);
 			if (udpatedSchemeDto.SequencePadding < 1)
 				throw new ArgumentException("Sequence padding must be at least 1");
 
@@ -65,66 +56,37 @@ namespace Backend.Services
 			existingScheme.IsDefault = udpatedSchemeDto.IsDefault;
 
 			if (wasDefault && !existingScheme.IsDefault)
-				throw new InvalidOperationException("Cannot unset the default numbering scheme. You can set a different scheme as default.");
+				throw new InvalidOperationException("Cannot unset the default numbering scheme. You can only set a different scheme as default.");
 
 			if (existingScheme.IsDefault)
-				await SetDefaultSchemeAsync(existingScheme);
+				await numberingSchemeRepository.SetDefaultSchemeAsync(existingScheme);
 
-			await context.SaveChangesAsync();
+			numberingSchemeRepository.Update(existingScheme);
+			await numberingSchemeRepository.SaveChangesAsync();
 
-			NumberingScheme? updatedScheme = await context.NumberingScheme
-				.AsNoTracking()
-				.FirstOrDefaultAsync(ins => ins.Id == id);
-
-			if (updatedScheme is null)
-				throw new KeyNotFoundException($"Invoice Numbering Scheme with id {id} not found after update");
-
+			NumberingScheme? updatedScheme = await numberingSchemeRepository.GetByIdAsync(id, true);
 			return NumberingSchemeMapper.MapToDto(updatedScheme);
 		}
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			NumberingScheme? schemeToDelete = await context.NumberingScheme
-				.FirstOrDefaultAsync(ins => ins.Id == id);
-			if (schemeToDelete is null)
-				return false;
-
+			NumberingScheme schemeToDelete = await numberingSchemeRepository.GetByIdAsync(id, false);
 			if (schemeToDelete.IsDefault)
 				throw new InvalidOperationException("Cannot delete the default numbering scheme");
 
-			// Check if the schemeToDelete is in use
-			bool isInUseByEntity = await context.Entity.AnyAsync(e => e.CurrentNumberingSchemeId == id);
+			bool isInUseByEntity = await numberingSchemeRepository.IsInUseByEntity(schemeToDelete);
 			if (isInUseByEntity)
-				throw new ArgumentException("Cannot delete the scheme as it is being used by and entity");
+				throw new ArgumentException("Cannot delete the scheme as it is being used by an entity");
 
-			context.NumberingScheme.Remove(schemeToDelete);
-			await context.SaveChangesAsync();
-			return true;
+			bool status = await numberingSchemeRepository.DeleteAsync(id);
+			await numberingSchemeRepository.SaveChangesAsync();
+			return status;
 		}
 
 		public async Task<NumberingSchemeDto> GetDefaultNumberingSchemeAsync()
 		{
-			NumberingScheme? defaultScheme = await context.NumberingScheme
-				.AsNoTracking()
-				.FirstOrDefaultAsync(ins => ins.IsDefault);
-
-			if (defaultScheme is null)
-				throw new KeyNotFoundException("Default Invoice Numbering Scheme not found");
-
+			NumberingScheme defaultScheme = await numberingSchemeRepository.GetDefaultScheme(true);
 			return NumberingSchemeMapper.MapToDto(defaultScheme);
-		}
-
-		private async Task SetDefaultSchemeAsync(NumberingScheme newDefaultScheme)
-		{
-			List<NumberingScheme> allDefaultSchemes = await context.NumberingScheme
-				.Where(ins => ins.IsDefault)
-				.ToListAsync();
-			foreach (NumberingScheme scheme in allDefaultSchemes)
-			{
-				if (scheme.Id != newDefaultScheme.Id)
-					scheme.IsDefault = false;
-			}
-			newDefaultScheme.IsDefault = true;
 		}
 	}
 }

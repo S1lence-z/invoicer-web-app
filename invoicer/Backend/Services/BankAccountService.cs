@@ -1,59 +1,50 @@
 ﻿using Application.Mappers;
-using Backend.Database;
+using Application.RepositoryInterfaces;
+using Application.ServiceInterfaces;
 using Domain.Models;
-using Microsoft.EntityFrameworkCore;
 using Shared.DTOs;
-using Shared.ServiceInterfaces;
 
 namespace Backend.Services
 {
-	public class BankAccountService(ApplicationDbContext context) : IBankAccountService
+	public class BankAccountService(IBankAccountRepository bankAccountRepository) : IBankAccountService
 	{
 		public async Task<BankAccountDto> GetByIdAsync(int id)
 		{
-			BankAccount? foundBankAcc = await context.BankAccount.FindAsync(id);
-			if (foundBankAcc is null)
-				throw new KeyNotFoundException($"Bank account with id {id} not found");
+			BankAccount foundBankAcc = await bankAccountRepository.GetByIdAsync(id, true);
 			return BankAccountMapper.MapToDto(foundBankAcc);
 		}
 
 		public async Task<IList<BankAccountDto>> GetAllAsync()
 		{
-			List<BankAccount> allBankAccs = await context.BankAccount.ToListAsync();
+			IEnumerable<BankAccount> allBankAccs = await bankAccountRepository.GetAllAsync();
 			return allBankAccs.Select(BankAccountMapper.MapToDto).ToList();
 		}
 
 		public async Task<BankAccountDto> CreateAsync(BankAccountDto newBankAcc)
 		{
 			BankAccount bankAcc = BankAccountMapper.MapToDomain(newBankAcc);
-			await context.BankAccount.AddAsync(bankAcc);
-			await context.SaveChangesAsync();
+			await bankAccountRepository.CreateAsync(bankAcc);
+			await bankAccountRepository.SaveChangesAsync();
 			return BankAccountMapper.MapToDto(bankAcc);
 		}
 
 		public async Task<BankAccountDto> UpdateAsync(int id, BankAccountDto updatedBankAcc)
 		{
-			BankAccount? bankAcc = await context.BankAccount.FindAsync(id);
-			if (bankAcc is null)
-				throw new KeyNotFoundException($"Bank account with id {id} not found");
+			BankAccount existingBankAcc = await bankAccountRepository.GetByIdAsync(id, false);
+			existingBankAcc.BankName = updatedBankAcc.BankName;
+			existingBankAcc.AccountNumber = updatedBankAcc.AccountNumber;
+			existingBankAcc.BankCode = updatedBankAcc.BankCode;
+			existingBankAcc.IBAN = updatedBankAcc.IBAN;
 
-			bankAcc.BankName = updatedBankAcc.BankName;
-			bankAcc.AccountNumber = updatedBankAcc.AccountNumber;
-			bankAcc.BankCode = updatedBankAcc.BankCode;
-			bankAcc.IBAN = updatedBankAcc.IBAN;
-
-			await context.SaveChangesAsync();
-
-			return BankAccountMapper.MapToDto(bankAcc);
+			bankAccountRepository.Update(existingBankAcc);
+			await bankAccountRepository.SaveChangesAsync();
+			return BankAccountMapper.MapToDto(existingBankAcc);
 		}
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			BankAccount? bankAcc = await context.BankAccount.FindAsync(id);
-			if (bankAcc is null)
-				return false;
-			context.BankAccount.Remove(bankAcc);
-			await context.SaveChangesAsync();
+			await bankAccountRepository.DeleteAsync(id);
+			await bankAccountRepository.SaveChangesAsync();
 			return true;
 		}
 	}

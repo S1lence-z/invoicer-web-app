@@ -1,7 +1,7 @@
 ﻿using Shared.DTOs;
 using Shared.Interfaces;
 
-namespace Shared.ServiceInterfaces
+namespace Application.ServiceInterfaces
 {
 	public interface IInvoiceService : IService<int, InvoiceDto> 
 	{

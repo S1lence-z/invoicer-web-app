@@ -1,119 +1,74 @@
 ﻿using Application.Mappers;
-using Backend.Database;
+using Application.RepositoryInterfaces;
+using Application.ServiceInterfaces;
 using Domain.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Shared.DTOs;
-using Shared.ServiceInterfaces;
 
 namespace Backend.Services
 {
-	public class EntityService(ApplicationDbContext context, INumberingSchemeService numberingSchemeService) : IEntityService
+	public class EntityService(IEntityRepository entityRepository, IAddressRepository addressRepository, IBankAccountRepository bankAccountRepository,  INumberingSchemeService numberingSchemeService) : IEntityService
 	{
 		public async Task<EntityDto> GetByIdAsync(int id)
 		{
-			Entity? foundEntity = await context.Entity
-				.Include(e => e.BankAccount)
-				.Include(e => e.Address)
-				.FirstOrDefaultAsync(e => e.Id == id);
-			if (foundEntity is null)
-				throw new KeyNotFoundException($"Entity with id {id} not found");
+			Entity? foundEntity = await entityRepository.GetByIdAsync(id, true);
 			return EntityMapper.MapToDto(foundEntity);
 		}
 
 		public async Task<IList<EntityDto>> GetAllAsync()
 		{
-			List<Entity> allEntities = await context.Entity
-				.Include(e => e.BankAccount)
-				.Include(e => e.Address)
-				.ToListAsync();
+			IEnumerable<Entity> allEntities = await entityRepository.GetAllAsync();
 			return allEntities.Select(EntityMapper.MapToDto).ToList();
 		}
 
-		public async Task<EntityDto> CreateAsync(EntityDto newEntity)
+		public async Task<EntityDto> CreateAsync(EntityDto newEntityDto)
 		{
-			Address? address = await context.Address.AsNoTracking().FirstOrDefaultAsync(a => a.Id == newEntity.AddressId);
-			BankAccount? bankAccount = await context.BankAccount.AsNoTracking().FirstOrDefaultAsync(ba => ba.Id == newEntity.BankAccountId);
+			await addressRepository.GetByIdAsync(newEntityDto.AddressId, true);
+			await bankAccountRepository.GetByIdAsync(newEntityDto.BankAccountId, true);
 
-			if (address is null)
-				throw new ArgumentException($"Address with id {newEntity.AddressId} not found.");
+			NumberingSchemeDto defaultScheme = await numberingSchemeService.GetDefaultNumberingSchemeAsync();
+			newEntityDto.CurrentNumberingSchemeId = defaultScheme.Id;
+			Entity entity = EntityMapper.MapToDomain(newEntityDto);
 
-			if (bankAccount is null)
-				throw new ArgumentException($"Bank account with id {newEntity.BankAccountId} not found.");
+			await entityRepository.CreateAsync(entity);
+			await entityRepository.SaveChangesAsync();
 
-			NumberingSchemeDto? defaultScheme = await numberingSchemeService.GetDefaultNumberingSchemeAsync();
-			newEntity.CurrentNumberingSchemeId = defaultScheme.Id;
-			Entity entity = EntityMapper.MapToDomain(newEntity);
-
-			await context.Entity.AddAsync(entity);
-			await context.SaveChangesAsync();
-
-			Entity? createdEntity = await context.Entity
-				.Include(e => e.BankAccount)
-				.Include(e => e.Address)
-				.AsNoTracking()
-				.FirstOrDefaultAsync(e => e.Id == entity.Id);
-
-			if (createdEntity is null)
-				throw new ArgumentException($"Failed to create entity with id {entity.Id}");
-
+			Entity createdEntity = await entityRepository
+				.GetByIdAsync(entity.Id, true);
 			return EntityMapper.MapToDto(createdEntity);
 		}
 
 		public async Task<EntityDto> UpdateAsync(int id, EntityDto newEntityData)
 		{
-			Entity? existingEntity = await context.Entity.FindAsync(id);
-			if (existingEntity is null)
-				throw new ArgumentException($"Entity with id {id} not found.");
-			
-			Address? possibleNewAddres = await context.Address.FindAsync(newEntityData.AddressId);
-			BankAccount? possibleNewBankAcc = await context.BankAccount.FindAsync(newEntityData.BankAccountId);
-			
-			if (possibleNewAddres is null)
-				throw new ArgumentException($"Updated address with id {newEntityData.AddressId} not found.");
-			if (possibleNewBankAcc is null)
-				throw new ArgumentException($"Updated bank account with id {newEntityData.BankAccountId} not found.");
+			Entity existingEntity = await entityRepository.GetByIdAsync(id, false);
+			Address possibleNewAddress = await addressRepository.GetByIdAsync(newEntityData.AddressId, false);
+			BankAccount possibleNewBankAcc = await bankAccountRepository.GetByIdAsync(newEntityData.BankAccountId, false);
 
-			existingEntity.AddressId = newEntityData.AddressId;
-			existingEntity.BankAccountId = newEntityData.BankAccountId;
-			existingEntity.Address = possibleNewAddres;
+			existingEntity.Address = possibleNewAddress;
 			existingEntity.BankAccount = possibleNewBankAcc;
 			existingEntity.Email = newEntityData.Email;
 			existingEntity.Ico = newEntityData.Ico;
 			existingEntity.Name = newEntityData.Name;
 			existingEntity.PhoneNumber = newEntityData.PhoneNumber;
 			existingEntity.CurrentNumberingSchemeId = newEntityData.CurrentNumberingSchemeId;
+			entityRepository.Update(existingEntity);
+			await entityRepository.SaveChangesAsync();
 
-			await context.SaveChangesAsync();
-
-			Entity? updatedEntity = await context.Entity
-				.Include(e => e.BankAccount)
-				.Include(e => e.Address)
-				.AsNoTracking()
-				.FirstOrDefaultAsync(e => e.Id == id);
-
-			return EntityMapper.MapToDto(updatedEntity!);
+			Entity updatedEntity = await entityRepository.GetByIdAsync(id, true);
+			return EntityMapper.MapToDto(updatedEntity);
 		}
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			Entity? entity = await context.Entity
-			   .Include(e => e.BankAccount)
-			   .Include(e => e.Address)
-			   .Include(e => e.SoldInvoices)
-			   .FirstOrDefaultAsync(e => e.Id == id);
+			Entity entityToDelete = await entityRepository.GetWithSoldInvoicesByIdAsync(id, true);
+			if (entityToDelete.SoldInvoices.Count > 0)
+				throw new InvalidOperationException($"{entityToDelete.Name} cannot be deleted because it has existing invoices.");
 
-			if (entity is null)
-				return false;
-
-			if (entity.SoldInvoices.Count > 0)
-				throw new InvalidOperationException($"{entity.Name} cannot be deleted because it has existing invoices.");
-
-			context.Entity.Remove(entity);
-			context.Address.Remove(entity.Address!);
-			context.BankAccount.Remove(entity.BankAccount!);
-			await context.SaveChangesAsync();
-			return true;
+			int addressId = entityToDelete.AddressId;
+			int bankAccountId = entityToDelete.BankAccountId;
+			bool status = await entityRepository.DeleteAsync(id);
+			bool addressStatus = await addressRepository.DeleteAsync(addressId);
+			bool bankAccountStatus = await bankAccountRepository.DeleteAsync(bankAccountId);
+			return status && addressStatus && bankAccountStatus;
 		}
 	}
 }

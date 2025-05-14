@@ -2,7 +2,7 @@
 using Frontend.Utils;
 using Shared.Api;
 using Shared.DTOs;
-using Shared.ServiceInterfaces;
+using Application.ServiceInterfaces;
 
 namespace Frontend.Api
 {

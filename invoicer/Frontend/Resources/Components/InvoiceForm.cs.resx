@@ -158,7 +158,7 @@
     <value>Množství</value>
   </data>
   <data name="ItemQuantityPlaceholder" xml:space="preserve">
-    <value>Množ.</value>
+    <value>Množ</value>
   </data>
   <data name="ItemUnitLabel" xml:space="preserve">
     <value>Jednotka</value>

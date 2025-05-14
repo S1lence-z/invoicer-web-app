@@ -1,6 +1,6 @@
 ﻿using Shared.Interfaces;
 
-namespace Shared.ServiceInterfaces
+namespace Application.ServiceInterfaces
 {
 	public interface IAresApiService
 	{

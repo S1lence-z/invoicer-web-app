@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using System.Text.Json;
+using Application.ServiceInterfaces;
 using Refit;
 using Shared.AresApiModels;
 using Shared.Interfaces;
-using Shared.ServiceInterfaces;
 
-namespace Backend.Services.AresApiService
+namespace Infrustructure.ExternalServices.AresApi
 {
 	public class AresApiService : IAresApiService
 	{
