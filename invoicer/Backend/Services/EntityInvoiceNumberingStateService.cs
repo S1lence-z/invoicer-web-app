@@ -11,14 +11,25 @@ namespace Backend.Services
 	{
 		public async Task<EntityInvoiceNumberingSchemeState> CreateByEntityId(int entityId)
 		{
-			// Check if the entity exists
+			// Ensure the entity exists
 			await entityRepository.GetByIdAsync(entityId, true);
 
-			// Check if the numbering scheme state already exists
-			await numberingStateRepository.GetByEntityIdAsync(entityId, false);
+			// Try to get existing state
+			EntityInvoiceNumberingSchemeState? existingState = null;
+			try
+			{
+				existingState = await numberingStateRepository.GetByEntityIdAsync(entityId, true);
+			}
+			catch (KeyNotFoundException)
+			{
+				// State does not exist, will create below
+			}
 
-			// Create a new numbering scheme state
-			EntityInvoiceNumberingSchemeState newNumberingState = new()
+			if (existingState is not null)
+				return existingState;
+
+			// Create new state
+			var newNumberingState = new EntityInvoiceNumberingSchemeState
 			{
 				EntityId = entityId
 			};
