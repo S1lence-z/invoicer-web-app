@@ -1,11 +1,11 @@
 ﻿using Application.Mappers;
 using Domain.Models;
-using Shared.DTOs;
+using Application.DTOs;
 using Shared.Enums;
-using Application.Interfaces;
-using Shared.Interfaces;
 using Application.ServiceInterfaces;
 using Application.RepositoryInterfaces;
+using Application.ExternalServiceInterfaces;
+using Application.DTOs.Pdf;
 
 namespace Backend.Services
 {

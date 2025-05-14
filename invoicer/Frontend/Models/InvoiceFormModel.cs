@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Frontend.Validators;
 using Shared.Enums;
-using Shared.DTOs;
+using Application.DTOs;
 
 namespace Frontend.Models
 {

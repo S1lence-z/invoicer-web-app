@@ -1,5 +1,5 @@
-﻿using Shared.DTOs;
-using Shared.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
 
 namespace Application.ServiceInterfaces
 {

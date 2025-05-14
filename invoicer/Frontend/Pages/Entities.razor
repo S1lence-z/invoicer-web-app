@@ -1,10 +1,10 @@
 ﻿@page "/entities";
+@using System.Net
+@using Application.DTOs
+@using Application.ServiceInterfaces
 @using Frontend.Components;
 @using Frontend.Services;
 @using Microsoft.Extensions.Localization;
-@using Shared.DTOs
-@using Application.ServiceInterfaces
-@using System.Net
 @inject IEntityService entityService;
 @inject ErrorService errorService;
 @inject NavigationManager navigationManager;

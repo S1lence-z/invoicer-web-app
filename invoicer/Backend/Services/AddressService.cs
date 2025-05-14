@@ -1,8 +1,8 @@
 ﻿using Domain.Models;
-using Shared.DTOs;
 using Application.Mappers;
 using Application.ServiceInterfaces;
 using Application.RepositoryInterfaces;
+using Application.DTOs;
 
 namespace Backend.Services
 {

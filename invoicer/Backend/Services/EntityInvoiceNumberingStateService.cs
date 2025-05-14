@@ -1,10 +1,9 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
-using Microsoft.EntityFrameworkCore;
 using Backend.Utils;
 using Shared.Enums;
-using Application.Interfaces;
 using Application.RepositoryInterfaces;
+using Application.ServiceInterfaces;
 
 namespace Backend.Services
 {

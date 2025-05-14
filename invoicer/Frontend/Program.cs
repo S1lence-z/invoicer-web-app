@@ -8,6 +8,7 @@ using Microsoft.JSInterop;
 using System.Globalization;
 using Microsoft.Extensions.Options;
 using Application.ServiceInterfaces;
+using Application.ExternalServiceInterfaces;
 
 namespace Frontend
 {

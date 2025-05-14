@@ -1,10 +1,11 @@
-﻿@using Frontend.Models
+﻿@using Application.DTOs
+@using Application.ExternalServiceInterfaces
+@using Application.ServiceInterfaces
+@using Frontend.Models
 @using Frontend.Services
 @using Frontend.Utils
+@using Infrustructure.ExternalServices.AresApi.AresApiModels
 @using Microsoft.Extensions.Localization
-@using Shared.AresApiModels
-@using Shared.DTOs
-@using Application.ServiceInterfaces
 @inject IAresApiService aresApiService
 @inject IAddressService addressService
 @inject IEntityService entityService

@@ -1,7 +1,7 @@
 ﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Application.Mappers;
-using Shared.DTOs;
+using Application.DTOs;
 using Application.ServiceInterfaces;
 using Application.RepositoryInterfaces;
 

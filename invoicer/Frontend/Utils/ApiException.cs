@@ -1,4 +1,4 @@
-﻿using Shared.Api;
+﻿using Application.DTOs.Api;
 
 namespace Frontend.Utils
 {
