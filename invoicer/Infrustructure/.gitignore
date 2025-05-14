@@ -220,3 +220,6 @@ project.lock.json
 
 # UWP Projects
 AppPackages/
+
+# other
+Migrations
