@@ -49,7 +49,6 @@ services:
       - ./Frontend:/app/Frontend
       - ./Application:/app/Application
       - ./Domain:/app/Domain
-      - ./Infrastructure:/app/Infrastructure
       - ./Shared:/app/Shared
       - nuget_cache:/root/.nuget/packages
 
@@ -59,8 +58,6 @@ services:
       - frontend_application_bin:/app/Application/bin
       - frontend_domain_obj:/app/Domain/obj
       - frontend_domain_bin:/app/Domain/bin
-      - frontend_infrastructure_obj:/app/Infrastructure/obj
-      - frontend_infrastructure_bin:/app/Infrastructure/bin
       - frontend_shared_obj:/app/Shared/obj
       - frontend_shared_bin:/app/Shared/bin
     working_dir: /app/Frontend
@@ -69,7 +66,7 @@ services:
       - ASPNETCORE_URLS=http://+:5000
       - DOTNET_USE_POLLING_FILE_WATCHER=true
       - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
-    command: dotnet watch run --non-interactive --no-launch-profile
+    command: dotnet watch run --non-interactive --no-launch-profile --no-hot-reload
     depends_on:
       backend:
         condition: service_healthy
@@ -94,7 +91,5 @@ volumes:
   frontend_application_bin:
   frontend_domain_obj:
   frontend_domain_bin:
-  frontend_infrastructure_obj:
-  frontend_infrastructure_bin:
   frontend_shared_obj:
   frontend_shared_bin:
