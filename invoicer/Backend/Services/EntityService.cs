@@ -68,6 +68,7 @@ namespace Backend.Services
 			bool status = await entityRepository.DeleteAsync(id);
 			bool addressStatus = await addressRepository.DeleteAsync(addressId);
 			bool bankAccountStatus = await bankAccountRepository.DeleteAsync(bankAccountId);
+			await entityRepository.SaveChangesAsync();
 			return status && addressStatus && bankAccountStatus;
 		}
 	}
