@@ -6,8 +6,6 @@ Welcome to the Invoicer application documentation. This document provides develo
 
 The application aims to provide functionality for creating, managing, and potentially generating PDF versions of invoices, along with managing related entities like customers/business entities, bank accounts, and numbering schemes.
 
-**Note:** This documentation reflects the project structure as of `12. 5. 2025`. An architectural refactoring is planned to better align with Clean Architecture principles. Sections related to `Backend` and `Shared` will likely see significant changes.
-
 ## 2. Getting Started
 
 ### Prerequisites
@@ -31,40 +29,39 @@ The application aims to provide functionality for creating, managing, and potent
     *   Create the database file `Invoicer.db` in the `Backend/Database/` directory.
     *   Apply Entity Framework Core migrations:
         ```bash
-        cd src/Backend # Navigate to the Backend project directory
-        dotnet ef database update
+         dotnet ef migrations add InitialCreate -p .\Infrustructure\ -s .\Backend\
+         dotnet ef database update -s .\Backend\
         ```
     * The `Backend/Database/Patches/InsertSampleData.sql` script might be available for seeding initial data for testing. Execute this against your database if needed.
-4.  **Build the Solution:**
-    ```bash
-    dotnet build Invoicer.sln
-    ```
-5.  **Run the Application:**
- - **Using Docker Compose:**
-        ```
-        docker-compose -f docker-compose.dev.yml up
-        ```
-        This will start the application in development mode with the necessary services.
-  - **Manually**
-    *   **Backend API:**
+4.  **Run the Application:**
+
+    * Using Docker Compose:
+        * Development mode:
+            ```bash
+            docker compose -f docker-compose.dev.yml up
+            ```
+        * Staging mode:
+            ```bash
+            docker compose -f docker-compose.staging.yml up
+            ```
+   * Manually:
+     * Backend API:
         ```bash
         cd src/Backend
         dotnet run
         ```
-        The API will typically be available at `https://localhost:xxxx` or `http://localhost:yyyy` (check the console output).
-    *   **Frontend UI:**
+        For the URL, check the console output.
+
+     * Frontend UI:
         ```bash
         cd src/Frontend
         dotnet run
         ```
-        The Blazor WebAssembly application will typically be available at a different port (check console output). Access it via your web browser.
+        For the URL, check the console output.
 
 ## 3. Project Architecture Overview
 
-### Database Structure
-![Database Structure](../assets/db_model.jpg)
-
-### Layered Architecture
+### Architecture Diagram
 
 The solution follows a multi-project structure, currently organized as follows:
 
@@ -100,7 +97,11 @@ The solution follows a multi-project structure, currently organized as follows:
     *   `appsettings.json`: Configuration files.
     *   `Program.cs`: Application entry point and service configuration.
 
-#### 3.4. `Invoicer.Frontend`
+
+#### 3.4. `Invoicer.Infrastructure`
+*   **Purpose:** (Future) Dedicated project for infrastructure concerns, including database access, external service integrations, and implementations of application services.
+
+#### 3.5. `Invoicer.Frontend`
 
 *   **Purpose:** The user interface layer, built using Blazor WebAssembly. It interacts with the `Backend` via HTTP API calls.
 *   **Key Contents:**
@@ -114,7 +115,7 @@ The solution follows a multi-project structure, currently organized as follows:
     *   `Validators/`: Custom validation attributes used in forms.
     *   `Program.cs`: Frontend application entry point and service configuration.
 
-#### 3.5. `Invoicer.Shared`
+#### 3.6. `Invoicer.Shared`
 
 *   **Purpose:** A library for code shared across multiple projects, primarily `Frontend` and `Backend`.
 *   **Key Contents:**
@@ -134,29 +135,25 @@ The solution follows a multi-project structure, currently organized as follows:
 *   **ORM:** Entity Framework Core
 *   **PDF Generation:** QuestPDF
 
-## 5. Dependencies Overview (as of `12. 5. 2025`)
+## 5. Dependencies Overview
 
-*   `Frontend` -> `Shared`
-*   `Backend` -> `Application`, `Domain`, `Shared`
+*   `Backend` -> `Infrastructure`
+*   `Frontend` -> `Application`
+*   `Infrastructure` -> `Application`
 *   `Application` -> `Domain`, `Shared`
 *   `Domain` -> `Shared`
-*   `Shared` -> (None of the above)
+*   `Shared` -> None
 
-**Interaction Note:** `Frontend` interacts with `Backend` primarily via HTTP calls defined in `Frontend/Api/` services, targeting the controllers in the `Backend` project.
+**Interaction:** `Frontend` interacts with `Backend` primarily via HTTP calls defined in `Frontend/Api/` services, targeting the controllers in the `Backend` project.
 
-## 6. Key Concepts & Features
+## 6. Database Model
+### Database Structure
+![Database Structure](../assets/db_model.jpg)
+
+## 7. Key Concepts & Features
 
 *   **Invoicing:** Core functionality revolves around creating, reading, updating, and deleting Invoices and InvoiceItems. Domain models and Backend services/controllers are central.
 *   **Entity Management:** Managing business entities (customers/suppliers) that issue or receive invoices.
 *   **Numbering Schemes:** Configurable schemes for generating sequential invoice numbers, potentially per entity and year/period. See `Domain/Services/InvoiceNumberGenerator.cs` and related state management services (`IEntityInvoiceNumberingStateService`).
 *   **PDF Generation:** Generating PDF documents for invoices. See `Application/Interfaces/IInvoicePdfGenerator.cs` and its implementation in `Backend/Utils/InvoicePdfGenerator/`.
 *   **ARES API Integration:** Interacting with the ARES system (Czech business registry). See `Backend/Services/AresApiService.cs`, `Backend/Controllers/AresController.cs`, and related models in `Shared/Api/`.
-
-## 7. Future Refactoring Goals (High-Level)
-
-*   Introduce a dedicated `Infrastructure` project.
-*   Move EF Core DbContext, migrations, and repository/service implementations from `Backend` to `Infrastructure`.
-*   Move external service implementations (PDF, ARES client) to `Infrastructure`.
-*   Move DTOs and Application-level service interfaces from `Shared` to `Application`.
-*   Ensure `Backend` primarily functions as the API/Presentation layer and Composition Root.
-*   Minimize the scope of the `Shared` project to only truly universal items (e.g., core enums, minimal base types).
