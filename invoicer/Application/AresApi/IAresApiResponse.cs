@@ -1,4 +1,4 @@
-﻿namespace Application.DTOs.AresApi
+﻿namespace Application.AresApi
 {
 	public interface IAresApiResponse { }
 }

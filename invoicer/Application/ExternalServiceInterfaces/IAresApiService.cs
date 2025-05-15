@@ -1,4 +1,4 @@
-﻿using Application.DTOs.AresApi;
+﻿using Application.AresApi;
 using Application.Interfaces;
 
 namespace Application.ExternalServiceInterfaces

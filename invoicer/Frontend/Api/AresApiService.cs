@@ -1,8 +1,7 @@
 ﻿using System.Text.Json;
 using Application.Interfaces;
-using Application.DTOs.AresApi;
 using Application.ExternalServiceInterfaces;
-using Infrastructure.ExternalServices.AresApi.AresApiModels;
+using Application.AresApi;
 
 namespace Frontend.Api
 {
