@@ -8,15 +8,13 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # 1. Copy project files (.csproj) for Frontend and Shared
-COPY ["Frontend/Frontend.csproj", "Frontend/"]
-COPY ["Shared/Shared.csproj", "Shared/"]
+COPY ["Frontend/", "Frontend/"]
+COPY ["Application/", "Application/"]
+COPY ["Domain/", "Domain/"]
+COPY ["Shared/", "Shared/"]
 
 # 2. Restore dependencies
 RUN dotnet restore "Frontend/Frontend.csproj"
-
-# 3. Copy the rest of the source code for these projects
-COPY ["Frontend/", "Frontend/"]
-COPY ["Shared/", "Shared/"]
 
 # 4. Publish Blazor WASM app. The key output is the 'wwwroot' folder.
 WORKDIR "/src/Frontend"
