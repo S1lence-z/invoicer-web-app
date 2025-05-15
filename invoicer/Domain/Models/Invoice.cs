@@ -2,7 +2,7 @@
 
 namespace Domain.Models
 {
-	public class Invoice
+	public record class Invoice
 	{
 		public int Id { get; set; }
 		public int SellerId { get; set; }
@@ -19,8 +19,8 @@ namespace Domain.Models
 		public int NumberingSchemeId { get; set; }
 
 		// Navigation properties
-		public Entity? Seller { get; set; }
-		public Entity? Buyer { get; set; }
-		public virtual NumberingScheme? InvoiceNumberingScheme { get; set; }
+		public virtual Entity Seller { get; set; } = null!;
+		public virtual Entity Buyer { get; set; } = null!;
+		public virtual NumberingScheme InvoiceNumberingScheme { get; set; } = null!;
 	}
 }

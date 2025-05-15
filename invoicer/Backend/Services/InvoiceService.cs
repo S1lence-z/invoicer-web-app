@@ -49,7 +49,7 @@ namespace Backend.Services
 
 			Invoice invoice = InvoiceMapper.MapToDomain(newInvoice);
 			await invoiceRepository.CreateAsync(invoice);
-			await entityInvoiceNumberingStateService.UpdateForNextAsync(seller.Id, EntityInvoiceNumberingStateUpdateStatus.Creating, newInvoice.IsCustomInvoiceNumber, invoice);
+			await entityInvoiceNumberingStateService.UpdateForNextAsync(seller.Id, Status.Creating, newInvoice.IsCustomInvoiceNumber, invoice);
 			await invoiceRepository.SaveChangesAsync();
 
 			// TODO: how does this know the id?
@@ -79,7 +79,7 @@ namespace Backend.Services
 			if (existingInvoice.InvoiceNumber != updatedInvoice.InvoiceNumber)
 			{
 				existingInvoice.InvoiceNumber = updatedInvoice.InvoiceNumber;
-				await entityInvoiceNumberingStateService.UpdateForNextAsync(existingInvoice.SellerId, EntityInvoiceNumberingStateUpdateStatus.Updating, updatedInvoice.IsCustomInvoiceNumber, existingInvoice);
+				await entityInvoiceNumberingStateService.UpdateForNextAsync(existingInvoice.SellerId, Status.Updating, updatedInvoice.IsCustomInvoiceNumber, existingInvoice);
 			}
 
 			invoiceRepository.Update(existingInvoice);
@@ -92,7 +92,7 @@ namespace Backend.Services
 		public async Task<bool> DeleteAsync(int id)
 		{
 			Invoice existingInvoice = await invoiceRepository.GetByIdAsync(id, false);
-			await entityInvoiceNumberingStateService.UpdateForNextAsync(existingInvoice.SellerId, EntityInvoiceNumberingStateUpdateStatus.Deleting, false, existingInvoice);
+			await entityInvoiceNumberingStateService.UpdateForNextAsync(existingInvoice.SellerId, Status.Deleting, false, existingInvoice);
 			bool status = await invoiceRepository.DeleteAsync(id);
 			await invoiceRepository.SaveChangesAsync();
 			return status;

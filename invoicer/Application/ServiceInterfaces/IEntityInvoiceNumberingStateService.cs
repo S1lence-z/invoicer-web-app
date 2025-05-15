@@ -9,6 +9,6 @@ namespace Application.ServiceInterfaces
 
 		Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate);
 
-		Task<bool> UpdateForNextAsync(int entityId, EntityInvoiceNumberingStateUpdateStatus updateStatus, bool isUsingUserDefinedState, Invoice invoice);
+		Task<bool> UpdateForNextAsync(int entityId, Status updateStatus, bool isUsingUserDefinedState, Invoice invoice);
 	}
 }

@@ -127,7 +127,7 @@ namespace Infrastructure.Persistance
 				invoice.Property(i => i.DeliveryMethod).HasConversion<string>().HasDefaultValue(DeliveryMethod.PersonalPickUp);
 				invoice.HasMany(i => i.Items).WithOne().HasForeignKey(i => i.InvoiceId).OnDelete(DeleteBehavior.Cascade);
 
-				// Invoice Number Scheme
+				// Invoice Numbering Scheme
 				invoice.Property(i => i.NumberingSchemeId).IsRequired();
 				invoice.HasOne(i => i.InvoiceNumberingScheme)
 					.WithMany(ins => ins.InvoicesGeneratedWithScheme)

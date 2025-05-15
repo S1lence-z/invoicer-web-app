@@ -32,6 +32,7 @@ namespace Infrastructure.Repositories
 				.Include(i => i.Buyer)
 					.ThenInclude(b => b!.BankAccount)
 				.Include(i => i.Items)
+				.Include(i => i.InvoiceNumberingScheme)
 				.AsNoTracking()
 				.ToListAsync();
 		}
@@ -40,6 +41,7 @@ namespace Infrastructure.Repositories
 		{
 			if (isReadonly)
 				return await context.Invoice
+					.Where(i => i.SellerId == entityId)
 					.Include(i => i.Seller)
 						.ThenInclude(s => s!.Address)
 					.Include(i => i.Seller)
@@ -49,8 +51,8 @@ namespace Infrastructure.Repositories
 					.Include(i => i.Buyer)
 						.ThenInclude(b => b!.BankAccount)
 					.Include(i => i.Items)
+					.Include(i => i.InvoiceNumberingScheme)
 					.AsNoTracking()
-					.Where(i => i.SellerId == entityId)
 					.ToListAsync() ?? throw new KeyNotFoundException($"No invoice found for entity with id {entityId}");
 			else
 				return await context.Invoice
@@ -64,6 +66,7 @@ namespace Infrastructure.Repositories
 					.Include(i => i.Buyer)
 						.ThenInclude(b => b!.BankAccount)
 					.Include(i => i.Items)
+					.Include(i => i.InvoiceNumberingScheme)
 					.ToListAsync() ?? throw new KeyNotFoundException($"No invoice found for entity with id {entityId}");
 		}
 
