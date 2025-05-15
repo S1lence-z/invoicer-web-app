@@ -8,7 +8,7 @@
     <h4 class="text-primary mx-auto">@L["SectionTitle"]</h4>
     <div class="d-flex flex-row gap-4 text-center align-items-center my-2">
         <input type="text" class="form-control" placeholder="@L["IcoInputPlaceholder"]" value="@UserInputIco" @oninput="HandleUserInputChange" />
-        <button class="btn btn-success w-50" @onclick="OnFillInAresData.InvokeAsync">@L["FillInButton"]</button>
+        <button disabled="@(string.IsNullOrEmpty(UserInputIco) || UserInputIco.Length != IcoLength)" class="btn btn-success w-50" @onclick="OnFillInAresData.InvokeAsync">@L["FillInButton"]</button>
     </div>
     @if (!string.IsNullOrEmpty(AresApiErrorMessage))
     {
@@ -22,6 +22,8 @@
     [Parameter, EditorRequired] public EventCallback<string> UserInputIcoChanged { get; set; }
     [Parameter, EditorRequired] public EventCallback<bool> OnFillInAresData { get; set; }
     [Parameter, EditorRequired] public string AresApiErrorMessage { get; set; } = string.Empty;
+
+    private const int IcoLength = 8;
 
     private async Task HandleUserInputChange(ChangeEventArgs e)
     {
