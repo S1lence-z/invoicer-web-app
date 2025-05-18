@@ -35,7 +35,7 @@ The "Entities" section allows you to manage the businesses or individuals you in
 ### Adding a New Entity
 1.  Navigate to the **Entities** screen.
 2.  Click the **Add New Entity** button (usually located in the top right of the content area).
-3.  An "Add New Entity" pop-up window will appear.
+3.  You will be redirected to the "Add Entity" page.
 4.  **(Optional - Czech Entities):** If you know the Czech ICO (IÈO) number, enter it in the **Enter ICO...** field at the top and click **Fill In**. The system may attempt to automatically populate some fields based on the ARES registry.
 5.  **Fill in the details:**
     *   Name
@@ -83,7 +83,7 @@ This section covers creating and managing your invoices.
 ### Adding a New Invoice
 1.  Navigate to the **Invoices** screen.
 2.  Click the **Add New Invoice** button (top right).
-3.  An "Add New Invoice" pop-up window will appear.
+3.  An "Add New Invoice" page will appear.
 4.  **Fill in the Invoice Header details:**
     *   **Invoice Number:** This may be generated automatically based on your numbering schemes. You might be able to click **Customize** to enter a specific number if needed (use with caution).
     *   **Issue Date, Due Date, VAT Date:** Enter or select the relevant dates.
@@ -103,7 +103,8 @@ This section covers creating and managing your invoices.
         *   Enter or select the **VAT Rate** (e.g., 0.21 for 21%).
     *   Click the **Add Item** button to add another line item row.
     *   Click the **Remove** button next to an item row to delete it.
-6.  Once all header details and line items are complete, click the **Submit Invoice** button.
+6.  If you forgot to add a buyer entity, you can click the **+** button next to the "Select a buyer" field to create a new entity directly from the invoice form.
+7.  Once all header details and line items are complete, click the **Submit Invoice** button.
 
 ![invoice_form](../assets/invoice_form.png)
 
