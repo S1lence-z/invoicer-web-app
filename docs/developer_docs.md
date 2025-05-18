@@ -65,66 +65,65 @@ The application aims to provide functionality for creating, managing, and potent
 
 The solution follows a multi-project structure, currently organized as follows:
 
-![Project Structure](../assets/project_architecture.jpg)
+![Project Structure](../assets/project_architecture.jpeg)
 
-#### 3.1. `Invoicer.Domain`
-
-*   **Purpose:** Contains the core business logic, models (entities), and domain-specific rules, independent of other layers.
-*   **Key Contents:**
-    *   `Models/`: Contains Plain Old C# Objects (POCOs) representing the core business entities (e.g., `Invoice.cs`, `Entity.cs`, `Address.cs`, `NumberingScheme.cs`). These should ideally only contain data and core business rules/methods.
-    *   `Services/`: Contains domain services encapsulating logic that doesn't naturally belong to a single entity (e.g., `InvoiceNumberGenerator.cs`).
-    *   `Interfaces/`: Defines interfaces for domain services or abstractions needed *within* the domain itself (e.g., `IInvoiceNumberGenerator.cs`).
-
-#### 3.2. `Invoicer.Application`
-
-*   **Purpose:** Intended to orchestrate application use cases/features. It defines interfaces for infrastructure concerns and contains application-specific logic like mapping.
-*   **Key Contents:**
-    *   `Interfaces/`: Defines contracts (interfaces) for services that the application layer needs but are implemented elsewhere (typically Infrastructure, but currently some might be in `Backend`). Examples: `IInvoicePdfGenerator.cs`, `IEntityInvoiceNumberingStateService.cs`.
-    *   `Mappers/`: Contains logic (e.g., using AutoMapper profiles or manual mapping) to convert between Domain entities and Data Transfer Objects (DTOs) or other models (e.g., `InvoiceMapper.cs`).
-    *   *(Future)* This layer should ideally contain Command/Query handlers, DTOs, validation logic, and application-specific exceptions after refactoring.
-
-#### 3.3. `Invoicer.Backend`
-
-*   **Purpose:** Currently serves multiple roles:
-    1.  **API Layer:** Exposes HTTP endpoints for the `Frontend` or other clients.
-    2.  **Infrastructure/Persistence Layer:** Contains database interaction logic (EF Core) and implementations for some services defined in `Application` or `Shared`.
-    3.  **Composition Root:** Configures dependency injection, middleware, and application startup (`Program.cs`).
-*   **Key Contents:**
-    *   `Controllers/`: ASP.NET Core API controllers handling incoming HTTP requests (e.g., `InvoiceController.cs`).
-    *   `Database/`: Contains the Entity Framework Core `DbContext` (`ApplicationDbContext.cs`), migrations (`Migrations/`), and potentially seed scripts/patches. **(This belongs in an Infrastructure layer)**.
-    *   `Services/`: Contains concrete implementations of services, including those performing data access using EF Core (e.g., `InvoiceService.cs`, `AddressService.cs`) and external interactions (`AresApiService.cs`). **(These implementations belong in an Infrastructure layer)**.
-    *   `Utils/`: Utility classes specific to the backend, including implementations like `InvoicePdfGenerator.cs`. **(Implementations belong in an Infrastructure layer)**.
-    *   `appsettings.json`: Configuration files.
-    *   `Program.cs`: Application entry point and service configuration.
-
-
-#### 3.4. `Invoicer.Infrastructure`
-*   **Purpose:** (Future) Dedicated project for infrastructure concerns, including database access, external service integrations, and implementations of application services.
-
-#### 3.5. `Invoicer.Frontend`
-
-*   **Purpose:** The user interface layer, built using Blazor WebAssembly. It interacts with the `Backend` via HTTP API calls.
-*   **Key Contents:**
-    *   `wwwroot/`: Static assets (CSS, JavaScript, images).
-    *   `Api/`: Contains client-side services or typed HttpClients responsible for calling the `Backend` API endpoints (e.g., `InvoiceService.cs` here calls the `Backend`'s `InvoiceController`).
-    *   `Components/`: Reusable Blazor UI components (.razor files).
-    *   `Layout/`: Defines the main application layout structure (`MainLayout.razor`, `NavMenu.razor`).
-    *   `Models/`: Contains View Models specific to the Frontend (e.g., `InvoiceFormModel.cs`).
-    *   `Pages/`: Routable Blazor components representing application pages (.razor files).
-    *   `Services/`: Client-side services for UI logic (e.g., `LoadingService.cs`, `ErrorService.cs`).
-    *   `Validators/`: Custom validation attributes used in forms.
-    *   `Program.cs`: Frontend application entry point and service configuration.
-
-#### 3.6. `Invoicer.Shared`
+#### 3.1. `Invoicer.Shared`
 
 *   **Purpose:** A library for code shared across multiple projects, primarily `Frontend` and `Backend`.
 *   **Key Contents:**
-    *   `Api/`: Contains models related to specific external APIs (e.g., `AresApiModels`, `AresApiResponse.cs`). **(Consider moving API-specific contracts/models closer to their usage or into Application/Infrastructure)**.
-    *   `DTOs/`: Data Transfer Objects used for communication between layers, especially between `Backend` and `Frontend` (e.g., `InvoiceDto.cs`). **(Many of these might belong in Application)**.
-    *   `Enums/`: Enumerations used across different layers (e.g., `InvoiceStatus.cs`, `Currency.cs`).
-    *   `Extensions/`: Extension methods for common types (`StringExtensions.cs`, `DateTimeExtensions.cs`).
-    *   `Interfaces/`: Currently contains some shared interfaces (`IAresApiResponse.cs`, `IPdfGenerationResult.cs`) and *service contracts* (`ServiceInterfaces/` like `IInvoiceService.cs`). **(Service contracts primarily belong in Application)**.
-    *   `PdfGenerator/`: Potentially shared models or base components related to PDF generation.
+    *   `Enums/`: Enumerations used across different layers (`InvoiceStatus.cs`, `Currency.cs`)
+    *   `Extensions/`: Extension methods for common types (`StringExtensions.cs`, `DateTimeExtensions.cs`)
+
+#### 3.2. `Invoicer.Domain`
+
+*   **Purpose:** Contains the core business logic, models (entities), and domain-specific rules, independent of other layers.
+*   **Key Contents:**
+    *   `Models/`: Contains Plain Old C# Objects (POCOs) representing the core business entities (`Invoice.cs`, `Entity.cs`). These should ideally only contain data and core business rules/methods.
+    *   `Services/`: Contains domain services encapsulating logic that doesn't naturally belong to a single entity (`InvoiceNumberGenerator.cs`)
+    *   `Interfaces/`: Defines interfaces for domain services or abstractions needed *within* the domain itself (`IInvoiceNumberGenerator.cs`)
+
+#### 3.3. `Invoicer.Application`
+
+*   **Purpose:** Intended to orchestrate application use cases/features. It defines interfaces for infrastructure concerns and contains application-specific logic like mapping.
+*   **Key Contents:**
+    *  `AresApi/`: Contains models and services related to the ARES API integration, models and contracts.
+    *  `DTOs/`: Data Transfer Objects used for communication between layers, especially between `Backend` and `Frontend` (`InvoiceDto.cs`)
+    *  `Extensions`: Extension methods for DTOs (`InvoiceDtoExtensions.cs`)
+    *  `ExternalServiceInterfaces/`: Contains interfaces for external services (`IAresApiService.cs`, `IInvoicePdfGenerator.cs`), which are implemented in the `Infrastructure` layer.
+    *  `Interfaces/`: Defines base interfaces (`IRepository.cs`, `IResult.cs`, `IService.cs`)
+    *  `Mappers/`: Contains logic to convert between Domain entities and Data Transfer Objects (DTOs) or other models (`InvoiceMapper.cs`)
+    *  `RepositoryInterfaces/`: Contains interfaces for repositories, which are implemented in the `Infrastructure` layer (`IInvoiceRepository.cs`, `IEntityRepository.cs`)
+    *  `ServiceInterfaces/`: Contains interfaces for application services, which are implemented in the `Infrastructure` layer (`IInvoiceService.cs`, `IEntityService.cs`) 
+
+#### 3.4. `Invoicer.Infrastructure`
+*   **Purpose:** Dedicated project for infrastructure concerns, including database access, external service integrations, and implementations of application services.
+  * **Key Contents:**
+    *  `Persistance/`: Contains the Entity Framework Core `DbContext` (`ApplicationDbContext.cs`), migrations (`Migrations/`) and the database itself (Sqlite).
+    *  `Repositories/`: Contains concrete implementations of repository interfaces defined in `Application` (`InvoiceRepository.cs`, `EntityRepository.cs`).
+    *  `ExternalServices/`: Contains implementations of external service interfaces defined in `Application` (`AresApiService.cs`, `InvoicePdfGenerator.cs`).
+
+#### 3.5. `Invoicer.Backend`
+
+*   **Purpose:** Currently serves multiple roles:
+    1.  **API Layer:** Exposes HTTP endpoints for the `Frontend` or other clients.
+    3.  **Composition Root:** Configures dependency injection, middleware, and application startup (`Program.cs`).
+*   **Key Contents:**
+    *   `Controllers/`: ASP.NET Core API controllers handling incoming HTTP requests (e.g., `InvoiceController.cs`).
+    *   `Services/`: Contains concrete implementations of services, including those performing data access using EF Core (`InvoiceService.cs`, `AddressService.cs`)
+    *   `Utils/`: Utility classes specific to the backend (`EntityInvoiceNumberingStateUpdater.cs`, ...)
+
+#### 3.6. `Invoicer.Frontend`
+
+*   **Purpose:** The user interface layer, built using Blazor WebAssembly. It interacts with the `Backend` via HTTP API calls.
+*   **Key Contents:**
+    *   `Api/`: Contains client-side services or typed HttpClients responsible for calling the `Backend` API endpoints (e.g., `InvoiceService.cs` here calls the `Backend`'s `InvoiceController`).
+    *   `Pages/`: Routable Blazor components representing application pages (.razor files).
+    *   `Utils/`: Utility classes specific to the frontend (`NavLinkItem.cs`, `NavMenuItemsProvider.cs`).
+    *   `Components/`: Reusable Blazor UI components (.razor files).
+    *   `Services/`: Client-side services for UI logic (e.g., `LoadingService.cs`, `ErrorService.cs`).
+    *   `Models/`: Contains View Models specific to the Frontend (e.g., `InvoiceFormModel.cs`).
+    *   `Validators/`: Custom validation attributes used in forms.
+    *   `Layout/`: Defines the main application layout structure (`MainLayout.razor`, `NavMenu.razor`).
 
 ## 4. Technology Stack
 
@@ -137,12 +136,12 @@ The solution follows a multi-project structure, currently organized as follows:
 
 ## 5. Dependencies Overview
 
+*   `Shared` -> None
+*   `Domain` -> `Shared`
+*   `Application` -> `Domain`
+*   `Infrastructure` -> `Application`
 *   `Backend` -> `Infrastructure`
 *   `Frontend` -> `Application`
-*   `Infrastructure` -> `Application`
-*   `Application` -> `Domain`, `Shared`
-*   `Domain` -> `Shared`
-*   `Shared` -> None
 
 **Interaction:** `Frontend` interacts with `Backend` primarily via HTTP calls defined in `Frontend/Api/` services, targeting the controllers in the `Backend` project.
 
