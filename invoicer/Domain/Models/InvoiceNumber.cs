@@ -39,7 +39,7 @@ namespace Domain.Models
 		public static InvoiceNumber FromString(string potentialInvoiceNumber, NumberingScheme scheme, IInvoiceNumberParser parser)
 		{
 			if (!parser.TryParse(potentialInvoiceNumber, scheme, out ParsedInvoiceNumberComponents components, out string? errorMessage))
-				throw new ArgumentException($"Invalid invoice number string '{potentialInvoiceNumber}' for scheme with id'{scheme.Id}': {errorMessage}");
+				throw new ArgumentException($"Invalid invoice number string '{potentialInvoiceNumber}' for scheme with id '{scheme.Id}': {errorMessage}");
 			return new InvoiceNumber(potentialInvoiceNumber, scheme, components);
 		}
 	}

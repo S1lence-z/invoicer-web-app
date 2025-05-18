@@ -153,7 +153,7 @@ namespace Backend.Services
 			IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesBySellerId(newInvoice.SellerId, true);
 			foreach (Invoice invoice in existingInvoices.Where(inv => inv.Id != newInvoice.Id))
 			{
-				int existingSequenceNumber = InvoiceNumber.FromString(invoice.InvoiceNumber, newInvoiceNumberingScheme, invoiceNumberParser).GetSequenceNumberAsInt();
+				int existingSequenceNumber = InvoiceNumber.FromString(invoice.InvoiceNumber, invoice.InvoiceNumberingScheme, invoiceNumberParser).GetSequenceNumberAsInt();
 				if (existingSequenceNumber > newSequenceNumber)
 					newSequenceNumber = existingSequenceNumber;
 			}
