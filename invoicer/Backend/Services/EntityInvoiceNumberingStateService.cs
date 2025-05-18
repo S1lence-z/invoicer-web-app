@@ -1,13 +1,12 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
-using Backend.Utils;
 using Shared.Enums;
 using Application.RepositoryInterfaces;
 using Application.ServiceInterfaces;
 
 namespace Backend.Services
 {
-	public class EntityInvoiceNumberingStateService(IEntityInvoiceNumberingStateRepository numberingStateRepository, IEntityRepository entityRepository, INumberingSchemeRepository numberingSchemeRepository, IInvoiceRepository invoiceRepository, IInvoiceNumberGenerator invoiceNumberGenerator) : IEntityInvoiceNumberingStateService
+	public class EntityInvoiceNumberingStateService(IEntityInvoiceNumberingStateRepository numberingStateRepository, IEntityRepository entityRepository, INumberingSchemeRepository numberingSchemeRepository, IInvoiceRepository invoiceRepository, IInvoiceNumberGenerator invoiceNumberGenerator, IInvoiceNumberParser invoiceNumberParser) : IEntityInvoiceNumberingStateService
 	{
 		public async Task<EntityInvoiceNumberingSchemeState> CreateByEntityId(int entityId)
 		{
@@ -51,7 +50,7 @@ namespace Backend.Services
 			EntityInvoiceNumberingSchemeState state = await numberingStateRepository.GetByEntityIdAsync(entityId, true);
 
 			// Generate the next updatedInvoice number and update the state
-			string newInvoiceNumber = invoiceNumberGenerator.GenerateInvoiceNumber(numberingScheme, state, generationDate);
+			string newInvoiceNumber = invoiceNumberGenerator.Generate(numberingScheme, state, generationDate);
 			return newInvoiceNumber;
 		}
 
@@ -94,25 +93,14 @@ namespace Backend.Services
 		{
 			if (isUsingUserDefinedState)
 			{
-				string customSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(newInvoice.InvoiceNumber, newInvoiceNumberingScheme);
-				if (!int.TryParse(customSequenceNumber, out int newSequenceNumber))
-					throw new ArgumentException($"Invalid sequence number in invoice number: {newInvoice.InvoiceNumber}");
+				InvoiceNumber customInvoiceNumber = InvoiceNumber.FromString(newInvoice.InvoiceNumber, newInvoiceNumberingScheme, invoiceNumberParser);
+				int newSequenceNumber = customInvoiceNumber.GetSequenceNumberAsInt();
 
 				// Check if the new sequence number does not already exist by looking at existing invoices for the current seller
-				if (!await IsInvoiceNumberUnique(newInvoice.InvoiceNumber, newInvoice.SellerId))
+				if (!await invoiceRepository.IsInvoiceNumberUniqueForSellerAsync(newInvoice.InvoiceNumber, newInvoice.SellerId))
 					throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} already exists for this entity");
 
-				// Set the biggest sequence number as the last one for the state
-				IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesByEntityId(newInvoice.SellerId, true);
-				foreach (Invoice invoice in existingInvoices)
-				{
-					string extractedSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(invoice.InvoiceNumber, newInvoiceNumberingScheme);
-					if (!int.TryParse(extractedSequenceNumber, out int existingSequenceNumber))
-						throw new ArgumentException($"Invalid sequence number in invoice number: {invoice.InvoiceNumber}");
-					if (existingSequenceNumber > newSequenceNumber)
-						newSequenceNumber = existingSequenceNumber;
-				}
-
+				newSequenceNumber = await GetLastSequenceNumber(newInvoice, newInvoiceNumberingScheme, newSequenceNumber);
 				state.SetNewSequenceNumber(newSequenceNumber);
 			}
 			else
@@ -123,29 +111,15 @@ namespace Backend.Services
 		{
 			if (isUsingUserDefinedState)
 			{
-				string customSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(updatedInvoice.InvoiceNumber, updatedInvoicesNumberingScheme);
-				if (!int.TryParse(customSequenceNumber, out int newSequenceNumber))
-					throw new ArgumentException($"Invalid sequence number in invoice number: {updatedInvoice.InvoiceNumber}");
+				InvoiceNumber customInvoiceNumber = InvoiceNumber.FromString(updatedInvoice.InvoiceNumber, updatedInvoicesNumberingScheme, invoiceNumberParser);
+				int newSequenceNumber = customInvoiceNumber.GetSequenceNumberAsInt();
 
 				// Check if the new sequence number does not already exist by looking at existing invoices for the current seller
-				if (!await IsInvoiceNumberUnique(updatedInvoice.InvoiceNumber, updatedInvoice.SellerId))
+				if (!await invoiceRepository.IsInvoiceNumberUniqueForSellerAsync(updatedInvoice.InvoiceNumber, updatedInvoice.SellerId))
 					throw new ArgumentException($"Invoice number {updatedInvoice.InvoiceNumber} already exists for this entity");
 
 				// Set the biggest sequence number as the last one for the state
-				IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesByEntityId(updatedInvoice.SellerId, true);
-				foreach (Invoice invoice in existingInvoices)
-				{
-					if (invoice.Id == updatedInvoice.Id)
-						continue;
-					
-					string extractedSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(invoice.InvoiceNumber, invoice.InvoiceNumberingScheme);
-					if (!int.TryParse(extractedSequenceNumber, out int existingSequenceNumber))
-						throw new ArgumentException($"Invalid sequence number in invoice number: {invoice.InvoiceNumber}");
-
-					if (existingSequenceNumber > newSequenceNumber)
-						newSequenceNumber = existingSequenceNumber;
-				}
-
+				newSequenceNumber = await GetLastSequenceNumber(updatedInvoice, updatedInvoicesNumberingScheme, newSequenceNumber);
 				state.SetNewSequenceNumber(newSequenceNumber);
 			}
 			else
@@ -166,24 +140,25 @@ namespace Backend.Services
 			NumberingScheme lastInvoiceNumberingScheme = await numberingSchemeRepository.GetByIdAsync(lastInvoice.NumberingSchemeId, true);
 
 			// Extract the sequence number from the last invoice
-			string extractedSequenceNumber = InvoiceNumberUtils.ExtractSequenceNumber(lastInvoice.InvoiceNumber, lastInvoiceNumberingScheme);
-			if (!int.TryParse(extractedSequenceNumber, out int lastSequenceNumber))
-				throw new ArgumentException($"Invalid sequence number in invoice number: {lastInvoice.InvoiceNumber}");
+			int lastSequenceNumber = InvoiceNumber.FromString(lastInvoice.InvoiceNumber, lastInvoiceNumberingScheme, invoiceNumberParser).GetSequenceNumberAsInt();
 
 			// Check how many invoices this entity has
 			int invoiceCount = await invoiceRepository.GetInvoiceCountByEntityId(entityId);
 			state.SetNewSequenceNumber(lastSequenceNumber);
 		}
 
-		private async Task<bool> IsInvoiceNumberUnique(string invoiceNumber, int entityId)
+		private async Task<int> GetLastSequenceNumber(Invoice newInvoice, NumberingScheme newInvoiceNumberingScheme, int newSequenceNumber)
 		{
-			IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesByEntityId(entityId, true);
-			foreach (Invoice invoice in existingInvoices)
+			// Set the biggest sequence number as the last one for the state
+			IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesBySellerId(newInvoice.SellerId, true);
+			foreach (Invoice invoice in existingInvoices.Where(inv => inv.Id != newInvoice.Id))
 			{
-				if (invoice.InvoiceNumber == invoiceNumber)
-					return false;
+				int existingSequenceNumber = InvoiceNumber.FromString(invoice.InvoiceNumber, newInvoiceNumberingScheme, invoiceNumberParser).GetSequenceNumberAsInt();
+				if (existingSequenceNumber > newSequenceNumber)
+					newSequenceNumber = existingSequenceNumber;
 			}
-			return true;
+
+			return newSequenceNumber;
 		}
 	}
 }

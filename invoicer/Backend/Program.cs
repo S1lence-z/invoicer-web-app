@@ -44,7 +44,8 @@ namespace Backend
 			// Add external services
 			builder.Services.AddScoped<IAresApiService, AresApiService>();
 			builder.Services.AddScoped<IInvoicePdfGenerator, QuestInvoicePdfGenerator>();
-			builder.Services.AddSingleton<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
+			builder.Services.AddScoped<IInvoiceNumberParser, InvoiceNumberParser>();
+			builder.Services.AddScoped<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();

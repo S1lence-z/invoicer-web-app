@@ -12,6 +12,7 @@ namespace Application.RepositoryInterfaces
 		Task<IEnumerable<Invoice>> GetAllAsync();
 		Task<Invoice?> GetLastInvoiceAsync(int entityId, bool isReadonly, params int[] invoiceIdsToExclude);
 		Task<int> GetInvoiceCountByEntityId(int entityId);
-		Task<IEnumerable<Invoice>> GetAllInvoicesByEntityId(int entityId, bool isReadonly);
+		Task<IEnumerable<Invoice>> GetAllInvoicesBySellerId(int entityId, bool isReadonly);
+		Task<bool> IsInvoiceNumberUniqueForSellerAsync(string invoiceNumber, int sellerId);
 	}
 }

@@ -4,11 +4,11 @@ using Shared.Enums;
 
 namespace Domain.Services
 {
-	public sealed class InvoiceNumberGenerator : IInvoiceNumberGenerator
+	public sealed class InvoiceNumberGenerator(IInvoiceNumberParser invoiceNumberParser) : IInvoiceNumberGenerator
 	{
-		public string GenerateInvoiceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime generationDate)
+		public InvoiceNumber Generate(NumberingScheme scheme, EntityInvoiceNumberingSchemeState currentState, DateTime generationDate)
 		{
-			int sequenceNumber = ShouldResetSequenceNumber(scheme, state, generationDate) ? 1 : state.LastSequenceNumber + 1;
+			int sequenceNumber = ShouldResetSequenceNumber(scheme, currentState, generationDate) ? 1 : currentState.LastSequenceNumber + 1;
 
 			// Format the sequence number with padding
 			string formattedSequenceNumber = scheme.SequencePadding > 0
@@ -38,11 +38,10 @@ namespace Domain.Services
 				parts.Add(formattedSequenceNumber);
 			}
 			else
-			{
 				throw new InvalidOperationException($"Invalid sequence position: {scheme.SequencePosition}");
-			}
 
-			return scheme.Prefix + string.Join(separator, parts.Where(p => !string.IsNullOrEmpty(p)));
+			string invoiceNumber = scheme.Prefix + string.Join(separator, parts.Where(p => !string.IsNullOrEmpty(p)));
+			return InvoiceNumber.FromString(invoiceNumber, scheme, invoiceNumberParser);
 		}
 
 		private static string GetYearPart(DateTime generationDate, YearFormat yearFormat)
