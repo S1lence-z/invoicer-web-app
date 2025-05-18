@@ -113,10 +113,10 @@ namespace Backend.Services
 						newSequenceNumber = existingSequenceNumber;
 				}
 
-				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, newSequenceNumber);
+				state.SetNewSequenceNumber(newSequenceNumber);
 			}
 			else
-				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, state.LastSequenceNumber + 1);
+				state.SetNewSequenceNumber(state.LastSequenceNumber + 1);
 		}
 
 		private async Task HandleUpdatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice updatedInvoice, NumberingScheme updatedInvoicesNumberingScheme)
@@ -146,10 +146,10 @@ namespace Backend.Services
 						newSequenceNumber = existingSequenceNumber;
 				}
 
-				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, newSequenceNumber);
+				state.SetNewSequenceNumber(newSequenceNumber);
 			}
 			else
-				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, state.LastSequenceNumber + 1);
+				state.SetNewSequenceNumber(state.LastSequenceNumber + 1);
 		}
 
 		private async Task HandleDeletingAsync(EntityInvoiceNumberingSchemeState state, int entityId, Invoice newInvoice)
@@ -158,7 +158,7 @@ namespace Backend.Services
 			Invoice? lastInvoice = await invoiceRepository.GetLastInvoiceAsync(entityId, true, newInvoice.Id);
 			if (lastInvoice is null)
 			{
-				EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, 0);
+				state.SetNewSequenceNumber(0);
 				return;
 			}
 
@@ -172,7 +172,7 @@ namespace Backend.Services
 
 			// Check how many invoices this entity has
 			int invoiceCount = await invoiceRepository.GetInvoiceCountByEntityId(entityId);
-			EntityInvoiceNumberingStateUpdater.SetNewSequenceNumber(state, lastSequenceNumber);
+			state.SetNewSequenceNumber(lastSequenceNumber);
 		}
 
 		private async Task<bool> IsInvoiceNumberUnique(string invoiceNumber, int entityId)

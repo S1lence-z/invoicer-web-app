@@ -52,7 +52,6 @@ namespace Backend.Services
 			await entityInvoiceNumberingStateService.UpdateForNextAsync(seller.Id, Status.Creating, newInvoice.IsCustomInvoiceNumber, invoice);
 			await invoiceRepository.SaveChangesAsync();
 
-			// TODO: how does this know the id?
 			Invoice createdInvoice = await invoiceRepository.GetByIdAsync(invoice.Id, true);
 			return InvoiceMapper.MapToDto(createdInvoice);
 		}
