@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Shared.Interfaces;
-using Shared.ServiceInterfaces;
-using Shared.AresApiModels;
+using Application.ExternalServiceInterfaces;
+using Application.Interfaces;
+using Application.AresApi;
 
 namespace Backend.Controllers
 {

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Shared.DTOs;
+using Application.DTOs;
 using Shared.Enums;
 
 namespace Frontend.Models

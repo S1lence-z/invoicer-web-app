@@ -1,11 +1,12 @@
 ﻿@page "/invoicenumbering"
+@using Application.DTOs
+@using Application.Extensions
+@using Application.ServiceInterfaces
 @using Frontend.Api
-@using Frontend.Services
 @using Frontend.Components
+@using Frontend.Services
 @using Microsoft.Extensions.Localization
-@using Shared.DTOs
 @using Shared.Extensions
-@using Shared.ServiceInterfaces
 @inject ErrorService errorService
 @inject IEntityService entityService
 @inject INumberingSchemeService numberingService

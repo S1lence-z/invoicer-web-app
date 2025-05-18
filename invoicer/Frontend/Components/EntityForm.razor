@@ -1,10 +1,11 @@
-﻿@using Frontend.Models
+﻿@using Application.AresApi
+@using Application.DTOs
+@using Application.ExternalServiceInterfaces
+@using Application.ServiceInterfaces
+@using Frontend.Models
 @using Frontend.Services
 @using Frontend.Utils
 @using Microsoft.Extensions.Localization
-@using Shared.AresApiModels
-@using Shared.DTOs
-@using Shared.ServiceInterfaces
 @inject IAresApiService aresApiService
 @inject IAddressService addressService
 @inject IEntityService entityService
@@ -170,7 +171,7 @@
         // Populate the form
         entityFormModel.Ico = newData.ico!;
         entityFormModel.Name = newData.obchodniJmeno!;
-        entityFormModel.Street = newData.sidlo!.nazevUlice + newData.sidlo.cisloDomovni;
+        entityFormModel.Street = string.Join(" ", [newData.sidlo!.nazevUlice, newData.sidlo.cisloDomovni]);
         entityFormModel.ZipCode = newData.sidlo.psc;
         entityFormModel.City = newData.sidlo.nazevObce!;
         entityFormModel.Country = newData.sidlo.nazevStatu!;

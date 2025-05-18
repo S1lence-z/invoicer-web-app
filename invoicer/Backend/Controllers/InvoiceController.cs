@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Shared.Api;
-using Shared.DTOs;
-using Shared.Interfaces;
-using Shared.ServiceInterfaces;
+﻿using Application.DTOs.Pdf;
+using Application.ServiceInterfaces;
+using Microsoft.AspNetCore.Mvc;
+using Application.DTOs.Api;
+using Application.DTOs;
 
 namespace Backend.Controllers
 {
@@ -65,7 +65,7 @@ namespace Backend.Controllers
 			}
 			catch (ArgumentException e)
 			{
-				return BadRequest(ApiErrorResponse.Create("Invalid request", e.Message, 400));
+				return BadRequest(ApiErrorResponse.Create(e.Message, e.Message, 400));
 			}
 			catch (KeyNotFoundException e)
 			{

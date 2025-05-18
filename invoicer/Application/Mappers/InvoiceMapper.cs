@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Shared.DTOs;
+using Application.DTOs;
 
 namespace Application.Mappers
 {
