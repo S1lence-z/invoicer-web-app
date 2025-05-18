@@ -4,7 +4,6 @@ using Backend.Utils;
 using Shared.Enums;
 using Application.RepositoryInterfaces;
 using Application.ServiceInterfaces;
-using Infrastructure.Repositories;
 
 namespace Backend.Services
 {

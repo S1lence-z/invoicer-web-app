@@ -1,5 +1,4 @@
 ﻿using Domain.Models;
-using Microsoft.EntityFrameworkCore;
 using Application.Mappers;
 using Application.DTOs;
 using Application.ServiceInterfaces;

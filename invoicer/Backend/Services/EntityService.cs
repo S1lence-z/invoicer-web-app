@@ -6,7 +6,7 @@ using Domain.Models;
 
 namespace Backend.Services
 {
-	public class EntityService(IEntityRepository entityRepository, IAddressRepository addressRepository, IBankAccountRepository bankAccountRepository,  INumberingSchemeService numberingSchemeService) : IEntityService
+	public class EntityService(IEntityRepository entityRepository, IAddressService addressService, IBankAccountService bankAccountService,  INumberingSchemeService numberingSchemeService) : IEntityService
 	{
 		public async Task<EntityDto> GetByIdAsync(int id)
 		{
@@ -22,8 +22,8 @@ namespace Backend.Services
 
 		public async Task<EntityDto> CreateAsync(EntityDto newEntityDto)
 		{
-			await addressRepository.GetByIdAsync(newEntityDto.AddressId, true);
-			await bankAccountRepository.GetByIdAsync(newEntityDto.BankAccountId, true);
+			await addressService.GetByIdAsync(newEntityDto.AddressId);
+			await bankAccountService.GetByIdAsync(newEntityDto.BankAccountId);
 
 			NumberingSchemeDto defaultScheme = await numberingSchemeService.GetDefaultNumberingSchemeAsync();
 			newEntityDto.CurrentNumberingSchemeId = defaultScheme.Id;
@@ -40,11 +40,11 @@ namespace Backend.Services
 		public async Task<EntityDto> UpdateAsync(int id, EntityDto newEntityData)
 		{
 			Entity existingEntity = await entityRepository.GetByIdAsync(id, false);
-			Address possibleNewAddress = await addressRepository.GetByIdAsync(newEntityData.AddressId, false);
-			BankAccount possibleNewBankAcc = await bankAccountRepository.GetByIdAsync(newEntityData.BankAccountId, false);
+			AddressDto possibleNewAddress = await addressService.GetByIdAsync(newEntityData.AddressId);
+			BankAccountDto possibleNewBankAcc = await bankAccountService.GetByIdAsync(newEntityData.BankAccountId);
 
-			existingEntity.Address = possibleNewAddress;
-			existingEntity.BankAccount = possibleNewBankAcc;
+			existingEntity.Address = AddressMapper.MapToDomain(possibleNewAddress);
+			existingEntity.BankAccount = BankAccountMapper.MapToDomain(possibleNewBankAcc);
 			existingEntity.Email = newEntityData.Email;
 			existingEntity.Ico = newEntityData.Ico;
 			existingEntity.Name = newEntityData.Name;
@@ -66,8 +66,8 @@ namespace Backend.Services
 			int addressId = entityToDelete.AddressId;
 			int bankAccountId = entityToDelete.BankAccountId;
 			bool status = await entityRepository.DeleteAsync(id);
-			bool addressStatus = await addressRepository.DeleteAsync(addressId);
-			bool bankAccountStatus = await bankAccountRepository.DeleteAsync(bankAccountId);
+			bool addressStatus = await addressService.DeleteAsync(addressId);
+			bool bankAccountStatus = await bankAccountService.DeleteAsync(bankAccountId);
 			await entityRepository.SaveChangesAsync();
 			return status && addressStatus && bankAccountStatus;
 		}
