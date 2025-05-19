@@ -19,29 +19,35 @@ namespace Domain.Services
 			string monthPart = scheme.IncludeMonth ? GetMonthPart(generationDate) : string.Empty;
 			string separator = scheme.UseSeperator ? scheme.Seperator : string.Empty;
 
-			List<string> parts = [];
-
-			if (scheme.SequencePosition == Position.Start)
-			{
-				parts.Add(formattedSequenceNumber);
-				if (scheme.InvoiceNumberYearFormat != YearFormat.None)
-					parts.Add(yearPart);
-				if (scheme.IncludeMonth)
-					parts.Add(monthPart);
-			}
-			else if (scheme.SequencePosition == Position.End)
-			{
-				if (scheme.InvoiceNumberYearFormat != YearFormat.None)
-					parts.Add(yearPart);
-				if (scheme.IncludeMonth)
-					parts.Add(monthPart);
-				parts.Add(formattedSequenceNumber);
-			}
-			else
-				throw new InvalidOperationException($"Invalid sequence position: {scheme.SequencePosition}");
+			List<string> parts = ConstructInvoiceNumberParts(scheme, formattedSequenceNumber, yearPart, monthPart);
 
 			string invoiceNumber = scheme.Prefix + string.Join(separator, parts.Where(p => !string.IsNullOrEmpty(p)));
 			return InvoiceNumber.FromString(invoiceNumber, scheme, invoiceNumberParser);
+		}
+
+		private static List<string> ConstructInvoiceNumberParts(NumberingScheme scheme, string formattedSequenceNumber, string yearPart, string monthPart)
+		{
+			List<string> parts = [];
+			switch (scheme.SequencePosition)
+			{
+				case Position.Start:
+					parts.Add(formattedSequenceNumber);
+					if (scheme.InvoiceNumberYearFormat != YearFormat.None)
+						parts.Add(yearPart);
+					if (scheme.IncludeMonth)
+						parts.Add(monthPart);
+					break;
+				case Position.End:
+					if (scheme.InvoiceNumberYearFormat != YearFormat.None)
+						parts.Add(yearPart);
+					if (scheme.IncludeMonth)
+						parts.Add(monthPart);
+					parts.Add(formattedSequenceNumber);
+					break;
+				default:
+					throw new InvalidOperationException($"Invalid sequence position: {scheme.SequencePosition}");
+			}
+			return parts;
 		}
 
 		private static string GetYearPart(DateTime generationDate, YearFormat yearFormat)

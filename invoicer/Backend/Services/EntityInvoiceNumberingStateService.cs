@@ -15,27 +15,23 @@ namespace Backend.Services
 			await entityService.GetByIdAsync(entityId);
 
 			// Try to get existing state
-			EntityInvoiceNumberingSchemeState? existingState = null;
 			try
 			{
-				existingState = await numberingStateRepository.GetByEntityIdAsync(entityId, true);
+				EntityInvoiceNumberingSchemeState existingState = await numberingStateRepository.GetByEntityIdAsync(entityId, true);
+				return existingState;
 			}
 			catch (KeyNotFoundException)
 			{
-				// State does not exist, will create below
+				// If not found, create a new state
+				var newNumberingState = new EntityInvoiceNumberingSchemeState
+				{
+					EntityId = entityId
+				};
+
+				await numberingStateRepository.AddAsync(newNumberingState);
+				await numberingStateRepository.SaveChangesAsync();
+				return newNumberingState;
 			}
-
-			if (existingState is not null)
-				return existingState;
-
-			// Create new state
-			var newNumberingState = new EntityInvoiceNumberingSchemeState
-			{
-				EntityId = entityId
-			};
-			await numberingStateRepository.AddAsync(newNumberingState);
-			await numberingStateRepository.SaveChangesAsync();
-			return newNumberingState;
 		}
 
 		public async Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate)
