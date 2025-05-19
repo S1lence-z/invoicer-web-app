@@ -65,6 +65,7 @@ namespace Frontend.Models
 				Name = entity.Name,
 				Email = entity.Email,
 				PhoneNumber = entity.PhoneNumber,
+				IsClient = entity.IsClient,
 				BankAccountId = entity.BankAccountId,
 				AccountNumber = entity.BankAccount?.AccountNumber ?? string.Empty,
 				BankCode = entity.BankAccount?.BankCode ?? string.Empty,
