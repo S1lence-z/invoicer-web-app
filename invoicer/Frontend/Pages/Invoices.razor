@@ -123,14 +123,14 @@
         }
     }
 
-    private async void PopulateShownInvoices(IList<InvoiceDto> newInvoices)
+    private void PopulateShownInvoices(IList<InvoiceDto> newInvoices)
     {
         shownInvoices.Clear();
         foreach (var inv in newInvoices)
         {
             shownInvoices.Add(inv);
         }
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     private void SearchInvoices(ChangeEventArgs e)

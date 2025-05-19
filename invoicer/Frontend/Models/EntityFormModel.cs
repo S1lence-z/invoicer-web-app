@@ -22,6 +22,9 @@ namespace Frontend.Models
 		[RegularExpression(@"^\+?(\d{1,3})\)?[-. ]?(\d{1,3})[-. ]?(\d{1,4})$", ErrorMessage = "Invalid phone number format")]
 		public string PhoneNumber { get; set; } = string.Empty;
 
+		[Required(ErrorMessage = "Is this a client of yours?")]
+		public bool IsClient { get; set; } = true;
+
 		// Bank Account
 		public int BankAccountId { get; set; }
 

@@ -28,7 +28,17 @@
     @* ENTITY FORM *@
     <EditForm Model="@entityFormModel" OnValidSubmit="SubmitForm">
         <DataAnnotationsValidator />
-        <div class="row mb-4">
+        <div class="row mt-4">
+            <div class="col">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="entity-isClient" @bind="entityFormModel.IsClient" />
+                    <label for="entity-isClient" class="form-check-label font-weight-bold">@L["IsThisClient"]</label>
+                    <ValidationMessage For="@(() => entityFormModel.IsClient)" />
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
             <div class="col">
                 <label for="entity-name" class="font-weight-bold">@L["NameLabel"]</label>
                 <input type="text" class="form-control" id="entity-name" placeholder="@L["NamePlaceholder"]" @bind="entityFormModel.Name" />
@@ -40,7 +50,7 @@
                 <ValidationMessage For="@(() => entityFormModel.Ico)" />
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-4">
             <div class="col">
                 <label for="entity-email" class="font-weight-bold">@L["EmailLabel"]</label>
                 <input type="email" class="form-control" id="entity-email" placeholder="@L["EmailPlaceholder"]" @bind="entityFormModel.Email" />
@@ -54,7 +64,7 @@
         </div>
         <hr />
         @* ADDRESS FORM *@
-        <div class="row mb-4">
+        <div class="row">
             <div class="col">
                 <label for="address-street" class="font-weight-bold">@L["AddressStreetLabel"]</label>
                 <input type="text" class="form-control" id="address-street" placeholder="@L["AddressStreetPlaceholder"]" @bind="entityFormModel.Street" />
@@ -66,7 +76,7 @@
                 <ValidationMessage For="@(() => entityFormModel.ZipCode)" />
             </div>
         </div>
-        <div class="row mb-4">
+        <div class="row mt-4">
             <div class="col">
                 <label for="address-city" class="font-weight-bold">@L["AddressCityLabel"]</label>
                 <input type="text" class="form-control" id="address-city" placeholder="@L["AddressCityPlaceholder"]" @bind="entityFormModel.City" />
@@ -80,7 +90,7 @@
         </div>
         <hr />
         @* BANK ACCOUNT FORM *@
-        <div class="row mb-4">
+        <div class="row">
             <div class="col">
                 <label for="bank-acc-accNumber" class="font-weight-bold">@L["BankAccountNumberLabel"]</label>
                 <input type="text" class="form-control" id="bank-acc-accNumber" placeholder="@L["BankAccountNumberPlaceholder"]" @bind="entityFormModel.AccountNumber" />
@@ -92,7 +102,7 @@
                 <ValidationMessage For="@(() => entityFormModel.BankCode)" />
             </div>
         </div>
-        <div class="row mb-4">
+        <div class="row my-4">
             <div class="col">
                 <label for="bank-acc-name" class="font-weight-bold">@L["BankNameLabel"]</label>
                 <input type="text" class="form-control" id="bank-acc-name" placeholder="@L["BankNamePlaceholder"]" @bind="entityFormModel.BankName" />
