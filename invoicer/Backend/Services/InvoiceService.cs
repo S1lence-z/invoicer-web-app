@@ -73,6 +73,7 @@ namespace Backend.Services
 			existingInvoice.BuyerId = updatedInvoice.BuyerId;
 			await UpdateInvoiceItemsAsync(existingInvoice, updatedInvoice.Items);
 
+			// If the nubmer was changed for an existing invoice, update the numbering state
 			if (existingInvoice.InvoiceNumber != updatedInvoice.InvoiceNumber)
 			{
 				existingInvoice.InvoiceNumber = updatedInvoice.InvoiceNumber;
