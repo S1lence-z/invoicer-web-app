@@ -104,7 +104,7 @@ namespace Infrastructure.Repositories
 			return await context.Invoice.AsNoTracking().CountAsync(i => i.SellerId == entityId);
 		}
 
-		public async Task<Invoice?> GetLastInvoiceAsync(int entityId, bool isReadonly, params int[] invoiceIdsToExclude)
+		public async Task<Invoice?> GetLastInvoiceByIssueDateAsync(int entityId, bool isReadonly, params int[] invoiceIdsToExclude)
 		{
 			if (isReadonly)
 				return await context.Invoice
@@ -117,6 +117,7 @@ namespace Infrastructure.Repositories
 				return await context.Invoice
 					.Where(i => i.SellerId == entityId && !invoiceIdsToExclude.Contains(i.Id))
 					.OrderByDescending(i => i.IssueDate)
+					.OrderByDescending(i => i.Id)
 					.FirstOrDefaultAsync() ?? null;
 		}
 

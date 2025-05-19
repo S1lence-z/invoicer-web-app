@@ -3,15 +3,16 @@ using Domain.Models;
 using Shared.Enums;
 using Application.RepositoryInterfaces;
 using Application.ServiceInterfaces;
+using Application.DTOs;
 
 namespace Backend.Services
 {
-	public class EntityInvoiceNumberingStateService(IEntityInvoiceNumberingStateRepository numberingStateRepository, IEntityRepository entityRepository, INumberingSchemeRepository numberingSchemeRepository, IInvoiceRepository invoiceRepository, IInvoiceNumberGenerator invoiceNumberGenerator, IInvoiceNumberParser invoiceNumberParser) : IEntityInvoiceNumberingStateService
+	public class EntityInvoiceNumberingStateService(IEntityInvoiceNumberingStateRepository numberingStateRepository, IEntityService entityService, INumberingSchemeRepository numberingSchemeRepository, IInvoiceRepository invoiceRepository, IInvoiceNumberGenerator invoiceNumberGenerator, IInvoiceNumberParser invoiceNumberParser) : IEntityInvoiceNumberingStateService
 	{
 		public async Task<EntityInvoiceNumberingSchemeState> CreateByEntityId(int entityId)
 		{
 			// Ensure the entity exists
-			await entityRepository.GetByIdAsync(entityId, true);
+			await entityService.GetByIdAsync(entityId);
 
 			// Try to get existing state
 			EntityInvoiceNumberingSchemeState? existingState = null;
@@ -40,7 +41,7 @@ namespace Backend.Services
 		public async Task<string> GetNextInvoiceNumberAsync(int entityId, DateTime generationDate)
 		{
 			// Get the entity
-			Entity existingEntity = await entityRepository.GetByIdAsync(entityId, true);
+			EntityDto existingEntity = await entityService.GetByIdAsync(entityId);
 			int numberingSchemeId = existingEntity.CurrentNumberingSchemeId;
 
 			// Get the numbering scheme
@@ -57,7 +58,7 @@ namespace Backend.Services
 		public async Task<bool> UpdateForNextAsync(int entityId, Status updateStatus, bool isUsingUserDefinedState, Invoice newInvoice)
 		{
 			// Get the entity
-			Entity existingEntity = await entityRepository.GetByIdAsync(entityId, true);
+			EntityDto existingEntity = await entityService.GetByIdAsync(entityId);
 
 			// Get the entity's numbering scheme
 			int entityNumberingSchemeId = existingEntity.CurrentNumberingSchemeId;
@@ -100,7 +101,7 @@ namespace Backend.Services
 				if (!await invoiceRepository.IsInvoiceNumberUniqueForSellerAsync(newInvoice.InvoiceNumber, newInvoice.SellerId))
 					throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} already exists for this entity");
 
-				newSequenceNumber = await GetLastSequenceNumber(newInvoice, newInvoiceNumberingScheme, newSequenceNumber);
+				newSequenceNumber = await GetLastSequenceNumber(newInvoice, newSequenceNumber);
 				state.SetNewSequenceNumber(newSequenceNumber);
 			}
 			else
@@ -119,7 +120,7 @@ namespace Backend.Services
 					throw new ArgumentException($"Invoice number {updatedInvoice.InvoiceNumber} already exists for this entity");
 
 				// Set the biggest sequence number as the last one for the state
-				newSequenceNumber = await GetLastSequenceNumber(updatedInvoice, updatedInvoicesNumberingScheme, newSequenceNumber);
+				newSequenceNumber = await GetLastSequenceNumber(updatedInvoice, newSequenceNumber);
 				state.SetNewSequenceNumber(newSequenceNumber);
 			}
 			else
@@ -129,7 +130,7 @@ namespace Backend.Services
 		private async Task HandleDeletingAsync(EntityInvoiceNumberingSchemeState state, int entityId, Invoice newInvoice)
 		{
 			// Find the last invoice for this entity excluding the one being deleted
-			Invoice? lastInvoice = await invoiceRepository.GetLastInvoiceAsync(entityId, true, newInvoice.Id);
+			Invoice? lastInvoice = await invoiceRepository.GetLastInvoiceByIssueDateAsync(entityId, true, newInvoice.Id);
 			if (lastInvoice is null)
 			{
 				state.SetNewSequenceNumber(0);
@@ -143,11 +144,10 @@ namespace Backend.Services
 			int lastSequenceNumber = InvoiceNumber.FromString(lastInvoice.InvoiceNumber, lastInvoiceNumberingScheme, invoiceNumberParser).GetSequenceNumberAsInt();
 
 			// Check how many invoices this entity has
-			int invoiceCount = await invoiceRepository.GetInvoiceCountByEntityId(entityId);
 			state.SetNewSequenceNumber(lastSequenceNumber);
 		}
 
-		private async Task<int> GetLastSequenceNumber(Invoice newInvoice, NumberingScheme newInvoiceNumberingScheme, int newSequenceNumber)
+		private async Task<int> GetLastSequenceNumber(Invoice newInvoice, int newSequenceNumber)
 		{
 			// Set the biggest sequence number as the last one for the state
 			IEnumerable<Invoice> existingInvoices = await invoiceRepository.GetAllInvoicesBySellerId(newInvoice.SellerId, true);
