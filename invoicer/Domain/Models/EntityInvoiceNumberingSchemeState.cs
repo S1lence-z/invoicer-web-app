@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models
 {
-	public class EntityInvoiceNumberingSchemeState
+	public record class EntityInvoiceNumberingSchemeState
 	{
 		// Primary key
 		public int EntityId { get; set; }

@@ -2,7 +2,7 @@
 
 namespace Domain.Models
 {
-	public class NumberingScheme
+	public record class NumberingScheme
 	{
 		public int Id { get; set; }
 

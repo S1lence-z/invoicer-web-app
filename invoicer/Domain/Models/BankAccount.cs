@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models
 {
-    public class BankAccount
+    public record class BankAccount
     {
 		public int Id { get; set; }
 		public string AccountNumber { get; set; } = string.Empty;

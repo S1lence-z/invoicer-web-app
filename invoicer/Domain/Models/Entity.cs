@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models
 {
-	public class Entity
+	public record class Entity
 	{
 		public int Id { get; set; }
 		public string Ico { get; set; } = string.Empty;
@@ -10,6 +10,7 @@
 		public int BankAccountId { get; set; }
 		public int AddressId { get; set; }
 		public int CurrentNumberingSchemeId { get; set; }
+		public bool IsClient { get; set; }
 
 		// Navigation properties
 		public BankAccount? BankAccount { get; set; }

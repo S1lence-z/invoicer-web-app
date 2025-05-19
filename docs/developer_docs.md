@@ -30,7 +30,7 @@ The application aims to provide functionality for creating, managing, and potent
     *   Apply Entity Framework Core migrations:
         ```bash
          cd Infrastructure/
-         dotnet ef migrations add InitialCreate
+         dotnet ef migrations add InitialCreate -s ../Backend
          dotnet ef database update
         ```
     * The `Infrastructure/Patches/InsertSampleData.sql` script might be available for seeding initial data for testing. Execute this against your database if needed.

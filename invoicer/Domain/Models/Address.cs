@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models
 {
-    public class Address
+    public record class Address
     {
         public int Id { get; set; }
 		public string Street { get; set; } = string.Empty;
