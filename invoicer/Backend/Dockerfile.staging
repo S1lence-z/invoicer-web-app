@@ -31,7 +31,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Copy over the sqlite database
-COPY --from=build /src/Backend/Database/Invoicer.db .
+COPY --from=build /src/Infrastructure/Persistance/Invoicer.db .
 
 ENTRYPOINT ["dotnet", "Backend.dll"]
 
