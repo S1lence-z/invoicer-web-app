@@ -68,7 +68,7 @@
             <label for="seller" class="font-weight-bold">@L["SellerLabel"]</label>
             <select class="form-control" id="seller" @bind="InvoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind" disabled="@(InvoiceInstance is not null)">
                 <option value="0">@L["SellerSelectOption"]</option>
-                @foreach (var entity in AllEntities)
+                @foreach (EntityDto entity in AllSellers)
                 {
                     <option value="@entity.Id">@entity.Name</option>
                 }
@@ -80,7 +80,7 @@
                 <label for="buyer" class="font-weight-bold">@L["BuyerLabel"]</label>
                 <select class="form-control" id="buyer" @bind="InvoiceFormModel.BuyerId">
                     <option value="0">@L["BuyerSelectOption"]</option>
-                    @foreach (var entity in AllBuyers)
+                    @foreach (EntityDto entity in AllBuyers)
                     {
                         <option value="@entity.Id">@entity.Name</option>
                     }
@@ -206,6 +206,7 @@
     // Form Models
     private InvoiceFormModel InvoiceFormModel { get; set; } = new();
     private IList<EntityDto> AllEntities = new List<EntityDto>();
+    private IList<EntityDto> AllSellers = new List<EntityDto>();
     private IList<EntityDto> AllBuyers = new List<EntityDto>();
 
     // Variables
@@ -237,26 +238,13 @@
         try
         {
             AllEntities = await entityService.GetAllAsync();
-            AllBuyers = AllEntities.Where(e => e.Id != InvoiceFormModel.SellerId).ToList();
+            AllSellers = AllEntities.Where(e => !e.IsClient).ToList();
+            AllBuyers = AllEntities.Where(e => e.IsClient).ToList();
         }
         catch (Exception e)
         {
             errorService.ShowError(e.Message);
         }
-    }
-
-    private void UpdateBuyers(int newSellerId)
-    {
-        int buyerIdBeforeSellerChange = InvoiceFormModel.BuyerId;
-
-        AllBuyers = AllEntities
-            .Where(e => e.Id != newSellerId)
-            .ToList();
-
-        if (buyerIdBeforeSellerChange == 0)
-            InvoiceFormModel.BuyerId = 0;
-        else if (buyerIdBeforeSellerChange == newSellerId || !AllBuyers.Any(b => b.Id == buyerIdBeforeSellerChange))
-            InvoiceFormModel.BuyerId = AllBuyers.FirstOrDefault()?.Id ?? 0;
     }
 
     private void ToggleCustomInvoiceNumber()
@@ -356,7 +344,6 @@
             return;
         defaultFetchedInvoiceNumber = newInvoice.InvoiceNumber;
         InvoiceFormModel.InvoiceNumber = defaultFetchedInvoiceNumber;
-        UpdateBuyers(sellerId);
     }
 
     private async Task<InvoiceDto?> GetNewOrUpdatedInvoiceInitialData(int sellerId)
