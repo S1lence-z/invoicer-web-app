@@ -44,21 +44,11 @@ namespace Infrastructure.Repositories
 					.FirstOrDefaultAsync(e => e.Id == id) ?? throw new KeyNotFoundException($"Entity with id {id} not found.");
 		}
 
-		public async Task<Entity> GetWithSoldInvoicesByIdAsync(int id, bool isReadonly)
+		public async Task<bool> HasAnyInvoicesAsync(int entityId)
 		{
-			if (isReadonly)
-				return await context.Entity
-					.Include(e => e.BankAccount)
-					.Include(e => e.Address)
-					.Include(e => e.SoldInvoices)
-					.AsNoTracking()
-					.FirstOrDefaultAsync(e => e.Id == id) ?? throw new KeyNotFoundException($"Entity with id {id} not found.");
-			else
-				return await context.Entity
-					.Include(e => e.BankAccount)
-					.Include(e => e.Address)
-					.Include(e => e.SoldInvoices)
-					.FirstOrDefaultAsync(e => e.Id == id) ?? throw new KeyNotFoundException($"Entity with id {id} not found.");
+			return await context.Invoice
+				.AsNoTracking()
+				.AnyAsync(i => i.SellerId == entityId || i.BuyerId == entityId);
 		}
 
 		public async Task SaveChangesAsync()

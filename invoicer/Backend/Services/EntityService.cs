@@ -59,8 +59,9 @@ namespace Backend.Services
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			Entity entityToDelete = await entityRepository.GetWithSoldInvoicesByIdAsync(id, true);
-			if (entityToDelete.SoldInvoices.Count > 0)
+			Entity entityToDelete = await entityRepository.GetByIdAsync(id, false);
+			bool hasExistingInvoices = await entityRepository.HasAnyInvoicesAsync(id);
+			if (hasExistingInvoices)
 				throw new InvalidOperationException($"{entityToDelete.Name} cannot be deleted because it has existing invoices.");
 
 			int addressId = entityToDelete.AddressId;

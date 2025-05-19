@@ -27,7 +27,7 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return StatusCode(500, ApiErrorResponse.Create(e.Message, e.Message, 500));
 			}
 		}
 
@@ -43,7 +43,7 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return StatusCode(500, ApiErrorResponse.Create(e.Message, e.Message, 500));
 			}
 		}
 
@@ -104,7 +104,7 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return StatusCode(500, ApiErrorResponse.Create(e.Message, e.Message, 500));
 			}
 		}
 
@@ -129,7 +129,7 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return StatusCode(500, ApiErrorResponse.Create(e.Message, e.Message, 500));
 			}
 		}
 
@@ -160,7 +160,7 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return StatusCode(500, ApiErrorResponse.Create(e.Message, e.Message, 500));
 			}
 		}
 
@@ -181,7 +181,7 @@ namespace Backend.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(500, ApiErrorResponse.Create("Internal server error", e.Message, 500));
+				return StatusCode(500, ApiErrorResponse.Create(e.Message, e.Message, 500));
 			}
 		}
 	}
