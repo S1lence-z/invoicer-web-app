@@ -40,16 +40,13 @@ namespace Backend.Services
 		public async Task<EntityDto> UpdateAsync(int id, EntityDto newEntityData)
 		{
 			Entity existingEntity = await entityRepository.GetByIdAsync(id, false);
-			AddressDto possibleNewAddress = await addressService.GetByIdAsync(newEntityData.AddressId);
-			BankAccountDto possibleNewBankAcc = await bankAccountService.GetByIdAsync(newEntityData.BankAccountId);
 
-			existingEntity.Address = AddressMapper.MapToDomain(possibleNewAddress);
-			existingEntity.BankAccount = BankAccountMapper.MapToDomain(possibleNewBankAcc);
 			existingEntity.Email = newEntityData.Email;
 			existingEntity.Ico = newEntityData.Ico;
 			existingEntity.Name = newEntityData.Name;
 			existingEntity.PhoneNumber = newEntityData.PhoneNumber;
 			existingEntity.CurrentNumberingSchemeId = newEntityData.CurrentNumberingSchemeId;
+
 			entityRepository.Update(existingEntity);
 			await entityRepository.SaveChangesAsync();
 
