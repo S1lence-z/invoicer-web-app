@@ -70,10 +70,10 @@ namespace Backend.Services
 			switch (updateStatus)
 			{
 				case Status.Creating:
-					await HandleCreatingAsync(state, isUsingUserDefinedState, newInvoice, entityNumberingScheme);
+					await HandleCreatingUpdatingAsync(state, isUsingUserDefinedState, newInvoice, entityNumberingScheme);
 					break;
 				case Status.Updating:
-					await HandleUpdatingAsync(state, isUsingUserDefinedState, newInvoice, invoiceNumberingScheme);
+					await HandleCreatingUpdatingAsync(state, isUsingUserDefinedState, newInvoice, invoiceNumberingScheme);
 					break;
 				case Status.Deleting:
 					await HandleDeletingAsync(state, entityId, newInvoice);
@@ -86,25 +86,7 @@ namespace Backend.Services
 			return true;
 		}
 
-		private async Task HandleCreatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice newInvoice, NumberingScheme newInvoiceNumberingScheme)
-		{
-			if (isUsingUserDefinedState)
-			{
-				InvoiceNumber customInvoiceNumber = InvoiceNumber.FromString(newInvoice.InvoiceNumber, newInvoiceNumberingScheme, invoiceNumberParser);
-				int newSequenceNumber = customInvoiceNumber.GetSequenceNumberAsInt();
-
-				// Check if the new sequence number does not already exist by looking at existing invoices for the current seller
-				if (!await invoiceRepository.IsInvoiceNumberUniqueForSellerAsync(newInvoice.InvoiceNumber, newInvoice.SellerId))
-					throw new ArgumentException($"Invoice number {newInvoice.InvoiceNumber} already exists for this entity");
-
-				newSequenceNumber = await GetLastSequenceNumber(newInvoice, newSequenceNumber);
-				state.SetNewSequenceNumber(newSequenceNumber);
-			}
-			else
-				state.SetNewSequenceNumber(state.LastSequenceNumber + 1);
-		}
-
-		private async Task HandleUpdatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice updatedInvoice, NumberingScheme updatedInvoicesNumberingScheme)
+		private async Task HandleCreatingUpdatingAsync(EntityInvoiceNumberingSchemeState state, bool isUsingUserDefinedState, Invoice updatedInvoice, NumberingScheme updatedInvoicesNumberingScheme)
 		{
 			if (isUsingUserDefinedState)
 			{
