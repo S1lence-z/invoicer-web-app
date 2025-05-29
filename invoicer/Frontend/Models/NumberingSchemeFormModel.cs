@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
+using Frontend.Models.Base;
 using Shared.Enums;
 
 namespace Frontend.Models
 {
-	public record class NumberingSchemeFormModel
+	public class NumberingSchemeFormModel : FormModelBase<NumberingSchemeFormModel, NumberingSchemeDto>
 	{
-		public int Id { get; set; }
-
 		[RegularExpression(@"^.*$", ErrorMessage = "Invalid input format")]
 		public string Prefix { get; set; } = string.Empty;
 
@@ -32,24 +31,7 @@ namespace Frontend.Models
 
 		public bool IsDefault { get; set; } = false;
 
-		public static NumberingSchemeFormModel FromDto(NumberingSchemeDto dto)
-		{
-			return new NumberingSchemeFormModel
-			{
-				Id = dto.Id,
-				Prefix = dto.Prefix,
-				UseSeperator = dto.UseSeperator,
-				Seperator = dto.Seperator,
-				SequencePosition = dto.SequencePosition,
-				SequencePadding = dto.SequencePadding,
-				YearFormat = dto.YearFormat,
-				IncludeMonth = dto.IncludeMonth,
-				ResetFrequency = dto.ResetFrequency,
-				IsDefault = dto.IsDefault
-			};
-		}
-
-		public NumberingSchemeDto ToDto()
+		public override NumberingSchemeDto ToDto()
 		{
 			return new NumberingSchemeDto
 			{
@@ -64,6 +46,34 @@ namespace Frontend.Models
 				ResetFrequency = ResetFrequency,
 				IsDefault = IsDefault
 			};
+		}
+
+		protected override void LoadFromDto(NumberingSchemeDto dto)
+		{
+			Id = dto.Id;
+			Prefix = dto.Prefix;
+			UseSeperator = dto.UseSeperator;
+			Seperator = dto.Seperator;
+			SequencePosition = dto.SequencePosition;
+			SequencePadding = dto.SequencePadding;
+			YearFormat = dto.YearFormat;
+			IncludeMonth = dto.IncludeMonth;
+			ResetFrequency = dto.ResetFrequency;
+			IsDefault = dto.IsDefault;
+		}
+
+		protected override void ResetProperties()
+		{
+			Id = 0;
+			Prefix = string.Empty;
+			UseSeperator = true;
+			Seperator = "-";
+			SequencePosition = Position.Start;
+			SequencePadding = 3;
+			YearFormat = YearFormat.FourDigit;
+			IncludeMonth = true;
+			ResetFrequency = ResetFrequency.Yearly;
+			IsDefault = false;
 		}
 	}
 }
