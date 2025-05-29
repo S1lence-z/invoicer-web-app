@@ -76,6 +76,9 @@ namespace Backend.Services
 			bool isInUseByEntity = await numberingSchemeRepository.IsInUseByEntity(schemeToDelete);
 			if (isInUseByEntity)
 				throw new ArgumentException("Cannot delete the scheme as it is being used by an entity");
+			bool isInUseByInvoice = schemeToDelete.InvoicesGeneratedWithScheme.Count != 0;
+			if (isInUseByInvoice)
+				throw new ArgumentException("Cannot delete the scheme as it is by some generate invoices");
 
 			bool status = await numberingSchemeRepository.DeleteAsync(id);
 			await numberingSchemeRepository.SaveChangesAsync();
