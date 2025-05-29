@@ -55,6 +55,20 @@ namespace Backend
 
 			var app = builder.Build();
 
+			// Create the db migrations and apply them
+			using (var scope = app.Services.CreateScope())
+			{
+				try
+				{
+					var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+					dbContext.Database.Migrate();
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
+				}
+			}
+
 			// Enable Swagger UI
 			app.UseSwagger();
 			app.UseSwaggerUI();
