@@ -246,7 +246,8 @@
                 Email = entityFormModel.Email,
                 PhoneNumber = entityFormModel.PhoneNumber,
                 AddressId = newAddressResponse.Id,
-                BankAccountId = newBankAccountResponse.Id
+                BankAccountId = newBankAccountResponse.Id,
+                IsClient = entityFormModel.IsClient,
             };
         EntityDto newEntityResponse = await entityService.CreateAsync(newEntity);
     }
@@ -291,7 +292,8 @@
                 PhoneNumber = entityFormModel.PhoneNumber,
                 CurrentNumberingSchemeId = EntityInstance.CurrentNumberingSchemeId,
                 AddressId = editedAddressResponse.Id,
-                BankAccountId = editedBankAccountResponse.Id
+                BankAccountId = editedBankAccountResponse.Id,
+                IsClient = entityFormModel.IsClient
             };
         EntityDto editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
     }

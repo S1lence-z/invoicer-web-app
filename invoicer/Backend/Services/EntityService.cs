@@ -41,11 +41,14 @@ namespace Backend.Services
 		{
 			Entity existingEntity = await entityRepository.GetByIdAsync(id, false);
 
-			existingEntity.Email = newEntityData.Email;
-			existingEntity.Ico = newEntityData.Ico;
 			existingEntity.Name = newEntityData.Name;
+			existingEntity.Ico = newEntityData.Ico;
+			existingEntity.Email = newEntityData.Email;
 			existingEntity.PhoneNumber = newEntityData.PhoneNumber;
+			existingEntity.BankAccountId = newEntityData.BankAccountId;
+			existingEntity.AddressId = newEntityData.AddressId;
 			existingEntity.CurrentNumberingSchemeId = newEntityData.CurrentNumberingSchemeId;
+			existingEntity.IsClient = newEntityData.IsClient;
 
 			entityRepository.Update(existingEntity);
 			await entityRepository.SaveChangesAsync();
