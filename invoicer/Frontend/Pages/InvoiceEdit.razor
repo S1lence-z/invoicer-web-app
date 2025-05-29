@@ -55,7 +55,7 @@
     private InvoiceDto? InvoiceInstance { get; set; } = null;
     private bool IsLoadingData { get; set; } = true;
     private bool LoadingFailed { get; set; } = false;
-    private string ReturnUrl { get; set; } = "/invoices";
+    private string ReturnUrl { get; set; } = "invoices";
     private bool IsEditingMode => InvoiceId.HasValue;
     private bool IsAddingNewEntity = false;
 
@@ -66,7 +66,7 @@
         if (query.Contains("returnUrl"))
         {
             var queryParams = ParseQueryString(query);
-            ReturnUrl = queryParams["returnUrl"] ?? "/invoices";
+            ReturnUrl = queryParams["returnUrl"] ?? "invoices";
         }
     }
 

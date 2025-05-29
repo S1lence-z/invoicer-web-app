@@ -166,14 +166,14 @@
 
     private void AddNewInvoice()
     {
-        navigationManager.NavigateTo("/invoice/add");
+        navigationManager.NavigateTo("invoice/add");
     }
 
     private void EditInvoice(InvoiceDto invToEdit)
     {
         string currentUrl = navigationManager.Uri;
         string encodedReturnUrl = WebUtility.UrlEncode(currentUrl);
-        navigationManager.NavigateTo($"/invoice/edit/{invToEdit.Id}?returnUrl={encodedReturnUrl}");
+        navigationManager.NavigateTo($"invoice/edit/{invToEdit.Id}?returnUrl={encodedReturnUrl}");
     }
 
     private async Task DeleteInvoice(InvoiceDto invToDelete)

@@ -9,7 +9,7 @@ services:
         DOTNET_VERSION: "8.0"
         BUILD_CONFIGURATION: Release
     ports:
-      - "8180:8080"
+      - "127.0.0.1:8180:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
         DOTNET_VERSION: "8.0"
         BUILD_CONFIGURATION: Release
     ports:
-      - "5180:80"
+      - "127.0.0.1:5180:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
     depends_on:  
