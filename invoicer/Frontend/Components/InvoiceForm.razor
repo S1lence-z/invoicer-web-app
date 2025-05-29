@@ -221,7 +221,7 @@
     {
         if (InvoiceInstance is not null)
         {
-            InvoiceFormModel = InvoiceFormModel.FromInvoice(InvoiceInstance);
+            InvoiceFormModel = InvoiceFormModel.FromDto(InvoiceInstance);
             defaultFetchedInvoiceNumber = InvoiceInstance.InvoiceNumber;
         }
         if (!IsActive)
@@ -278,22 +278,7 @@
 
     private async Task SubmitNewInvoice() 
     {
-        InvoiceDto newInvoice = new()
-            {
-                InvoiceNumber = InvoiceFormModel.InvoiceNumber,
-                IsCustomInvoiceNumber = InvoiceFormModel.IsCustomInvoiceNumber,
-                IssueDate = InvoiceFormModel.IssueDate,
-                DueDate = InvoiceFormModel.DueDate,
-                VatDate = InvoiceFormModel.VatDate,
-                Status = InvoiceFormModel.Status,
-                SellerId = InvoiceFormModel.SellerId,
-                BuyerId = InvoiceFormModel.BuyerId,
-                Currency = InvoiceFormModel.Currency,
-                PaymentMethod = InvoiceFormModel.PaymentMethod,
-                DeliveryMethod = InvoiceFormModel.DeliveryMethod,
-                Items = InvoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
-
-            };
+        InvoiceDto newInvoice = InvoiceFormModel.ToDto();
         InvoiceDto createdInvoice = await invoiceService.CreateAsync(newInvoice);
     }
 
@@ -301,21 +286,7 @@
     {
         if (InvoiceInstance is null)
             return;
-        InvoiceDto editedInvoice = InvoiceInstance with
-        {
-            InvoiceNumber = InvoiceFormModel.InvoiceNumber,
-            IsCustomInvoiceNumber = InvoiceFormModel.IsCustomInvoiceNumber,
-            IssueDate = InvoiceFormModel.IssueDate,
-            DueDate = InvoiceFormModel.DueDate,
-            VatDate = InvoiceFormModel.VatDate,
-            Status = InvoiceFormModel.Status,
-            SellerId = InvoiceFormModel.SellerId,
-            BuyerId = InvoiceFormModel.BuyerId,
-            Currency = InvoiceFormModel.Currency,
-            PaymentMethod = InvoiceFormModel.PaymentMethod,
-            DeliveryMethod = InvoiceFormModel.DeliveryMethod,
-            Items = InvoiceFormModel.Items.Select(InvoiceItemFormModel.ToInvoiceItem).ToList()
-        };
+        InvoiceDto editedInvoice = InvoiceFormModel.ToDto();
         InvoiceDto updatedInvoice = await invoiceService.UpdateAsync(editedInvoice.Id, editedInvoice);
     }
 
@@ -323,17 +294,17 @@
     {
         isCustomInvoiceNumber = false;
         defaultFetchedInvoiceNumber = string.Empty;
-        InvoiceFormModel = new();
+        InvoiceFormModel.ClearModel();
     }
 
     private void AddInvoiceItem()
     {
-        InvoiceFormModel.Items.Add(new());
+        InvoiceFormModel.AddItem(new());
     }
 
     private void RemoveInvoiceItem(InvoiceItemFormModel item)
     {
-        InvoiceFormModel.Items.Remove(item);
+        InvoiceFormModel.RemoveItem(item);
     }
 
     private async Task OnChosenSellerChangedAfterBind()

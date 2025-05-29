@@ -12,11 +12,9 @@
 		{
 			TFormModel formModel = new();
 			if (dto is not null)
-				formModel.PopulateFromDto(dto);
+				formModel.LoadFromDto(dto);
 			return formModel;
 		}
-
-		public void PopulateFromDto(TDto dto) => LoadFromDto(dto);
 
 		public abstract TDto ToDto();
 		protected abstract void LoadFromDto(TDto dto);
