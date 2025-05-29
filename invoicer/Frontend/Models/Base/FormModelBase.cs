@@ -16,15 +16,21 @@
 			return formModel;
 		}
 
-		public void PopulateFromDto(TDto dto) => MapPropertiesFromDto(dto);
+		public void PopulateFromDto(TDto dto) => LoadFromDto(dto);
 
-		protected abstract void MapPropertiesFromDto(TDto dto);
+		public abstract TDto ToDto();
+		protected abstract void LoadFromDto(TDto dto);
 		protected abstract void ResetProperties();
 
 		public virtual void ClearModel()
 		{
 			Id = 0;
 			ResetProperties();
+		}
+
+		public override string ToString()
+		{
+			return $"FormModel: {typeof(TFormModel).Name}, Dto: {typeof(TDto).Name}, Id: {Id}";
 		}
 	}
 }
