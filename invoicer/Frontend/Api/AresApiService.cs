@@ -10,7 +10,7 @@ namespace Frontend.Api
 		private readonly string _urlPath = "api/ares";
 		private static readonly JsonSerializerOptions jsonSerializeOptions = new() { PropertyNameCaseInsensitive = true, IncludeFields = true };
 
-		public async Task<IResult<IAresApiResponse>> GetEntityInformationByIcoAsync(string ico)
+		public async Task<IApiResult<IAresApiResponse>> GetEntityInformationByIcoAsync(string ico)
 		{
 			var response = await httpClient.GetAsync($"{_urlPath}/{ico}");	
 			if (response.IsSuccessStatusCode)

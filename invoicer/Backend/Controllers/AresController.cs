@@ -15,7 +15,7 @@ namespace Backend.Controllers
 
 		public async Task<IActionResult> GetEntityInformationByIco(string ico)
 		{
-			IResult<IAresApiResponse> responseData = await aresApiService.GetEntityInformationByIcoAsync(ico);
+			IApiResult<IAresApiResponse> responseData = await aresApiService.GetEntityInformationByIcoAsync(ico);
 
 			if (responseData.IsSuccess)
 			{

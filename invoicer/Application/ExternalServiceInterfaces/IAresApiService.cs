@@ -5,6 +5,6 @@ namespace Application.ExternalServiceInterfaces
 {
 	public interface IAresApiService
 	{
-		public Task<IResult<IAresApiResponse>> GetEntityInformationByIcoAsync(string ico);
+		public Task<IApiResult<IAresApiResponse>> GetEntityInformationByIcoAsync(string ico);
 	}
 }

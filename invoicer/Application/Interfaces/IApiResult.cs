@@ -1,6 +1,6 @@
 ﻿namespace Application.Interfaces
 {
-	public interface IResult<out TData>
+	public interface IApiResult<out TData>
 	{
 		TData? Data { get; }
 		string? ErrorMessage { get; }
