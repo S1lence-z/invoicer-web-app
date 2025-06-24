@@ -97,7 +97,7 @@ namespace Domain.Services
 			{
 				var (type, fixedLength, isNumeric) = expectedParts[i];
 
-				// If this isn't the first part immediately after the prefix AND the scheme uses separators, then a separator is expected before this current part.
+				// If this isn't the first part immediately after the prefix AND the scheme uses separators, then a separator is expected before this current part
 				if (!isFirstPartAfterPrefix && effectiveUseSeparator)
 				{
 					if (string.IsNullOrEmpty(remainingPart) || !remainingPart.StartsWith(scheme.Seperator))
@@ -121,7 +121,7 @@ namespace Domain.Services
 					currentSegmentValue = remainingPart.Substring(0, fixedLength);
 					remainingPart = remainingPart.Substring(fixedLength);
 				}
-				else // Part has a variable length (currently only Sequence with Padding == 0, so fixedLength is -1).
+				else // Part has a variable length (currently only Sequence with Padding == 0, so fixedLength is -1)
 				{
 					if (string.IsNullOrEmpty(remainingPart))
 					{
