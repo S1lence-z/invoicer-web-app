@@ -31,7 +31,7 @@ The application aims to provide functionality for creating, managing, and potent
         ```bash
          cd Infrastructure/
          dotnet ef migrations add InitialCreate -s ../Backend
-         dotnet ef database update
+         dotnet ef database update -s ../Backend
         ```
     * The `Infrastructure/Patches/InsertSampleData.sql` script might be available for seeding initial data for testing. Execute this against your database if needed.
 4.  **Run the Application:**
