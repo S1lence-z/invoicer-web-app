@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces;
+﻿using System.ComponentModel;
+using Domain.Interfaces;
 using Domain.Models;
 using Domain.Utils;
 using Shared.Enums;
@@ -36,33 +37,28 @@ namespace Domain.Services
 			return true;
 		}
 
-		private static bool IsValidAgainstScheme(string invoiceNumber, NumberingScheme scheme, out ParsedInvoiceNumberComponents components, out string? errorMessage)
+		private static bool TryExtractPrefix(string invoicenumber, NumberingScheme scheme, out ParsedInvoiceNumberComponents componentsWithPrefix, out string remainingPart, out string? errorMessage)
 		{
-			components = new ParsedInvoiceNumberComponents();
+			componentsWithPrefix = new ParsedInvoiceNumberComponents();
+			remainingPart = invoicenumber;
 			errorMessage = null;
-
-			bool effectiveUseSeparator = scheme.UseSeperator;
-			if (effectiveUseSeparator && string.IsNullOrEmpty(scheme.Seperator))
-				effectiveUseSeparator = false;
-
-			string remainingPart = invoiceNumber;
-
-			// Handle and store prefix
-			if (!string.IsNullOrEmpty(scheme.Prefix))
+			if (string.IsNullOrEmpty(scheme.Prefix))
 			{
-				if (!remainingPart.StartsWith(scheme.Prefix))
-				{
-					errorMessage = $"Invoice number does not start with the expected prefix '{scheme.Prefix}'.";
-					return false;
-				}
-				components.Prefix = scheme.Prefix;
-				remainingPart = remainingPart.Substring(scheme.Prefix.Length);
+				componentsWithPrefix.Prefix = string.Empty;
+				return true;
 			}
-			else
+			if (!remainingPart.StartsWith(scheme.Prefix))
 			{
-				components.Prefix = string.Empty;
+				errorMessage = $"Invoice number does not start with the expected prefix '{scheme.Prefix}'.";
+				return false;
 			}
+			componentsWithPrefix.Prefix = scheme.Prefix;
+			remainingPart = remainingPart.Substring(scheme.Prefix.Length);
+			return true;
+		}
 
+		private static List<(string, int, bool)> GetInvoiceNumberBlueprint(NumberingScheme scheme)
+		{
 			// Build the expected parts list based on the scheme settings
 			var expectedParts = new List<(string type, int fixedLength, bool isNumeric)>();
 			int yearLength = scheme.InvoiceNumberYearFormat switch
@@ -90,14 +86,33 @@ namespace Domain.Services
 					expectedParts.Add(("month", 2, true));
 				expectedParts.Add(("sequence", scheme.SequencePadding > 0 ? scheme.SequencePadding : -1, true));
 			}
+			return expectedParts;
+		}
 
-			// Parser the parts in the defined order
+		private static bool IsValidAgainstScheme(string invoiceNumber, NumberingScheme scheme, out ParsedInvoiceNumberComponents components, out string? errorMessage)
+		{
+			components = new ParsedInvoiceNumberComponents();
+			errorMessage = null;
+
+			bool effectiveUseSeparator = scheme.UseSeperator;
+			if (effectiveUseSeparator && string.IsNullOrEmpty(scheme.Seperator))
+				effectiveUseSeparator = false;
+			string remainingPart = invoiceNumber;
+
+			// Handle and store prefix
+			if (!TryExtractPrefix(invoiceNumber, scheme, out components, out remainingPart, out errorMessage))
+				return false;
+
+			// Get the expectedParts list
+			List<(string, int, bool)> expectedParts = GetInvoiceNumberBlueprint(scheme);
+
+			// Go through the expected parts and validate the remaining part of the invoice number
 			bool isFirstPartAfterPrefix = true;
 			for (int i = 0; i < expectedParts.Count; i++)
 			{
 				var (type, fixedLength, isNumeric) = expectedParts[i];
 
-				// If this isn't the first part immediately after the prefix AND the scheme uses separators, then a separator is expected before this current part.
+				// If this isn't the first part immediately after the prefix AND the scheme uses separators, then a separator is expected before this current part
 				if (!isFirstPartAfterPrefix && effectiveUseSeparator)
 				{
 					if (string.IsNullOrEmpty(remainingPart) || !remainingPart.StartsWith(scheme.Seperator))
@@ -121,7 +136,7 @@ namespace Domain.Services
 					currentSegmentValue = remainingPart.Substring(0, fixedLength);
 					remainingPart = remainingPart.Substring(fixedLength);
 				}
-				else // Part has a variable length (currently only Sequence with Padding == 0, so fixedLength is -1).
+				else // Part has a variable length (currently only Sequence with Padding == 0, so fixedLength is -1)
 				{
 					if (string.IsNullOrEmpty(remainingPart))
 					{
