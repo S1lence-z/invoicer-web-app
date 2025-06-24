@@ -76,6 +76,9 @@ namespace Backend.Services
 			bool isInUseByEntity = await numberingSchemeRepository.IsInUseByEntity(schemeToDelete);
 			if (isInUseByEntity)
 				throw new ArgumentException("Cannot delete the scheme as it is being used by an entity");
+			bool isInUseByInvoice = schemeToDelete.InvoicesGeneratedWithScheme.Count != 0;
+			if (isInUseByInvoice)
+				throw new ArgumentException("Cannot delete the scheme as it is by some generate invoices");
 
 			bool status = await numberingSchemeRepository.DeleteAsync(id);
 			await numberingSchemeRepository.SaveChangesAsync();
@@ -84,7 +87,7 @@ namespace Backend.Services
 
 		public async Task<NumberingSchemeDto> GetDefaultNumberingSchemeAsync()
 		{
-			NumberingScheme defaultScheme = await numberingSchemeRepository.GetDefaultScheme(true);
+			NumberingScheme defaultScheme = await numberingSchemeRepository.GetDefaultSchemeAsync(true);
 			return NumberingSchemeMapper.MapToDto(defaultScheme);
 		}
 	}

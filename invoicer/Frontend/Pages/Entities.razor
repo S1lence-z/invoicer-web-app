@@ -1,23 +1,31 @@
-﻿@page "/entities";
+﻿@page "/entities"
 @using System.Net
 @using Application.DTOs
 @using Application.ServiceInterfaces
-@using Frontend.Components;
-@using Frontend.Services;
-@using Microsoft.Extensions.Localization;
-@inject IEntityService entityService;
-@inject ErrorService errorService;
-@inject NavigationManager navigationManager;
-@inject IStringLocalizer<Entities> L;
+@using Frontend.Components
+@using Frontend.Services
+@using Microsoft.Extensions.Localization
+@inject IEntityService entityService
+@inject ErrorService errorService
+@inject NavigationManager navigationManager
+@inject IStringLocalizer<Entities> L
 
 @* PAGE CONTAINER *@
 <div class="d-flex flex-column border rounded-3" style="height:90vh;">
     @* HEADER *@
     <div class="d-flex flex-row justify-content-between align-content-center px-4 pt-4">
         <h3>@L["PageTitle"]</h3>
-        <button class="btn btn-primary" @onclick="AddNewEntity">
-            @L["AddNewEntityButton"]
-        </button>
+        <div class="d-flex align-items-center gap-2">
+            @* Filter Buttons *@
+            <div class="btn-group btn-group-sm" role="group" aria-label="Filter entities">
+                <button type="button" class="btn btn-outline-secondary" @onclick="FilterAllEntities">@L["FilterAllButton"]</button>
+                <button type="button" class="btn btn-outline-secondary" @onclick="FilterMyCompanies">@L["FilterMyCompaniesButton"]</button>
+                <button type="button" class="btn btn-outline-secondary" @onclick="FilterClients">@L["FilterClientsButton"]</button>
+            </div>
+            <button class="btn btn-primary" @onclick="AddNewEntity">
+                @L["AddNewEntityButton"]
+            </button>
+        </div>
     </div>
     <hr/>
     @* CONTENT *@
@@ -34,7 +42,7 @@
         {
             @* ENTITIES LIST*@
             <div class="d-flex flex-column gap-2" style="overflow-y:auto;">
-                @foreach (var entity in allEntities)
+                @foreach (var entity in shownEntities)
                 {
                     <EntityListItem Entity="entity" OnSelectEntity="SelectEntity" OnDeleteEntity="DeleteEntity" OnEditEntity="EditEntity" IsSelected="IsEntitySelected(entity)" />
                 }
@@ -56,6 +64,7 @@
 
 @code {
     private List<EntityDto> allEntities = new();
+    private List<EntityDto> shownEntities = new();
     private EntityDto? selectedEntity = null;
     private bool isLoadingData = true;
 
@@ -73,10 +82,10 @@
         {
             isLoadingData = true;
             allEntities = (await entityService.GetAllAsync()).ToList();
+            PopulateShownEntites(allEntities);
         }
         catch (Exception e)
         {
-            allEntities = new();
             errorService.ShowError($"Failed to load entities {e.Message}");
         }
         finally
@@ -122,5 +131,31 @@
     private void AddNewEntity()
     {
         navigationManager.NavigateTo("/entity/add");
+    }
+
+    private void PopulateShownEntites(List<EntityDto> entities)
+    {
+        shownEntities.Clear();
+        foreach (EntityDto entity in entities)
+        {
+            shownEntities.Add(entity);
+        }
+        StateHasChanged();
+    }
+
+    // Filtering methods
+    private void FilterAllEntities()
+    {
+        PopulateShownEntites(allEntities);
+    }
+
+    private void FilterMyCompanies()
+    {
+        PopulateShownEntites(allEntities.Where(e => !e.IsClient).ToList());
+    }
+
+    private void FilterClients()
+    {
+        PopulateShownEntites(allEntities.Where(e => e.IsClient).ToList());
     }
 }

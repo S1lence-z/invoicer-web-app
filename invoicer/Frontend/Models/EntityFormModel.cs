@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
+using Frontend.Models.Base;
 
 namespace Frontend.Models
 {
-	public record class EntityFormModel
+	public class EntityFormModel : FormModelBase<EntityFormModel, EntityDto>
 	{
-		public int Id { get; set; }
 
 		[Required(ErrorMessage = "Ico is required")]
 		[RegularExpression(@"^\d{8}$", ErrorMessage = "Ico must be 8 digits long")]
@@ -21,6 +21,11 @@ namespace Frontend.Models
 		[Required(ErrorMessage = "Phone number is required")]
 		[RegularExpression(@"^\+?(\d{1,3})\)?[-. ]?(\d{1,3})[-. ]?(\d{1,4})$", ErrorMessage = "Invalid phone number format")]
 		public string PhoneNumber { get; set; } = string.Empty;
+
+		[Required(ErrorMessage = "Is this a client of yours?")]
+		public bool IsClient { get; set; } = true;
+
+		public int CurrentNumberingSchemeId { get; set; } = 0;
 
 		// Bank Account
 		public int BankAccountId { get; set; }
@@ -53,25 +58,92 @@ namespace Frontend.Models
 		[Required(ErrorMessage = "Country is required")]
 		public string Country { get; set; } = string.Empty;
 
-		public static EntityFormModel FromEntity(EntityDto entity)
+		protected override void LoadFromDto(EntityDto dto)
 		{
-			return new EntityFormModel
+			ArgumentNullException.ThrowIfNull(dto);
+			Id = dto.Id;
+			Ico = dto.Ico;
+			Name = dto.Name;
+			Email = dto.Email;
+			PhoneNumber = dto.PhoneNumber;
+			IsClient = dto.IsClient;
+			CurrentNumberingSchemeId = dto.CurrentNumberingSchemeId;
+			if (dto.BankAccount is not null)
 			{
-				Id = entity.Id,
-				Ico = entity.Ico,
-				Name = entity.Name,
-				Email = entity.Email,
-				PhoneNumber = entity.PhoneNumber,
-				BankAccountId = entity.BankAccountId,
-				AccountNumber = entity.BankAccount?.AccountNumber ?? string.Empty,
-				BankCode = entity.BankAccount?.BankCode ?? string.Empty,
-				BankName = entity.BankAccount?.BankName ?? string.Empty,
-				IBAN = entity.BankAccount?.IBAN ?? string.Empty,
-				AddressId = entity.AddressId,
-				Street = entity.Address?.Street ?? string.Empty,
-				City = entity.Address?.City ?? string.Empty,
-				ZipCode = entity.Address?.ZipCode ?? 0,
-				Country = entity.Address?.Country ?? string.Empty
+				BankAccountId = dto.BankAccount.Id;
+				AccountNumber = dto.BankAccount.AccountNumber;
+				BankCode = dto.BankAccount.BankCode;
+				BankName = dto.BankAccount.BankName;
+				IBAN = dto.BankAccount.IBAN;
+			}
+			if (dto.Address is not null)
+			{
+				AddressId = dto.Address.Id;
+				Street = dto.Address.Street;
+				City = dto.Address.City;
+				ZipCode = dto.Address.ZipCode;
+				Country = dto.Address.Country;
+			}
+		}
+
+		protected override void ResetProperties()
+		{
+			Ico = string.Empty;
+			Name = string.Empty;
+			Email = string.Empty;
+			PhoneNumber = string.Empty;
+			IsClient = true;
+			BankAccountId = 0;
+			AccountNumber = string.Empty;
+			BankCode = string.Empty;
+			BankName = string.Empty;
+			IBAN = string.Empty;
+			AddressId = 0;
+			Street = string.Empty;
+			City = string.Empty;
+			ZipCode = 0;
+			Country = string.Empty;
+		}
+
+		public override EntityDto ToDto()
+		{
+			return new EntityDto
+			{
+				Id = Id,
+				Ico = Ico,
+				Name = Name,
+				Email = Email,
+				PhoneNumber = PhoneNumber,
+				CurrentNumberingSchemeId = CurrentNumberingSchemeId,
+				BankAccountId = BankAccountId,
+				AddressId = AddressId,
+				IsClient = IsClient,
+				BankAccount = GetBankAccountDto(),
+				Address = GetAddressDto()
+			};
+		}
+
+		public BankAccountDto GetBankAccountDto()
+		{
+			return new BankAccountDto
+			{
+				Id = BankAccountId,
+				AccountNumber = AccountNumber,
+				BankCode = BankCode,
+				BankName = BankName,
+				IBAN = IBAN
+			};
+		}
+
+		public AddressDto GetAddressDto()
+		{
+			return new AddressDto
+			{
+				Id = AddressId,
+				Street = Street,
+				City = City,
+				ZipCode = ZipCode,
+				Country = Country
 			};
 		}
 	}

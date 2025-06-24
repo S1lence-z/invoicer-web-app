@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
+using Frontend.Models.Base;
 
 namespace Frontend.Models
 {
-	public record class InvoiceItemFormModel
+	public class InvoiceItemFormModel : FormModelBase<InvoiceItemFormModel, InvoiceItemDto>
 	{
-		public int Id { get; set; }
-
 		public int InvoiceId { get; set; }
 
 		[Required(ErrorMessage = "Unit is required")]
@@ -27,32 +26,40 @@ namespace Frontend.Models
 		[Range(0.0, 1.0, ErrorMessage = "VAT rate must be between 0 and 1")]
 		public decimal VatRate { get; set; } = 0.21m;
 
-		public static InvoiceItemFormModel FromInvoiceItem(InvoiceItemDto item)
-		{
-			return new InvoiceItemFormModel
-			{
-				Id = item.Id,
-				InvoiceId = item.InvoiceId,
-				Unit = item.Unit,
-				Quantity = item.Quantity,
-				Description = item.Description,
-				UnitPrice = item.UnitPrice,
-				VatRate = item.VatRate
-			};
-		}
-
-		public static InvoiceItemDto ToInvoiceItem(InvoiceItemFormModel invFormModel)
+		public override InvoiceItemDto ToDto()
 		{
 			return new InvoiceItemDto
 			{
-				Id = invFormModel.Id,
-				InvoiceId = invFormModel.InvoiceId,
-				Unit = invFormModel.Unit,
-				Quantity = invFormModel.Quantity,
-				Description = invFormModel.Description,
-				UnitPrice = invFormModel.UnitPrice,
-				VatRate = invFormModel.VatRate
+				Id = Id,
+				InvoiceId = InvoiceId,
+				Unit = Unit,
+				Quantity = Quantity,
+				Description = Description,
+				UnitPrice = UnitPrice,
+				VatRate = VatRate
 			};
+		}
+
+		protected override void LoadFromDto(InvoiceItemDto dto)
+		{
+			Id = dto.Id;
+			InvoiceId = dto.InvoiceId;
+			Unit = dto.Unit;
+			Quantity = dto.Quantity;
+			Description = dto.Description;
+			UnitPrice = dto.UnitPrice;
+			VatRate = dto.VatRate;
+		}
+
+		protected override void ResetProperties()
+		{
+			Id = 0;
+			InvoiceId = 0;
+			Unit = string.Empty;
+			Quantity = 0;
+			Description = string.Empty;
+			UnitPrice = 0;
+			VatRate = 0.21m;
 		}
 	}
 }

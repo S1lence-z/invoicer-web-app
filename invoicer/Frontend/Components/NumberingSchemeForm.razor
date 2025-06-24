@@ -91,13 +91,13 @@
         <div class="row">
             <div class="col">
                 <label for="year-format" class="font-weight-bold">@L["YearFormatLabel"]</label>
-                <select id="year-format" class="form-select" @bind="SchemeFormModel.InvoiceNumberYearFormat">
+                <select id="year-format" class="form-select" @bind="SchemeFormModel.YearFormat">
                     @foreach (YearFormat value in Enum.GetValues(typeof(YearFormat)))
                     {
                         <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
                     }
                 </select>
-                <ValidationMessage For="@(() => SchemeFormModel.InvoiceNumberYearFormat)" />
+                <ValidationMessage For="@(() => SchemeFormModel.YearFormat)" />
             </div>
 
             <div class="col">
@@ -119,20 +119,20 @@
     [Parameter] public bool isActive { get; set; }
 
     // Form Model
-    private InvoiceNumberingFormModel SchemeFormModel { get; set; } = new();
+    private NumberingSchemeFormModel SchemeFormModel { get; set; } = new();
 
     // Methods
     protected override void OnParametersSet()
     {
         if (NumberingSchemeInstance is not null)
-            SchemeFormModel = InvoiceNumberingFormModel.FromDto(NumberingSchemeInstance);
+            SchemeFormModel = NumberingSchemeFormModel.FromDto(NumberingSchemeInstance);
         if (!isActive)
             ResetForm();
     }
 
     private void ResetForm()
     {
-        SchemeFormModel = new InvoiceNumberingFormModel();
+        SchemeFormModel.ClearModel();
     }
 
     private async Task SubmitForm()
@@ -177,7 +177,6 @@
             if (NumberingSchemeInstance is null)
                 return;
             NumberingSchemeDto updatedScheme = SchemeFormModel.ToDto();
-            updatedScheme.Id = NumberingSchemeInstance.Id;
             await numberingService.UpdateAsync(updatedScheme.Id, updatedScheme);
         }
         catch (Exception e)

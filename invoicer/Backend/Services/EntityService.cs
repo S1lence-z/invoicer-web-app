@@ -40,16 +40,16 @@ namespace Backend.Services
 		public async Task<EntityDto> UpdateAsync(int id, EntityDto newEntityData)
 		{
 			Entity existingEntity = await entityRepository.GetByIdAsync(id, false);
-			AddressDto possibleNewAddress = await addressService.GetByIdAsync(newEntityData.AddressId);
-			BankAccountDto possibleNewBankAcc = await bankAccountService.GetByIdAsync(newEntityData.BankAccountId);
 
-			existingEntity.Address = AddressMapper.MapToDomain(possibleNewAddress);
-			existingEntity.BankAccount = BankAccountMapper.MapToDomain(possibleNewBankAcc);
-			existingEntity.Email = newEntityData.Email;
-			existingEntity.Ico = newEntityData.Ico;
 			existingEntity.Name = newEntityData.Name;
+			existingEntity.Ico = newEntityData.Ico;
+			existingEntity.Email = newEntityData.Email;
 			existingEntity.PhoneNumber = newEntityData.PhoneNumber;
+			existingEntity.BankAccountId = newEntityData.BankAccountId;
+			existingEntity.AddressId = newEntityData.AddressId;
 			existingEntity.CurrentNumberingSchemeId = newEntityData.CurrentNumberingSchemeId;
+			existingEntity.IsClient = newEntityData.IsClient;
+
 			entityRepository.Update(existingEntity);
 			await entityRepository.SaveChangesAsync();
 
@@ -59,8 +59,9 @@ namespace Backend.Services
 
 		public async Task<bool> DeleteAsync(int id)
 		{
-			Entity entityToDelete = await entityRepository.GetWithSoldInvoicesByIdAsync(id, true);
-			if (entityToDelete.SoldInvoices.Count > 0)
+			Entity entityToDelete = await entityRepository.GetByIdAsync(id, false);
+			bool hasExistingInvoices = await entityRepository.HasAnyInvoicesAsync(id);
+			if (hasExistingInvoices)
 				throw new InvalidOperationException($"{entityToDelete.Name} cannot be deleted because it has existing invoices.");
 
 			int addressId = entityToDelete.AddressId;

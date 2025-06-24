@@ -2,7 +2,7 @@
 
 namespace Application.DTOs.Pdf
 {
-    public interface IPdfGenerationResult : IResult<byte[]>
+    public interface IPdfGenerationResult : IApiResult<byte[]>
     {
         string FileName { get; }
 	}

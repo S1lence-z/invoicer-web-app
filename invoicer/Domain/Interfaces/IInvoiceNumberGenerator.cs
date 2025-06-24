@@ -4,6 +4,6 @@ namespace Domain.Interfaces
 {
 	public interface IInvoiceNumberGenerator
 	{
-		string GenerateInvoiceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime at);
+		InvoiceNumber Generate(NumberingScheme scheme, EntityInvoiceNumberingSchemeState currentState, DateTime generationDate);
 	}
 }

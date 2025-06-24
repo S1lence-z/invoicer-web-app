@@ -10,7 +10,7 @@ namespace Application.RepositoryInterfaces
 		Task<NumberingScheme> CreateAsync(NumberingScheme numberingScheme);
 		NumberingScheme Update(NumberingScheme numberingScheme);
 		Task<bool> DeleteAsync(int id);
-		Task<NumberingScheme> GetDefaultScheme(bool isReadonly);
+		Task<NumberingScheme> GetDefaultSchemeAsync(bool isReadonly);
 		Task SetDefaultSchemeAsync(NumberingScheme numberingScheme);
 		Task<bool> IsInUseByEntity(NumberingScheme numberingScheme);
 	}

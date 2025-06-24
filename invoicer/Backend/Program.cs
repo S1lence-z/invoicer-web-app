@@ -44,7 +44,8 @@ namespace Backend
 			// Add external services
 			builder.Services.AddScoped<IAresApiService, AresApiService>();
 			builder.Services.AddScoped<IInvoicePdfGenerator, QuestInvoicePdfGenerator>();
-			builder.Services.AddSingleton<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
+			builder.Services.AddScoped<IInvoiceNumberParser, InvoiceNumberParser>();
+			builder.Services.AddScoped<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
@@ -53,6 +54,20 @@ namespace Backend
 			builder.Services.AddSwaggerGen();
 
 			var app = builder.Build();
+
+			// Create the db migrations and apply them
+			using (var scope = app.Services.CreateScope())
+			{
+				try
+				{
+					var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+					dbContext.Database.Migrate();
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
+				}
+			}
 
 			// Enable Swagger UI
 			app.UseSwagger();

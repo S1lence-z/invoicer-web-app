@@ -222,5 +222,4 @@ project.lock.json
 AppPackages/
 
 # other
-Migrations
 obj

@@ -4,11 +4,11 @@ using Shared.Enums;
 
 namespace Domain.Services
 {
-	public sealed class InvoiceNumberGenerator : IInvoiceNumberGenerator
+	public sealed class InvoiceNumberGenerator(IInvoiceNumberParser invoiceNumberParser) : IInvoiceNumberGenerator
 	{
-		public string GenerateInvoiceNumber(NumberingScheme scheme, EntityInvoiceNumberingSchemeState state, DateTime generationDate)
+		public InvoiceNumber Generate(NumberingScheme scheme, EntityInvoiceNumberingSchemeState currentState, DateTime generationDate)
 		{
-			int sequenceNumber = ShouldResetSequenceNumber(scheme, state, generationDate) ? 1 : state.LastSequenceNumber + 1;
+			int sequenceNumber = ShouldResetSequenceNumber(scheme, currentState, generationDate) ? 1 : currentState.LastSequenceNumber + 1;
 
 			// Format the sequence number with padding
 			string formattedSequenceNumber = scheme.SequencePadding > 0
@@ -19,30 +19,35 @@ namespace Domain.Services
 			string monthPart = scheme.IncludeMonth ? GetMonthPart(generationDate) : string.Empty;
 			string separator = scheme.UseSeperator ? scheme.Seperator : string.Empty;
 
+			List<string> parts = ConstructInvoiceNumberParts(scheme, formattedSequenceNumber, yearPart, monthPart);
+
+			string invoiceNumber = scheme.Prefix + string.Join(separator, parts.Where(p => !string.IsNullOrEmpty(p)));
+			return InvoiceNumber.FromString(invoiceNumber, scheme, invoiceNumberParser);
+		}
+
+		private static List<string> ConstructInvoiceNumberParts(NumberingScheme scheme, string formattedSequenceNumber, string yearPart, string monthPart)
+		{
 			List<string> parts = [];
-
-			if (scheme.SequencePosition == Position.Start)
+			switch (scheme.SequencePosition)
 			{
-				parts.Add(formattedSequenceNumber);
-				if (scheme.InvoiceNumberYearFormat != YearFormat.None)
-					parts.Add(yearPart);
-				if (scheme.IncludeMonth)
-					parts.Add(monthPart);
+				case Position.Start:
+					parts.Add(formattedSequenceNumber);
+					if (scheme.InvoiceNumberYearFormat != YearFormat.None)
+						parts.Add(yearPart);
+					if (scheme.IncludeMonth)
+						parts.Add(monthPart);
+					break;
+				case Position.End:
+					if (scheme.InvoiceNumberYearFormat != YearFormat.None)
+						parts.Add(yearPart);
+					if (scheme.IncludeMonth)
+						parts.Add(monthPart);
+					parts.Add(formattedSequenceNumber);
+					break;
+				default:
+					throw new InvalidOperationException($"Invalid sequence position: {scheme.SequencePosition}");
 			}
-			else if (scheme.SequencePosition == Position.End)
-			{
-				if (scheme.InvoiceNumberYearFormat != YearFormat.None)
-					parts.Add(yearPart);
-				if (scheme.IncludeMonth)
-					parts.Add(monthPart);
-				parts.Add(formattedSequenceNumber);
-			}
-			else
-			{
-				throw new InvalidOperationException($"Invalid sequence position: {scheme.SequencePosition}");
-			}
-
-			return scheme.Prefix + string.Join(separator, parts.Where(p => !string.IsNullOrEmpty(p)));
+			return parts;
 		}
 
 		private static string GetYearPart(DateTime generationDate, YearFormat yearFormat)

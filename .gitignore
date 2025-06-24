@@ -1,3 +1,4 @@
 .vs/
 /invoicer/QuestPdfPlayground/
 /invoicer/InvoiceNumberUtilsTests
+*.db

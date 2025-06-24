@@ -19,16 +19,26 @@
     {
         @* ARES API WINDOW *@
         <AresApiLookup UserInputIco="@userInputIco"
-            UserInputIcoChanged="@((string ico) => userInputIco = ico)"
-            AresApiService="aresApiService"
-            AresApiErrorMessage="@aresApiErrorMessage"
-            OnFillInAresData="FillInAresData"
-            />
+        UserInputIcoChanged="@((string ico) => userInputIco = ico)"
+        AresApiService="aresApiService"
+        AresApiErrorMessage="@aresApiErrorMessage"
+        OnFillInAresData="FillInAresData"
+        />
     }
     @* ENTITY FORM *@
     <EditForm Model="@entityFormModel" OnValidSubmit="SubmitForm">
         <DataAnnotationsValidator />
-        <div class="row mb-4">
+        <div class="row mt-4">
+            <div class="col">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="entity-isClient" @bind="entityFormModel.IsClient" />
+                    <label for="entity-isClient" class="form-check-label font-weight-bold">@L["IsThisClient"]</label>
+                    <ValidationMessage For="@(() => entityFormModel.IsClient)" />
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
             <div class="col">
                 <label for="entity-name" class="font-weight-bold">@L["NameLabel"]</label>
                 <input type="text" class="form-control" id="entity-name" placeholder="@L["NamePlaceholder"]" @bind="entityFormModel.Name" />
@@ -40,7 +50,7 @@
                 <ValidationMessage For="@(() => entityFormModel.Ico)" />
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-4">
             <div class="col">
                 <label for="entity-email" class="font-weight-bold">@L["EmailLabel"]</label>
                 <input type="email" class="form-control" id="entity-email" placeholder="@L["EmailPlaceholder"]" @bind="entityFormModel.Email" />
@@ -54,7 +64,7 @@
         </div>
         <hr />
         @* ADDRESS FORM *@
-        <div class="row mb-4">
+        <div class="row">
             <div class="col">
                 <label for="address-street" class="font-weight-bold">@L["AddressStreetLabel"]</label>
                 <input type="text" class="form-control" id="address-street" placeholder="@L["AddressStreetPlaceholder"]" @bind="entityFormModel.Street" />
@@ -66,7 +76,7 @@
                 <ValidationMessage For="@(() => entityFormModel.ZipCode)" />
             </div>
         </div>
-        <div class="row mb-4">
+        <div class="row mt-4">
             <div class="col">
                 <label for="address-city" class="font-weight-bold">@L["AddressCityLabel"]</label>
                 <input type="text" class="form-control" id="address-city" placeholder="@L["AddressCityPlaceholder"]" @bind="entityFormModel.City" />
@@ -80,7 +90,7 @@
         </div>
         <hr />
         @* BANK ACCOUNT FORM *@
-        <div class="row mb-4">
+        <div class="row">
             <div class="col">
                 <label for="bank-acc-accNumber" class="font-weight-bold">@L["BankAccountNumberLabel"]</label>
                 <input type="text" class="form-control" id="bank-acc-accNumber" placeholder="@L["BankAccountNumberPlaceholder"]" @bind="entityFormModel.AccountNumber" />
@@ -92,7 +102,7 @@
                 <ValidationMessage For="@(() => entityFormModel.BankCode)" />
             </div>
         </div>
-        <div class="row mb-4">
+        <div class="row my-4">
             <div class="col">
                 <label for="bank-acc-name" class="font-weight-bold">@L["BankNameLabel"]</label>
                 <input type="text" class="form-control" id="bank-acc-name" placeholder="@L["BankNamePlaceholder"]" @bind="entityFormModel.BankName" />
@@ -125,7 +135,7 @@
     protected override void OnParametersSet()
     {
         if (EntityInstance is not null)
-            entityFormModel = EntityFormModel.FromEntity(EntityInstance);
+            entityFormModel = EntityFormModel.FromDto(EntityInstance);
         if (!isActive)
             ResetForm();
     }
@@ -179,7 +189,7 @@
 
     private void ResetForm()
     {
-        entityFormModel = new();
+        entityFormModel.ClearModel();
         userInputIco = string.Empty;
         aresApiErrorMessage = string.Empty;
     }
@@ -208,35 +218,19 @@
 
     private async Task SubmitNewEntity() 
     {
-        AddressDto newAddress = new()
-            {
-                Street = entityFormModel.Street,
-                ZipCode = entityFormModel.ZipCode,
-                City = entityFormModel.City,
-                Country = entityFormModel.Country
-            };
+        // Create the dto
+        EntityDto newEntity = entityFormModel.ToDto();
+        AddressDto newAddress = entityFormModel.GetAddressDto();
+        BankAccountDto newBankAccount = entityFormModel.GetBankAccountDto();
         // Create the address
         AddressDto newAddressResponse = await addressService.CreateAsync(newAddress);
-
         // Create the bank account
-        var newBankAccount = new BankAccountDto
-            {
-                AccountNumber = entityFormModel.AccountNumber,
-                BankCode = entityFormModel.BankCode,
-                BankName = entityFormModel.BankName,
-                IBAN = entityFormModel.IBAN
-            };
         BankAccountDto newBankAccountResponse = await bankAccountService.CreateAsync(newBankAccount);
-
         // Create the entity
-        var newEntity = new EntityDto
+        newEntity = newEntity with
             {
-                Ico = entityFormModel.Ico,
-                Name = entityFormModel.Name,
-                Email = entityFormModel.Email,
-                PhoneNumber = entityFormModel.PhoneNumber,
                 AddressId = newAddressResponse.Id,
-                BankAccountId = newBankAccountResponse.Id
+                BankAccountId = newBankAccountResponse.Id,
             };
         EntityDto newEntityResponse = await entityService.CreateAsync(newEntity);
     }
@@ -248,41 +242,15 @@
             aresApiErrorMessage = "Entity instance is null";
             return;
         }
-        // Edit the address
+        // Get ids
         int addressId = EntityInstance.AddressId;
-        AddressDto editedAddress = new()
-            {
-                Id = addressId,
-                Street = entityFormModel.Street,
-                ZipCode = entityFormModel.ZipCode,
-                City = entityFormModel.City,
-                Country = entityFormModel.Country
-            };
-        AddressDto editedAddressResponse = await addressService.UpdateAsync(addressId, editedAddress);
-
-        // Edit the bank account
         int bankAccountId = EntityInstance.BankAccountId;
-        BankAccountDto editedBankAccount = new()
-            {
-                Id = bankAccountId,
-                AccountNumber = entityFormModel.AccountNumber,
-                BankCode = entityFormModel.BankCode,
-                BankName = entityFormModel.BankName,
-                IBAN = entityFormModel.IBAN
-            };
-        BankAccountDto? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, editedBankAccount);
-
-        // Edit the entity
-        EntityDto editedEntity = EntityInstance with
-            {
-                Ico = entityFormModel.Ico,
-                Name = entityFormModel.Name,
-                Email = entityFormModel.Email,
-                PhoneNumber = entityFormModel.PhoneNumber,
-                CurrentNumberingSchemeId = EntityInstance.CurrentNumberingSchemeId,
-                AddressId = editedAddressResponse.Id,
-                BankAccountId = editedBankAccountResponse.Id
-            };
-        EntityDto editedEntityResponse = await entityService.UpdateAsync(editedEntity.Id, editedEntity);
+        EntityDto updatedEntityDto = entityFormModel.ToDto();
+        AddressDto updatedAddressDto = entityFormModel.GetAddressDto();
+        BankAccountDto bankAccountDto = entityFormModel.GetBankAccountDto();
+        // Update the models
+        AddressDto editedAddressResponse = await addressService.UpdateAsync(addressId, updatedAddressDto);
+        BankAccountDto? editedBankAccountResponse = await bankAccountService.UpdateAsync(bankAccountId, bankAccountDto);
+        EntityDto editedEntityResponse = await entityService.UpdateAsync(updatedEntityDto.Id, updatedEntityDto);
     }
 }

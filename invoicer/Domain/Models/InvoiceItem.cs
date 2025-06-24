@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models
 {
-	public class InvoiceItem
+	public record class InvoiceItem
     {
 		public int Id { get; set; }
 		public int InvoiceId { get; set; }

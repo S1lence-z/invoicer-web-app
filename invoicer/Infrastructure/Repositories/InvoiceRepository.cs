@@ -37,7 +37,7 @@ namespace Infrastructure.Repositories
 				.ToListAsync();
 		}
 
-		public async Task<IEnumerable<Invoice>> GetAllInvoicesByEntityId(int entityId, bool isReadonly)
+		public async Task<IEnumerable<Invoice>> GetAllInvoicesBySellerId(int entityId, bool isReadonly)
 		{
 			if (isReadonly)
 				return await context.Invoice
@@ -104,7 +104,7 @@ namespace Infrastructure.Repositories
 			return await context.Invoice.AsNoTracking().CountAsync(i => i.SellerId == entityId);
 		}
 
-		public async Task<Invoice?> GetLastInvoiceAsync(int entityId, bool isReadonly, params int[] invoiceIdsToExclude)
+		public async Task<Invoice?> GetLastInvoiceByIssueDateAsync(int entityId, bool isReadonly, params int[] invoiceIdsToExclude)
 		{
 			if (isReadonly)
 				return await context.Invoice
@@ -117,7 +117,23 @@ namespace Infrastructure.Repositories
 				return await context.Invoice
 					.Where(i => i.SellerId == entityId && !invoiceIdsToExclude.Contains(i.Id))
 					.OrderByDescending(i => i.IssueDate)
+					.OrderByDescending(i => i.Id)
 					.FirstOrDefaultAsync() ?? null;
+		}
+
+		public async Task<bool> IsInvoiceNumberUniqueForSellerAsync(string invoiceNumber, int sellerId)
+		{
+			IEnumerable<Invoice> existingInvoices = await context.Invoice
+				.AsNoTracking()
+				.Where(i => i.SellerId == sellerId)
+				.ToListAsync();
+
+			foreach (Invoice invoice in existingInvoices)
+			{
+				if (invoice.InvoiceNumber == invoiceNumber)
+					return false;
+			}
+			return true;
 		}
 
 		public async Task SaveChangesAsync()

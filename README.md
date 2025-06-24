@@ -53,10 +53,15 @@ Detailed functional and non-functional requirements are available here:
     This is the easiest way to get started as it handles dependencies and database setup.
 
     ```bash
-    # Ensure Docker Desktop is running
     docker-compose -f docker-compose.dev.yml up --build
     ```
     This command will build the necessary Docker images and start the backend API and frontend application containers.
+    
+    If you want to run it in production mode, you can use the production Docker Compose file:
+    
+    ```bash
+    docker-compose -f docker-compose.staging.yml up --build
+    ```
 
     **Option B: Running Manually**
 
@@ -68,9 +73,7 @@ Detailed functional and non-functional requirements are available here:
         ```
     b.  **Setup Database:** Navigate to the Backend project directory and apply EF Core migrations. This will create the `Invoicer.db` SQLite file if it doesn't exist.
         ```bash
-        cd src/Backend
-        dotnet ef database update
-        cd ../.. # Return to the solution root directory
+        dotnet ef database update -s .\Backend\ -p .\Infrastructure\
         ```
         *Optional:* Execute the `src/Backend/Database/Patches/InsertSampleData.sql` script against the created `Invoicer.db` file using a SQLite tool if you need sample data.
 

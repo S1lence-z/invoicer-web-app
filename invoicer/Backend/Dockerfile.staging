@@ -30,8 +30,12 @@ FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Copy over the sqlite database
-COPY --from=build /src/Backend/Database/Invoicer.db .
+# Copy over the sqlite database if it exists, otherwise create an empty one
+RUN if [ -f /src/Infrastructure/Persistance/Invoicer.db ]; then \
+        cp /src/Infrastructure/Persistance/Invoicer.db .; \
+    else \
+        touch Invoicer.db .; \
+    fi
 
 ENTRYPOINT ["dotnet", "Backend.dll"]
 
