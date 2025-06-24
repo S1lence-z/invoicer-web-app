@@ -1,4 +1,4 @@
-# Invoicer Application - Developer Documentation
+# Invoicer - Developer Documentation
 
 ## 1. Introduction
 
