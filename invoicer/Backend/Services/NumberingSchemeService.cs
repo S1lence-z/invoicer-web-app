@@ -87,7 +87,7 @@ namespace Backend.Services
 
 		public async Task<NumberingSchemeDto> GetDefaultNumberingSchemeAsync()
 		{
-			NumberingScheme defaultScheme = await numberingSchemeRepository.GetDefaultScheme(true);
+			NumberingScheme defaultScheme = await numberingSchemeRepository.GetDefaultSchemeAsync(true);
 			return NumberingSchemeMapper.MapToDto(defaultScheme);
 		}
 	}

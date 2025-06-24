@@ -43,7 +43,7 @@ namespace Infrastructure.Repositories
 					.FirstOrDefaultAsync(ins => ins.Id == id) ?? throw new KeyNotFoundException($"Numbering scheme with id {id} not found.");
 		}
 
-		public async Task<NumberingScheme> GetDefaultScheme(bool isReadonly)
+		public async Task<NumberingScheme> GetDefaultSchemeAsync(bool isReadonly)
 		{
 			if (isReadonly)
 				return await context.NumberingScheme

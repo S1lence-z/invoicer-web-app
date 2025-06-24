@@ -18,7 +18,7 @@ namespace Infrastructure.ExternalServices.AresApi
 			_aresApi = RestService.For<IAresApi>(baseUrl);
 		}
 
-		public async Task<IResult<IAresApiResponse>> GetEntityInformationByIcoAsync(string ico)
+		public async Task<IApiResult<IAresApiResponse>> GetEntityInformationByIcoAsync(string ico)
 		{
 			try
 			{
@@ -38,7 +38,7 @@ namespace Infrastructure.ExternalServices.AresApi
 			}
 		}
 
-		private static IResult<IAresApiResponse> HandleErrorResponse(HttpStatusCode statusCode, AresApiErrorResponse errorResponse)
+		private static IApiResult<IAresApiResponse> HandleErrorResponse(HttpStatusCode statusCode, AresApiErrorResponse errorResponse)
 		{
 			string message = $"{(int)statusCode}: {errorResponse?.Popis ?? "Unknown Error"}";
 			return AresApiResult<AresApiErrorResponse>.Failure(errorResponse, message, (int)statusCode);

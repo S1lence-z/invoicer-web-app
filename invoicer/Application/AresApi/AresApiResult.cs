@@ -2,7 +2,7 @@
 
 namespace Application.AresApi
 {
-	public class AresApiResult<TData> : IResult<TData> where TData : IAresApiResponse
+	public class AresApiResult<TData> : IApiResult<TData> where TData : IAresApiResponse
 	{
 		public TData? Data { get; }
 		public bool IsSuccess { get; }
