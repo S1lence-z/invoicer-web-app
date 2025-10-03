@@ -2,3 +2,7 @@
 /invoicer/QuestPdfPlayground/
 /invoicer/InvoiceNumberUtilsTests
 *.db
+
+# Env
+*.local
+.env
