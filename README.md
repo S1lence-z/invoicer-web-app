@@ -53,14 +53,14 @@ Detailed functional and non-functional requirements are available here:
     This is the easiest way to get started as it handles dependencies and database setup.
 
     ```bash
-    docker-compose -f docker-compose.dev.yml up --build
+    docker compose -f docker-compose.dev.yml up --build
     ```
     This command will build the necessary Docker images and start the backend API and frontend application containers.
     
     If you want to run it in production mode, you can use the production Docker Compose file:
     
     ```bash
-    docker-compose -f docker-compose.staging.yml up --build
+    docker compose up --build
     ```
 
     **Option B: Running Manually**
