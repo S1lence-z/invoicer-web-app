@@ -4,8 +4,12 @@ using Shared.Enums;
 
 namespace Infrastructure.Persistance
 {
-	public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+	public class ApplicationDbContext : DbContext
 	{
+		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+		protected ApplicationDbContext(DbContextOptions options) : base(options) { }
+
 		public DbSet<Address> Address { get; set; }
 		public DbSet<BankAccount> BankAccount { get; set; }
 		public DbSet<Entity> Entity { get; set; }
