@@ -28,15 +28,18 @@ namespace Frontend
 			});
 
 			// Create a new http client
+			var hostBaseAddress = builder.HostEnvironment.BaseAddress;
+
 			builder.Services.AddScoped(sp =>
 			{
 				var envConfigOptions = sp.GetRequiredService<IOptions<EnvironmentConfig>>();
 				var envConfig = envConfigOptions.Value;
 
-				if (string.IsNullOrEmpty(envConfig.ApiBaseUrl))
-					throw new InvalidOperationException("ApiBaseUrl is not configured in appsettings.json or its environment-specific override.");
+				string baseUrl = !string.IsNullOrEmpty(envConfig.ApiBaseUrl)
+					? envConfig.ApiBaseUrl
+					: hostBaseAddress;
 
-				return new HttpClient { BaseAddress = new Uri(envConfig.ApiBaseUrl) };
+				return new HttpClient { BaseAddress = new Uri(baseUrl) };
 			});
 
 			// Add localization services

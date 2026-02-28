@@ -2,6 +2,7 @@ using Backend.Services;
 using Domain.Interfaces;
 using Domain.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 using Application.ServiceInterfaces;
 using Application.Interfaces;
 using Infrastructure.Persistance;
@@ -10,6 +11,7 @@ using Infrastructure.Repositories;
 using Infrastructure.ExternalServices.AresApi;
 using Application.ExternalServiceInterfaces;
 using Infrastructure.ExternalServices.InvoicePdfGenerator;
+using Shared.Enums;
 
 namespace Backend
 {
@@ -19,10 +21,21 @@ namespace Backend
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
-			// Add db context
-			builder.Services.AddDbContext<ApplicationDbContext>(options => 
-				options.UseSqlite(builder.Configuration.GetConnectionString("InvoicerDb"))
-			);
+			// Add db context with provider-specific subclass for migrations
+			DatabaseType databaseType = builder.Configuration.GetValue("DatabaseProvider", DatabaseType.Sqlite);
+			switch (databaseType)
+			{
+				case DatabaseType.PostgreSql:
+					builder.Services.AddDbContext<ApplicationDbContext, PgsqlDbContext>(options =>
+						options.UseNpgsql(builder.Configuration.GetConnectionString("pgsqlConnection")));
+					break;
+				case DatabaseType.Sqlite:
+					builder.Services.AddDbContext<ApplicationDbContext, SqliteDbContext>(options =>
+						options.UseSqlite(builder.Configuration.GetConnectionString("sqliteConnection")));
+					break;
+				default:
+					throw new InvalidOperationException("Invalid database provider specified in configuration.");
+			}
 
 			// Add repositories
 			builder.Services.AddScoped<IAddressRepository, AddressRepository>();
@@ -49,9 +62,13 @@ namespace Backend
 
 			// Add controllers after all the services
 			builder.Services.AddControllers();
-			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen();
+
+			// Swagger only in Development
+			if (builder.Environment.IsDevelopment())
+			{
+				builder.Services.AddEndpointsApiExplorer();
+				builder.Services.AddSwaggerGen();
+			}
 
 			var app = builder.Build();
 
@@ -69,13 +86,34 @@ namespace Backend
 				}
 			}
 
-			// Enable Swagger UI
-			app.UseSwagger();
-			app.UseSwaggerUI();
+			// Swagger UI only in Development
+			if (app.Environment.IsDevelopment())
+			{
+				app.UseSwagger();
+				app.UseSwaggerUI();
+			}
 
-			// app.UseHttpsRedirection();
+			// Support forwarded headers from reverse proxy
+			app.UseForwardedHeaders(new ForwardedHeadersOptions
+			{
+				ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+			});
 
-			// Enable CORS
+			// Read path base from X-Forwarded-Prefix header (set by nginx)
+			app.Use((context, next) =>
+			{
+				if (context.Request.Headers.TryGetValue("X-Forwarded-Prefix", out var prefix))
+				{
+					var pathBase = prefix.ToString().TrimEnd('/');
+					if (!string.IsNullOrEmpty(pathBase))
+					{
+						context.Request.PathBase = pathBase;
+					}
+				}
+				return next();
+			});
+
+			// Enable CORS (frontend and backend are on different origins)
 			EnableCors(app);
 
 			app.UseAuthorization();
