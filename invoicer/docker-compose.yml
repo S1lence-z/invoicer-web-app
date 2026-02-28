@@ -1,16 +1,16 @@
 services:
-    invoicer-proxy:
+    proxy:
         image: nginx:latest
         ports:
             - "127.0.0.1:${APP_PORT}:80"
         volumes:
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
         depends_on:
-            - invoicer-frontend
-            - invoicer-api
+            - frontend
+            - backend-api
         restart: unless-stopped
 
-    invoicer-frontend:
+    frontend:
         build:
             context: .
             dockerfile: Frontend/Dockerfile
@@ -18,13 +18,13 @@ services:
                 DOTNET_VERSION: "8.0"
                 BUILD_CONFIGURATION: Release
         environment:
-            - API_BASE_URL=${API_BASE_URL}
-            - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+            - BASE_PATH=${BASE_PATH:-/}
+            - API_BASE_URL=${API_BASE_URL:-}
         depends_on:
-            - invoicer-api
+            - backend-api
         restart: unless-stopped
 
-    invoicer-api:
+    backend-api:
         build:
             context: .
             dockerfile: Backend/Dockerfile
@@ -52,8 +52,8 @@ volumes:
 #   db-network:
 #     external: true
 #
-# And attach it to the invoicer-api service:
-#   invoicer-api:
+# And attach it to the backend-api service:
+#   backend-api:
 #     networks:
 #       - default
 #       - db-network

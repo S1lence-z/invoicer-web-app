@@ -24,6 +24,11 @@ RUN rm -rf /usr/share/nginx/html/*
 
 COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
 COPY Frontend/nginx.conf /etc/nginx/nginx.conf
-RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
+COPY Frontend/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh \
+    && chown -R nginx:nginx /usr/share/nginx/html \
+    && chmod -R 755 /usr/share/nginx/html
 
 EXPOSE 80
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
