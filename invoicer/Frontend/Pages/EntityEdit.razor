@@ -48,7 +48,7 @@
     private EntityDto? EntityInstance { get; set; } = null;
     private bool IsLoadingData { get; set; } = true;
     private bool LoadingFailed { get; set; } = false;
-    private string ReturnUrl { get; set; } = "/entities";
+    private string ReturnUrl { get; set; } = "entities";
     private bool IsEditingMode => EntityId.HasValue;
 
     protected override void OnInitialized()
@@ -58,7 +58,7 @@
         if (query.Contains("returnUrl"))
         {
             var queryParams = ParseQueryString(query);
-            ReturnUrl = queryParams["returnUrl"] ?? "/entities";
+            ReturnUrl = queryParams["returnUrl"] ?? "entities";
         }
         base.OnInitialized();
     }
