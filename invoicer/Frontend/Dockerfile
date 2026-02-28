@@ -18,14 +18,12 @@ WORKDIR "/src/Frontend"
 RUN dotnet publish "Frontend.csproj" -c $BUILD_CONFIGURATION -o /app/publish --no-restore
 
 # --- Final Stage (Nginx to serve static files) ---
-FROM nginx:${NGINX_VERSION} AS final
+FROM nginx AS final
 
 RUN rm -rf /usr/share/nginx/html/*
 
 COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
 COPY Frontend/nginx.conf /etc/nginx/nginx.conf
-COPY Frontend/entrypoint.sh /docker-entrypoint.d/40-configure-app.sh
-RUN sed -i 's/\r$//' /docker-entrypoint.d/40-configure-app.sh && \
-    chmod +x /docker-entrypoint.d/40-configure-app.sh
+RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
 
 EXPOSE 80
