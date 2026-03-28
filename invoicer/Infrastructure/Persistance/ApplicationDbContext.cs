@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using Shared.Enums;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Persistance
 {
@@ -18,9 +19,43 @@ namespace Infrastructure.Persistance
 		public DbSet<NumberingScheme> NumberingScheme { get; set; }
 		public DbSet<EntityInvoiceNumberingSchemeState> EntityInvoiceNumberingSchemeState { get; set; }
 
+        private static readonly ValueConverter<DateTime, DateTime> dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+			v => v.Kind == DateTimeKind.Unspecified 
+				? DateTime.SpecifyKind(v, DateTimeKind.Utc) 
+				: v.ToUniversalTime(),
+			v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+		private static readonly ValueConverter<DateTime?, DateTime?> nullableDateTimeConverter = new ValueConverter<DateTime?, DateTime?>(
+			v => v.HasValue 
+				? (v.Value.Kind == DateTimeKind.Unspecified 
+					? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) 
+					: v.Value.ToUniversalTime()) 
+				: v,
+			v => v.HasValue 
+				? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) 
+				: v);
+
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			// Converters to all entities for DateTime and DateTime? to ensure UTC storage
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				foreach (var property in entityType.GetProperties())
+				{
+					if (property.ClrType == typeof(DateTime))
+					{
+						property.SetValueConverter(dateTimeConverter);
+					}
+					else if (property.ClrType == typeof(DateTime?))
+					{
+						property.SetValueConverter(nullableDateTimeConverter);
+					}
+				}
+			}
+
+			// Configure entities
 			SetUpAddress(modelBuilder);
 			SetUpBankAccount(modelBuilder);
 			SetUpEntity(modelBuilder);
