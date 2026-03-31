@@ -480,3 +480,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Local desktop builds
+publish-frontend/
+publish-desktop/
