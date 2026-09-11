@@ -72,7 +72,9 @@ namespace Backend
 			builder.Services.AddScoped<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
 
 			// Add controllers after all the services
-			builder.Services.AddControllers();
+			// Register this assembly explicitly so controllers are found even when another
+			// executable (e.g. the Desktop host) is the entry assembly
+			builder.Services.AddControllers().AddApplicationPart(typeof(Program).Assembly);
 
 			// Swagger only in Development
 			if (builder.Environment.IsDevelopment())
@@ -128,9 +130,10 @@ namespace Backend
 			// Enable CORS (frontend and backend are on different origins)
 			EnableCors(app);
 
-			// Serve Blazor WASM frontend if wwwroot exists (used by Desktop mode)
-			var wwwrootPath = app.Environment.WebRootPath;
-			if (!string.IsNullOrEmpty(wwwrootPath) && Directory.Exists(wwwrootPath))
+			// Serve the Blazor WASM frontend from this process when explicitly enabled
+			// (the Desktop host sets ServeFrontend=true; the web deployment uses nginx instead)
+			bool serveFrontend = app.Configuration.GetValue("ServeFrontend", false);
+			if (serveFrontend)
 			{
 				app.UseBlazorFrameworkFiles();
 				app.UseStaticFiles();
@@ -140,8 +143,8 @@ namespace Backend
 
 			app.MapControllers();
 
-			// SPA fallback: serve index.html for non-API, non-file routes (Desktop mode)
-			if (!string.IsNullOrEmpty(wwwrootPath) && Directory.Exists(wwwrootPath))
+			// SPA fallback: serve index.html for non-API, non-file routes
+			if (serveFrontend)
 			{
 				app.MapFallbackToFile("index.html");
 			}
