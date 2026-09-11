@@ -19,12 +19,6 @@ jobs:
           - os: ubuntu-latest
             rid: linux-x64
             artifact: invoicer-linux-x64
-          - os: macos-latest
-            rid: osx-x64
-            artifact: invoicer-osx-x64
-          - os: macos-latest
-            rid: osx-arm64
-            artifact: invoicer-osx-arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -36,25 +30,30 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Publish Frontend (Blazor WASM)
-        working-directory: invoicer
-        run: dotnet publish Frontend/Frontend.csproj -c Release -o publish-frontend
-
+      # Desktop references the Frontend project, so this single publish also builds the
+      # Blazor WASM client and places it under publish-desktop/wwwroot
       - name: Publish Desktop (self-contained)
         working-directory: invoicer
         run: >
           dotnet publish Desktop/Desktop.csproj
           -c Release
-          --self-contained
           -r ${{ matrix.rid }}
+          --self-contained
           -p:DebugType=none
           -o publish-desktop
 
-      - name: Copy Frontend wwwroot to publish output
+      - name: Verify publish output
         shell: bash
+        working-directory: invoicer/publish-desktop
         run: |
-          mkdir -p invoicer/publish-desktop/wwwroot
-          cp -r invoicer/publish-frontend/wwwroot/* invoicer/publish-desktop/wwwroot/
+          test -f wwwroot/index.html
+          test -f wwwroot/_framework/blazor.webassembly.js
+          test -f Assets/icon.ico
+          if [[ "${{ matrix.rid }}" == linux-* ]]; then
+            # Fail here, not on a user's machine, if the native webview library cannot be linked
+            sudo apt-get update -q && sudo apt-get install -y -q libwebkit2gtk-4.1-0 libgtk-3-0 libnotify4
+            ldd Photino.Native.so | grep -q 'not found' && { ldd Photino.Native.so; exit 1; } || true
+          fi
 
       - name: Archive release
         shell: bash
