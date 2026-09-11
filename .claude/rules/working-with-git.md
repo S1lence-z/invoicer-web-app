@@ -4,6 +4,7 @@ You may only use the following git commands:
 - git commit
 - git push (only on non-default branches)
 - git log
+- git status
 
 When commiting do not add any long notes and use the following conventions:
 - Format: <type>: <message>
