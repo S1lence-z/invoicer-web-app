@@ -1,5 +1,6 @@
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using Photino.NET;
 
 namespace Desktop;
@@ -132,8 +133,58 @@ public class Program
 		else
 			Log($"Icon not found at {iconPath}");
 
+		window.WebMessageReceived += OnWebMessage;
+
 		return window;
 	}
+
+	/// <summary>
+	/// Messages posted by the frontend via <c>window.external.sendMessage</c> (see wwwroot/download.js).
+	/// </summary>
+	private static void OnWebMessage(object? sender, string message)
+	{
+		if (sender is not PhotinoWindow window)
+			return;
+
+		try
+		{
+			var request = JsonSerializer.Deserialize<WebMessage>(message, JsonOptions);
+			switch (request?.Type)
+			{
+				case "savePdf" when request.Data is not null:
+					SavePdf(window, request.FileName ?? "invoice.pdf", request.Data);
+					break;
+				default:
+					Log($"Ignoring unknown web message: {request?.Type ?? "<null>"}");
+					break;
+			}
+		}
+		catch (Exception ex)
+		{
+			Log($"Web message failed: {ex}");
+			window.ShowMessage(AppName, $"The operation failed: {ex.Message}", icon: PhotinoDialogIcon.Error);
+		}
+	}
+
+	private static void SavePdf(PhotinoWindow window, string fileName, string base64Data)
+	{
+		var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+		var defaultPath = Path.Combine(documents, fileName);
+
+		var target = window.ShowSaveFile("Save invoice", defaultPath, [("PDF", ["*.pdf"])]);
+		if (string.IsNullOrEmpty(target))
+			return; // user cancelled
+
+		if (!target.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+			target += ".pdf";
+
+		File.WriteAllBytes(target, Convert.FromBase64String(base64Data));
+		Log($"Saved PDF to {target}");
+	}
+
+	private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
+	private sealed record WebMessage(string? Type, string? FileName, string? Data);
 
 	/// <summary>
 	/// The Windows build has no console, so a startup failure is shown in a plain window
