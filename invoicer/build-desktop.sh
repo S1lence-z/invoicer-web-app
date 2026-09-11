@@ -5,39 +5,28 @@ set -e
 # Usage: ./build-desktop.sh [runtime-id]
 # Example: ./build-desktop.sh win-x64
 #          ./build-desktop.sh linux-x64
-#          ./build-desktop.sh osx-arm64
+#
+# The Desktop project references the Frontend project, so the Blazor WASM assets are
+# published into publish-desktop/wwwroot automatically.
 
 RID=${1:-linux-x64}
 OUTPUT_DIR="publish-desktop"
 
 echo "Building Invoicer Desktop for $RID..."
+rm -rf "$OUTPUT_DIR"
 
-# Clean previous output
-rm -rf "$OUTPUT_DIR" publish-frontend
-
-# Step 1: Publish the Frontend (Blazor WASM)
-echo "Publishing Frontend..."
-dotnet publish Frontend/Frontend.csproj -c Release -o publish-frontend --nologo -v q
-
-# Step 2: Publish the Desktop app (self-contained, NOT single-file)
-echo "Publishing Desktop..."
 dotnet publish Desktop/Desktop.csproj \
   -c Release \
-  --self-contained \
   -r "$RID" \
+  --self-contained \
   -p:DebugType=none \
   -o "$OUTPUT_DIR" \
   --nologo -v q
 
-# Step 3: Copy Frontend wwwroot into the publish output
-echo "Copying Frontend assets..."
-mkdir -p "$OUTPUT_DIR/wwwroot"
-cp -r publish-frontend/wwwroot/* "$OUTPUT_DIR/wwwroot/"
-
 echo ""
 echo "Build complete! Output in: $OUTPUT_DIR/"
 if [[ "$RID" == win-* ]]; then
-  echo "Run: $OUTPUT_DIR/Desktop.exe"
+  echo "Run: $OUTPUT_DIR/Invoicer.exe"
 else
-  echo "Run: ./$OUTPUT_DIR/Desktop"
+  echo "Run: ./$OUTPUT_DIR/Invoicer"
 fi

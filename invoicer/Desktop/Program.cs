@@ -1,160 +1,171 @@
 using System.Net;
-using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using Photino.NET;
 
 namespace Desktop;
 
 public class Program
 {
+	private const string AppName = "Invoicer";
+
+	// Fixed port so the browser origin (and therefore localStorage, e.g. the chosen culture)
+	// stays the same between launches. Falls back to a random port if it is taken.
+	private const int PreferredPort = 47831;
+
+	private static readonly string DataDir = Path.Combine(
+		Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName);
+
+	private static readonly string LogPath = Path.Combine(DataDir, "desktop.log");
+
 	[STAThread]
-	public static void Main(string[] args)
+	public static int Main(string[] args)
 	{
-		// Resolve the actual exe directory
-		var exeDir = Path.GetDirectoryName(Environment.ProcessPath) ?? AppContext.BaseDirectory;
+		Directory.CreateDirectory(DataDir);
+		Log($"Starting {AppName} desktop; data directory: {DataDir}");
 
-		// Log startup info for debugging
-		var logPath = Path.Combine(exeDir, "desktop.log");
-		Log(logPath, $"Starting Invoicer Desktop");
-		Log(logPath, $"Exe directory: {exeDir}");
-		Log(logPath, $"AppContext.BaseDirectory: {AppContext.BaseDirectory}");
-
-		// Verify wwwroot exists
-		var wwwrootDir = Path.Combine(exeDir, "wwwroot");
-		if (!Directory.Exists(wwwrootDir))
+		WebApplication app;
+		try
 		{
-			Log(logPath, $"ERROR: wwwroot not found at {wwwrootDir}");
-			return;
+			app = StartServer(args);
 		}
-		Log(logPath, $"wwwroot found: {wwwrootDir}");
-
-		// Find a free port for the embedded server
-		var port = GetAvailablePort();
-		var serverUrl = $"http://localhost:{port}";
-		Log(logPath, $"Server URL: {serverUrl}");
-
-		// Configure the SQLite database path next to the executable
-		var dataDir = Path.Combine(exeDir, "data");
-		Directory.CreateDirectory(dataDir);
-		var dbPath = Path.Combine(dataDir, "Invoicer.db");
-		Log(logPath, $"Database path: {dbPath}");
-
-		// Track server errors
-		Exception? serverError = null;
-		var serverReady = new ManualResetEventSlim(false);
-
-		// Start the ASP.NET Core backend in a background thread
-		var serverThread = new Thread(() =>
+		catch (Exception ex)
 		{
-			try
-			{
-				var builder = WebApplication.CreateBuilder(new string[]
-				{
-					$"--urls={serverUrl}",
-					$"--ConnectionStrings:sqliteConnection=Data Source={dbPath}",
-					"--DatabaseProvider=Sqlite",
-					$"--contentRoot={exeDir}"
-				});
+			Log($"FATAL: could not start the embedded server: {ex}");
+			ShowFatalError(ex);
+			return 1;
+		}
 
-				builder.Environment.WebRootPath = wwwrootDir;
+		var url = app.Urls.First();
+		Log($"Server listening on {url}");
 
-				Backend.Program.ConfigureServices(builder);
+		var window = CreateWindow();
+		window.Load(url);
+		window.WaitForClose();
 
-				var app = builder.Build();
+		Log("Window closed, stopping server");
+		app.StopAsync().GetAwaiter().GetResult();
+		return 0;
+	}
 
-				Backend.Program.ConfigurePipeline(app);
+	/// <summary>
+	/// Builds and starts the ASP.NET Core backend in-process, serving both the API and the
+	/// Blazor WASM frontend on the loopback interface.
+	/// </summary>
+	private static WebApplication StartServer(string[] args)
+	{
+		try
+		{
+			return StartServer(args, $"http://127.0.0.1:{PreferredPort}");
+		}
+		catch (IOException ex)
+		{
+			// Most likely "address already in use" (another instance is running)
+			Log($"Port {PreferredPort} unavailable ({ex.Message}); falling back to a random port");
+			return StartServer(args, "http://127.0.0.1:0");
+		}
+	}
 
-				app.Lifetime.ApplicationStarted.Register(() =>
-				{
-					Log(logPath, "Kestrel started, signaling ready");
-					serverReady.Set();
-				});
-
-				Log(logPath, "Starting Kestrel...");
-				app.Run();
-			}
-			catch (Exception ex)
-			{
-				Log(logPath, $"Server error: {ex}");
-				serverError = ex;
-				serverReady.Set();
-			}
+	private static WebApplication StartServer(string[] args, string url)
+	{
+		var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+		{
+			Args = args,
+			ContentRootPath = AppContext.BaseDirectory,
 		});
-		serverThread.IsBackground = true;
-		serverThread.Start();
 
-		// Wait for Kestrel to start
-		Log(logPath, "Waiting for server to start...");
-		if (!serverReady.Wait(TimeSpan.FromSeconds(60)))
+		// During `dotnet run` the Frontend assets are served from the build manifest rather than
+		// a physical wwwroot; this is a no-op in a published build.
+		builder.WebHost.UseStaticWebAssets();
+		builder.WebHost.UseUrls(url);
+
+		// Desktop-only settings. Added last, so they win over any appsettings.json that was
+		// copied from the Backend project, environment variables, or command-line arguments.
+		var dbPath = Path.Combine(DataDir, "Invoicer.db");
+		builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
 		{
-			Log(logPath, "ERROR: Server failed to start within 60 seconds");
-			return;
-		}
+			["ServeFrontend"] = "true",
+			["DatabaseProvider"] = "Sqlite",
+			["ConnectionStrings:sqliteConnection"] = $"Data Source={dbPath}",
+		});
 
-		if (serverError != null)
+		builder.Logging.AddProvider(new FileLoggerProvider(LogPath));
+
+		Backend.Program.ConfigureServices(builder);
+
+		var app = builder.Build();
+
+		Backend.Program.ConfigurePipeline(app);
+
+		try
 		{
-			Log(logPath, $"ERROR: Server failed: {serverError.Message}");
-			return;
+			app.StartAsync().GetAwaiter().GetResult();
 		}
-
-		// Verify the server is actually responding via HTTP
-		Log(logPath, "Verifying server with HTTP health check...");
-		if (!WaitForServerReady(serverUrl, TimeSpan.FromSeconds(15)))
+		catch
 		{
-			Log(logPath, "ERROR: Server not responding to HTTP requests");
-			return;
+			app.DisposeAsync().AsTask().GetAwaiter().GetResult();
+			throw;
 		}
-		Log(logPath, "Server is ready, opening window");
+		return app;
+	}
 
-		// Create the Photino window
-		var iconPath = Path.Combine(wwwrootDir, "icon-512.png");
+	private static PhotinoWindow CreateWindow()
+	{
+#if DEBUG
+		const bool devTools = true;
+#else
+		const bool devTools = false;
+#endif
+		var iconFile = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "icon.ico" : "icon.png";
+		var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", iconFile);
+
 		var window = new PhotinoWindow()
-			.SetTitle("Invoicer")
+			.SetTitle(AppName)
 			.SetUseOsDefaultSize(false)
 			.SetSize(1400, 900)
-			.Center();
+			.SetMinSize(900, 600)
+			.Center()
+			.SetDevToolsEnabled(devTools)
+			.SetContextMenuEnabled(devTools);
 
 		if (File.Exists(iconPath))
 			window.SetIconFile(iconPath);
+		else
+			Log($"Icon not found at {iconPath}");
 
-		window.Load(serverUrl);
-		window.WaitForClose();
+		return window;
 	}
 
-	private static bool WaitForServerReady(string url, TimeSpan timeout)
+	/// <summary>
+	/// The Windows build has no console, so a startup failure is shown in a plain window
+	/// instead of silently exiting.
+	/// </summary>
+	private static void ShowFatalError(Exception ex)
 	{
-		using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(3) };
-		var deadline = DateTime.UtcNow + timeout;
-
-		while (DateTime.UtcNow < deadline)
+		try
 		{
-			try
-			{
-				var response = client.GetAsync(url).Result;
-				if ((int)response.StatusCode < 500)
-					return true;
-			}
-			catch
-			{
-				// Not ready yet
-			}
-			Thread.Sleep(300);
+			var html = $"""
+				<html><body style="font-family:sans-serif;padding:2em">
+				<h2>{AppName} could not start</h2>
+				<p>{WebUtility.HtmlEncode(ex.Message)}</p>
+				<p>Details were written to:<br><code>{WebUtility.HtmlEncode(LogPath)}</code></p>
+				</body></html>
+				""";
+
+			new PhotinoWindow()
+				.SetTitle($"{AppName} - startup error")
+				.SetUseOsDefaultSize(false)
+				.SetSize(640, 360)
+				.Center()
+				.LoadRawString(html)
+				.WaitForClose();
 		}
-		return false;
+		catch (Exception windowEx)
+		{
+			// If even the webview cannot be created (e.g. WebView2 / WebKitGTK missing) there is
+			// nothing left to show; the log file has both errors.
+			Log($"Could not show the error window: {windowEx}");
+		}
 	}
 
-	private static int GetAvailablePort()
-	{
-		var listener = new TcpListener(IPAddress.Loopback, 0);
-		listener.Start();
-		var port = ((IPEndPoint)listener.LocalEndpoint).Port;
-		listener.Stop();
-		return port;
-	}
-
-	private static void Log(string logPath, string message)
-	{
-		var line = $"[{DateTime.Now:HH:mm:ss.fff}] {message}";
-		Console.WriteLine(line);
-		try { File.AppendAllText(logPath, line + Environment.NewLine); } catch { }
-	}
+	private static void Log(string message) => FileLoggerProvider.Write(LogPath, message);
 }
