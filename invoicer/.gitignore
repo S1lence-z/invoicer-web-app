@@ -482,5 +482,4 @@ $RECYCLE.BIN/
 *.swp
 
 # Local desktop builds
-publish-frontend/
 publish-desktop/

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Invoicer</AssemblyName>
+    <RootNamespace>Desktop</RootNamespace>
+    <!-- EF Core and Blazor rely on reflection; never trim the desktop build -->
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.*" />
+    <PackageReference Include="Photino.NET" Version="4.0.16" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Backend supplies the API and DI setup; Frontend supplies the Blazor WASM static assets,
+         which the static web assets pipeline copies into wwwroot/ on publish -->
+    <ProjectReference Include="..\Backend\Backend.csproj" />
+    <ProjectReference Include="..\Frontend\Frontend.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
