@@ -72,6 +72,10 @@ public class Program
 		{
 			Args = args,
 			ContentRootPath = AppContext.BaseDirectory,
+			// Never run as Development: the host forwards its environment name to the Blazor client
+			// (Blazor-Environment header), which would then load appsettings.Development.json and
+			// point API calls at the standalone backend on port 8080 instead of this process.
+			EnvironmentName = Environments.Production,
 		});
 
 		// During `dotnet run` the Frontend assets are served from the build manifest rather than
