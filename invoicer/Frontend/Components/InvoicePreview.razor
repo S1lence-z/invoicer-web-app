@@ -16,8 +16,14 @@
                     <p><strong>@L["DueDateLabel"]</strong> @Invoice.DueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
                 </div>
                 <div class="text-end">
-                    <p><strong>@L["PaymentMethodLabel"]</strong> @L[Invoice.PaymentMethod.ToString().SeperateCamelCase()]</p>
-                    <p><strong>@L["DeliveryMethodLabel"]</strong> @L[Invoice.DeliveryMethod.ToString().SeperateCamelCase()]</p>
+                    @if (Invoice.PaymentMethod is { } paymentMethod)
+                    {
+                        <p><strong>@L["PaymentMethodLabel"]</strong> @L[paymentMethod.ToString().SeperateCamelCase()]</p>
+                    }
+                    @if (Invoice.DeliveryMethod is { } deliveryMethod)
+                    {
+                        <p><strong>@L["DeliveryMethodLabel"]</strong> @L[deliveryMethod.ToString().SeperateCamelCase()]</p>
+                    }
                 </div>
             </div>
 

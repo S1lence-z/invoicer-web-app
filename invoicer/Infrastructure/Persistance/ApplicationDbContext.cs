@@ -163,8 +163,8 @@ namespace Infrastructure.Persistance
 				invoice.Property(i => i.VatDate).IsRequired();
 				invoice.Property(i => i.Status).HasConversion<string>().HasDefaultValue(InvoiceStatus.Pending);
 				invoice.Property(i => i.Currency).IsRequired().HasConversion<string>().HasDefaultValue(Currency.CZK);
-				invoice.Property(i => i.PaymentMethod).HasConversion<string>().HasDefaultValue(PaymentMethod.BankTransfer);
-				invoice.Property(i => i.DeliveryMethod).HasConversion<string>().HasDefaultValue(DeliveryMethod.PersonalPickUp);
+				invoice.Property(i => i.PaymentMethod).HasConversion<string>();
+				invoice.Property(i => i.DeliveryMethod).HasConversion<string>();
 				invoice.HasMany(i => i.Items).WithOne().HasForeignKey(i => i.InvoiceId).OnDelete(DeleteBehavior.Cascade);
 
 				// Invoice Numbering Scheme

@@ -80,17 +80,23 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 							text.Span(invoiceModel.InvoiceNumber).Bold();
 						});
 
-						col.Item().Text(text =>
+						if (invoiceModel.PaymentMethod is { } paymentMethod)
 						{
-							text.Span(GetLocalizedText("Payment Method: ", "Způsob platby: ", languageTag));
-							text.Span(invoiceModel.PaymentMethod.ToString().SeperateCamelCase()).Bold();
-						});
+							col.Item().Text(text =>
+							{
+								text.Span(GetLocalizedText("Payment Method: ", "Způsob platby: ", languageTag));
+								text.Span(paymentMethod.ToString().SeperateCamelCase()).Bold();
+							});
+						}
 
-						col.Item().Text(text =>
+						if (invoiceModel.DeliveryMethod is { } deliveryMethod)
 						{
-							text.Span(GetLocalizedText("Delivery Method: ", "Způsob doručení: ", languageTag));
-							text.Span(invoiceModel.DeliveryMethod.ToString().SeperateCamelCase()).Bold();
-						});
+							col.Item().Text(text =>
+							{
+								text.Span(GetLocalizedText("Delivery Method: ", "Způsob doručení: ", languageTag));
+								text.Span(deliveryMethod.ToString().SeperateCamelCase()).Bold();
+							});
+						}
 					});
 				});
 

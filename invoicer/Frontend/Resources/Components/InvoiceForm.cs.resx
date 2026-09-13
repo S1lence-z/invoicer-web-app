@@ -190,4 +190,7 @@
   <data name="SubmitInvoiceButtonText" xml:space="preserve">
     <value>Odeslat fakturu</value>
   </data>
+  <data name="NoneOption" xml:space="preserve">
+    <value>Nezadáno</value>
+  </data>
 </root>

@@ -108,6 +108,7 @@
         <div class="col">
             <label for="payment-method" class="font-weight-bold">@L["PaymentMethodLabel"]</label>
             <select class="form-control" id="payment-method" @bind="InvoiceFormModel.PaymentMethod">
+                <option value="">@L["NoneOption"]</option>
                 @foreach (PaymentMethod value in Enum.GetValues(typeof(PaymentMethod)))
                 {
                     <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
@@ -118,6 +119,7 @@
         <div class="col">
             <label for="delivery-method" class="font-weight-bold">@L["DeliveryMethodLabel"]</label>
             <select class="form-control" id="delivery-method" @bind="InvoiceFormModel.DeliveryMethod">
+                <option value="">@L["NoneOption"]</option>
                 @foreach (DeliveryMethod value in Enum.GetValues(typeof(DeliveryMethod)))
                 {
                     <option value="@value">@value.ToString()!.SeperateCamelCase()</option>

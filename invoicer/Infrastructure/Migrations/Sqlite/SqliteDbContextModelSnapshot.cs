@@ -163,10 +163,7 @@ namespace Infrastructure.Migrations.Sqlite
                         .HasDefaultValue("CZK");
 
                     b.Property<string>("DeliveryMethod")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
-                        .HasDefaultValue("PersonalPickUp");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("TEXT");
@@ -182,10 +179,7 @@ namespace Infrastructure.Migrations.Sqlite
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
-                        .HasDefaultValue("BankTransfer");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("INTEGER");

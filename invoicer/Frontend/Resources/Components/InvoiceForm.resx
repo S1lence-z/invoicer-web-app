@@ -190,4 +190,7 @@
   <data name="SubmitInvoiceButtonText" xml:space="preserve">
     <value>Submit Invoice</value>
   </data>
+  <data name="NoneOption" xml:space="preserve">
+    <value>None</value>
+  </data>
 </root>

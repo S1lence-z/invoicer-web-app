@@ -46,13 +46,11 @@ namespace Frontend.Models
 		[EnumDataType(typeof(Currency), ErrorMessage = "Invalid currency")]
 		public Currency Currency { get; set; } = Currency.CZK;
 
-		[Required(ErrorMessage = "Payment method is required")]
-		[EnumDataType(typeof(PaymentMethod), ErrorMessage = "Invalid payment method")]
-		public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.BankTransfer;
+		// Optional: null means the invoice does not state a payment method
+		public PaymentMethod? PaymentMethod { get; set; }
 
-		[Required(ErrorMessage = "Delivery method is required")]
-		[EnumDataType(typeof(DeliveryMethod), ErrorMessage = "Invalid delivery method")]
-		public DeliveryMethod DeliveryMethod { get; set; } = DeliveryMethod.Courier;
+		// Optional: null means the invoice does not state a delivery method
+		public DeliveryMethod? DeliveryMethod { get; set; }
 
 		[MinItemsRequired(1, typeof(InvoiceItemFormModel), ErrorMessage = "At least one item is required")]
 		public IList<InvoiceItemFormModel> Items { get; set; } = [];
@@ -106,8 +104,8 @@ namespace Frontend.Models
 			VatDate = DateTime.Now;
 			Status = InvoiceStatus.Pending;
 			Currency = Currency.CZK;
-			PaymentMethod = PaymentMethod.BankTransfer;
-			DeliveryMethod = DeliveryMethod.Courier;
+			PaymentMethod = null;
+			DeliveryMethod = null;
 			Items.Clear();
 		}
 

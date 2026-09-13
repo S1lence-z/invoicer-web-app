@@ -16,8 +16,8 @@ namespace Application.DTOs
 		public DateTime DueDate { get; set; }
 		public DateTime VatDate { get; set; } = DateTime.Now;
 		public Currency Currency { get; set; }
-		public PaymentMethod PaymentMethod { get; set; }
-		public DeliveryMethod DeliveryMethod { get; set; }
+		public PaymentMethod? PaymentMethod { get; set; }
+		public DeliveryMethod? DeliveryMethod { get; set; }
 		public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
 		public ICollection<InvoiceItemDto> Items { get; set; } = [];
 	}
