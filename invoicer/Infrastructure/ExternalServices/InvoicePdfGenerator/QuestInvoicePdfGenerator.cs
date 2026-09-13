@@ -34,10 +34,10 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator
 		public string ExtractLanguageTag(string lang)
 		{
 			if (string.IsNullOrEmpty(lang))
-				return "en-US";
+				return "cs";
 			string[] parts = lang.Split('-');
 			if (parts.Length == 0)
-				return "en-US";
+				return "cs";
 			string language = parts[0];
 			return language;
 		}

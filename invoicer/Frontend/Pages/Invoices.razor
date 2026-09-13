@@ -220,7 +220,7 @@
         {
             string currentCultureName = CultureInfo.CurrentCulture.Name;
             if (string.IsNullOrEmpty(currentCultureName))
-                currentCultureName = "en-US";
+                currentCultureName = "cs-CZ";
 
             IPdfGenerationResult response = await invoiceService.ExportInvoicePdfAsync(invToExport.Id, currentCultureName);
             if (!response.IsSuccess)

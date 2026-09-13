@@ -80,11 +80,11 @@ namespace Frontend
 				}
 				catch (CultureNotFoundException)
 				{
-					initialCulture = new CultureInfo("en-US");
+					initialCulture = new CultureInfo("cs-CZ");
 				}
 			}
 			else
-				initialCulture = new CultureInfo("en-US");
+				initialCulture = new CultureInfo("cs-CZ");
 
 			CultureInfo.DefaultThreadCurrentCulture = initialCulture;
 			CultureInfo.DefaultThreadCurrentUICulture = initialCulture;
