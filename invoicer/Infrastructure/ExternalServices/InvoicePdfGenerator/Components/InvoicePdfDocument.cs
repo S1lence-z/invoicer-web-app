@@ -131,23 +131,8 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 				// Empty item of the same width as the signature block keeps the page number centered
 				row.ConstantItem(signatureWidth);
 				row.RelativeItem().AlignBottom().AlignCenter().Text(x => x.CurrentPageNumber());
-				row.ConstantItem(signatureWidth)
-					.ShowIf(ctx => ctx.PageNumber == ctx.TotalPages)
-					.Element(ComposeSignatureBlock);
-			});
-		}
-
-		// Blank line for a handwritten signature with the signer's name under it, bottom right of the last page
-		private void ComposeSignatureBlock(IContainer container)
-		{
-			container.Column(col =>
-			{
-				col.Item().Height(40).BorderBottom(1);
-				col.Item().PaddingTop(4).Text(text =>
-				{
-					text.Span(GetLocalizedText("Signed by: ", "Podepsal: ", languageTag)).FontSize(9);
-					text.Span(invoiceModel.SignedBy).FontSize(9).Bold();
-				});
+				// Bottom right of the last page
+				row.ConstantItem(signatureWidth).Dynamic(new SignatureBlockComponent(invoiceModel.SignedBy, languageTag));
 			});
 		}
 	}
