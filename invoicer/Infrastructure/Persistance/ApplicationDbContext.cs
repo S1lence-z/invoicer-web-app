@@ -165,6 +165,7 @@ namespace Infrastructure.Persistance
 				invoice.Property(i => i.Currency).IsRequired().HasConversion<string>().HasDefaultValue(Currency.CZK);
 				invoice.Property(i => i.PaymentMethod).HasConversion<string>();
 				invoice.Property(i => i.DeliveryMethod).HasConversion<string>();
+				invoice.Property(i => i.SignedBy).HasDefaultValue(string.Empty);
 				invoice.HasMany(i => i.Items).WithOne().HasForeignKey(i => i.InvoiceId).OnDelete(DeleteBehavior.Cascade);
 
 				// Invoice Numbering Scheme

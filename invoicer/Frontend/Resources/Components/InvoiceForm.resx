@@ -193,4 +193,10 @@
   <data name="NoneOption" xml:space="preserve">
     <value>None</value>
   </data>
+  <data name="SignedByLabel" xml:space="preserve">
+    <value>Signed by</value>
+  </data>
+  <data name="SignedByPlaceholder" xml:space="preserve">
+    <value>Name of the person signing the invoice</value>
+  </data>
 </root>

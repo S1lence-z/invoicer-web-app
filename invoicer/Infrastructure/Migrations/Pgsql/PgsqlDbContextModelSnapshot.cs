@@ -197,6 +197,12 @@ namespace Infrastructure.Migrations.Pgsql
                     b.Property<int>("SellerId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("SignedBy")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()

@@ -193,4 +193,10 @@
   <data name="NoneOption" xml:space="preserve">
     <value>Nezadáno</value>
   </data>
+  <data name="SignedByLabel" xml:space="preserve">
+    <value>Podepsal</value>
+  </data>
+  <data name="SignedByPlaceholder" xml:space="preserve">
+    <value>Jméno osoby, která fakturu podepisuje</value>
+  </data>
 </root>

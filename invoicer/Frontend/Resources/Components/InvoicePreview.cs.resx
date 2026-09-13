@@ -163,4 +163,7 @@
   <data name="FinalPriceLabel" xml:space="preserve">
     <value>Celková cena:</value>
   </data>
+  <data name="SignedByLabel" xml:space="preserve">
+    <value>Podepsal:</value>
+  </data>
 </root>

@@ -52,6 +52,9 @@ namespace Frontend.Models
 		// Optional: null means the invoice does not state a delivery method
 		public DeliveryMethod? DeliveryMethod { get; set; }
 
+		// Optional: name of the person who signs the invoice
+		public string SignedBy { get; set; } = string.Empty;
+
 		[MinItemsRequired(1, typeof(InvoiceItemFormModel), ErrorMessage = "At least one item is required")]
 		public IList<InvoiceItemFormModel> Items { get; set; } = [];
 
@@ -71,6 +74,7 @@ namespace Frontend.Models
 				Currency = Currency,
 				PaymentMethod = PaymentMethod,
 				DeliveryMethod = DeliveryMethod,
+				SignedBy = SignedBy,
 				Items = [.. Items.Select(item => item.ToDto())]
 			};
 		}
@@ -89,6 +93,7 @@ namespace Frontend.Models
 			Currency = dto.Currency;
 			PaymentMethod = dto.PaymentMethod;
 			DeliveryMethod = dto.DeliveryMethod;
+			SignedBy = dto.SignedBy;
 			Items = [.. dto.Items.Select(InvoiceItemFormModel.FromDto)];
 		}
 
@@ -106,6 +111,7 @@ namespace Frontend.Models
 			Currency = Currency.CZK;
 			PaymentMethod = null;
 			DeliveryMethod = null;
+			SignedBy = string.Empty;
 			Items.Clear();
 		}
 

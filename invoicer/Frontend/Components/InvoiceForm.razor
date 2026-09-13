@@ -140,6 +140,10 @@
             </select>
             <ValidationMessage For="@(() => InvoiceFormModel.Status)" />
         </div>
+        <div class="col">
+            <label for="signed-by" class="font-weight-bold">@L["SignedByLabel"]</label>
+            <input type="text" class="form-control" id="signed-by" placeholder="@L["SignedByPlaceholder"]" @bind="InvoiceFormModel.SignedBy" />
+        </div>
     </div>
 
     <hr class="my-4" />

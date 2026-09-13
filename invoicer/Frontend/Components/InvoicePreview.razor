@@ -24,6 +24,10 @@
                     {
                         <p><strong>@L["DeliveryMethodLabel"]</strong> @L[deliveryMethod.ToString().SeperateCamelCase()]</p>
                     }
+                    @if (!string.IsNullOrWhiteSpace(Invoice.SignedBy))
+                    {
+                        <p><strong>@L["SignedByLabel"]</strong> @Invoice.SignedBy</p>
+                    }
                 </div>
             </div>
 

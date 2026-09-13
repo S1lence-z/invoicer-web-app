@@ -14,6 +14,7 @@ namespace Domain.Models
 		public Currency Currency { get; set; }
 		public PaymentMethod? PaymentMethod { get; set; }
 		public DeliveryMethod? DeliveryMethod { get; set; }
+		public string SignedBy { get; set; } = string.Empty;
 		public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
 		public ICollection<InvoiceItem> Items { get; set; } = [];
 		public int NumberingSchemeId { get; set; }

@@ -163,4 +163,7 @@
   <data name="FinalPriceLabel" xml:space="preserve">
     <value>Total Price:</value>
   </data>
+  <data name="SignedByLabel" xml:space="preserve">
+    <value>Signed by:</value>
+  </data>
 </root>
