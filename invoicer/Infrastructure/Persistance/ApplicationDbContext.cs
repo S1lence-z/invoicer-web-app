@@ -102,6 +102,7 @@ namespace Infrastructure.Persistance
 				entity.Property(e => e.Name).IsRequired();
 				entity.Property(e => e.Email).HasDefaultValue(string.Empty);
 				entity.Property(e => e.PhoneNumber).HasDefaultValue(string.Empty);
+				entity.Property(e => e.RegistrationText).HasDefaultValue(string.Empty);
 				entity.Property(e => e.CurrentNumberingSchemeId).IsRequired();
 				entity.Property(e => e.IsClient).HasDefaultValue(false).IsRequired();
 

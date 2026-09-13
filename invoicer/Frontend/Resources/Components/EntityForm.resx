@@ -203,4 +203,10 @@
   <data name="IsThisClient" xml:space="preserve">
     <value>Is this your client?</value>
   </data>
+  <data name="RegistrationTextLabel" xml:space="preserve">
+    <value>Registration text (printed under invoice items)</value>
+  </data>
+  <data name="RegistrationTextPlaceholder" xml:space="preserve">
+    <value>e.g. Natural person registered in the Trade Register</value>
+  </data>
 </root>

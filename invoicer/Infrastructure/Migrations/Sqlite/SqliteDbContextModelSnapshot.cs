@@ -112,6 +112,12 @@ namespace Infrastructure.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasDefaultValue("");
 
+                    b.Property<string>("RegistrationText")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");

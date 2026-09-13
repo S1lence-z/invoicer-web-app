@@ -136,4 +136,7 @@
   <data name="CountryLabel" xml:space="preserve">
     <value>Country:</value>
   </data>
+  <data name="RegistrationTextLabel" xml:space="preserve">
+    <value>Registration text:</value>
+  </data>
 </root>

@@ -7,7 +7,7 @@ using Shared.Extensions;
 
 namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 {
-	public class InvoiceItemsComponent(ICollection<InvoiceItem> items, Currency invoiceCurrency, string languageTag) : ComponentBase, IComponent
+	public class InvoiceItemsComponent(ICollection<InvoiceItem> items, Currency invoiceCurrency, string languageTag, string footnote) : ComponentBase, IComponent
 	{
 		private void ComposeInvoiceItemsTable(IContainer container)
 		{
@@ -85,8 +85,11 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 		{
 			container.Column(col =>
 			{
-				col.Item().PaddingBottom(100).Element(ComposeInvoiceItemsTable);
-				col.Item().Element(ComposeInvoicePriceTable);
+				col.Item().Element(ComposeInvoiceItemsTable);
+				// Seller's standard registry statement, directly under the item breakdown
+				if (!string.IsNullOrWhiteSpace(footnote))
+					col.Item().PaddingTop(8).Text(footnote).FontSize(9).Italic();
+				col.Item().PaddingTop(100).Element(ComposeInvoicePriceTable);
 			});
 		}
 	}

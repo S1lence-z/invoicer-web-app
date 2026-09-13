@@ -119,7 +119,7 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 				});
 
 				// Invoice Items Data
-				col.Item().Component(new InvoiceItemsComponent(invoiceModel.Items, invoiceModel.Currency, languageTag));
+				col.Item().Component(new InvoiceItemsComponent(invoiceModel.Items, invoiceModel.Currency, languageTag, invoiceModel.Seller!.RegistrationText));
 			});
 		}
 

@@ -22,6 +22,9 @@ namespace Frontend.Models
 		[RegularExpression(@"^\+?(\d{1,3})\)?[-. ]?(\d{1,3})[-. ]?(\d{1,4})$", ErrorMessage = "Invalid phone number format")]
 		public string PhoneNumber { get; set; } = string.Empty;
 
+		// Optional: printed under the invoice items when this entity is the seller
+		public string RegistrationText { get; set; } = string.Empty;
+
 		[Required(ErrorMessage = "Is this a client of yours?")]
 		public bool IsClient { get; set; } = true;
 
@@ -66,6 +69,7 @@ namespace Frontend.Models
 			Name = dto.Name;
 			Email = dto.Email;
 			PhoneNumber = dto.PhoneNumber;
+			RegistrationText = dto.RegistrationText;
 			IsClient = dto.IsClient;
 			CurrentNumberingSchemeId = dto.CurrentNumberingSchemeId;
 			if (dto.BankAccount is not null)
@@ -92,6 +96,7 @@ namespace Frontend.Models
 			Name = string.Empty;
 			Email = string.Empty;
 			PhoneNumber = string.Empty;
+			RegistrationText = string.Empty;
 			IsClient = true;
 			BankAccountId = 0;
 			AccountNumber = string.Empty;
@@ -114,6 +119,7 @@ namespace Frontend.Models
 				Name = Name,
 				Email = Email,
 				PhoneNumber = PhoneNumber,
+				RegistrationText = RegistrationText,
 				CurrentNumberingSchemeId = CurrentNumberingSchemeId,
 				BankAccountId = BankAccountId,
 				AddressId = AddressId,

@@ -201,4 +201,10 @@
   <data name="IsThisClient" xml:space="preserve">
     <value>Je to váš zákazník?</value>
   </data>
+  <data name="RegistrationTextLabel" xml:space="preserve">
+    <value>Text o zápisu do rejstříku (tiskne se pod položky faktury)</value>
+  </data>
+  <data name="RegistrationTextPlaceholder" xml:space="preserve">
+    <value>např. Fyzická osoba zapsaná v živnostenském rejstříku</value>
+  </data>
 </root>

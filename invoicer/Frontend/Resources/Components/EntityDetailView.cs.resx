@@ -136,4 +136,7 @@
   <data name="CountryLabel" xml:space="preserve">
     <value>Země:</value>
   </data>
+  <data name="RegistrationTextLabel" xml:space="preserve">
+    <value>Text o zápisu:</value>
+  </data>
 </root>
