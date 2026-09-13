@@ -60,7 +60,7 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 
 						col.Item().Text(text =>
 						{
-							text.Span(GetLocalizedText("VAT Date: ", "Datum DPH: ", languageTag));
+							text.Span(GetLocalizedText("Date of Taxable Supply: ", "Datum zdanitelného plnění: ", languageTag));
 							text.Span(invoiceModel.VatDate.FormatByCurrencyLocale(invoiceCurrency)).Bold();
 						});
 					});

@@ -116,7 +116,7 @@
     <value>Due Date</value>
   </data>
   <data name="VatDateLabel" xml:space="preserve">
-    <value>Vat Date</value>
+    <value>Date of Taxable Supply</value>
   </data>
   <data name="SellerLabel" xml:space="preserve">
     <value>Seller</value>

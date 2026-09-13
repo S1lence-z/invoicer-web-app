@@ -61,7 +61,7 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 				table.Header(header =>
 				{
 					header.Cell().Text(GetLocalizedText("Total Price without VAT", "Celková cena bez DPH", languageTag)).Bold().AlignCenter();
-					header.Cell().Text(GetLocalizedText("Total VAT", "Celkové DPH", languageTag)).Bold().AlignCenter();
+					header.Cell().Text(GetLocalizedText("VAT", "DPH", languageTag)).Bold().AlignCenter();
 					header.Cell().Text(GetLocalizedText("Total Price with VAT", "Celková cena s DPH", languageTag)).Bold().AlignCenter();
 				});
 				// Row with prices
@@ -75,7 +75,7 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 					.Padding(10)
 					.Text(text =>
 					{
-						text.Span(GetLocalizedText("Final Price: ", "Konečná cena: ", languageTag)).Bold().FontSize(14);
+						text.Span(GetLocalizedText("Total Price: ", "Celková cena: ", languageTag)).Bold().FontSize(14);
 						text.Span(invoiceCurrency.FormatAmount(totalPriceWithVat)).FontSize(14);
 					});
 			});

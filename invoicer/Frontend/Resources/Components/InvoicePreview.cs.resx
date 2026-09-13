@@ -155,12 +155,12 @@
     <value>Celková cena bez DPH:</value>
   </data>
   <data name="TotalVatLabel" xml:space="preserve">
-    <value>Celkové DPH:</value>
+    <value>DPH:</value>
   </data>
   <data name="TotalPriceWithVatLabel" xml:space="preserve">
     <value>Celková cena s DPH:</value>
   </data>
   <data name="FinalPriceLabel" xml:space="preserve">
-    <value>Konečná cena:</value>
+    <value>Celková cena:</value>
   </data>
 </root>

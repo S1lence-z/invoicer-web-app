@@ -116,7 +116,7 @@
     <value>Datum splatnosti</value>
   </data>
   <data name="VatDateLabel" xml:space="preserve">
-    <value>Datum DPH</value>
+    <value>Datum zdanitelného plnění</value>
   </data>
   <data name="SellerLabel" xml:space="preserve">
     <value>Dodavatel</value>
