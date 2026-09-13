@@ -173,12 +173,11 @@
             </div>
             <div class="col-md-2">
                 <label for="item-vat-rate-@uniqueItemHash" class="form-label small">@L["ItemVatRateLabel"]</label>
-                <input id="item-vat-rate-@uniqueItemHash" type="number" min="0" class="form-control form-control-sm" @bind="item.VatRate" step="0.01" />
-                <ValidationMessage For="@(() => item.VatRate)" />
+                <input id="item-vat-rate-@uniqueItemHash" type="number" min="0" max="100" step="1" class="form-control form-control-sm" @bind="item.VatRatePercent" />
+                <ValidationMessage For="@(() => item.VatRatePercent)" />
                 <div class="btn-group btn-group-sm mt-1 d-flex flex-grow-1" role="group" aria-label="@L["VatPresetAriaLabel"]">
                     <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 0)">0</button>
-                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 15)">15</button>
-                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 18)">18</button>
+                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 12)">12</button>
                     <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 21)">21</button>
                 </div>
             </div>
@@ -337,9 +336,9 @@
         }
     }
 
-    private void SetVatRate(InvoiceItemFormModel item, decimal ratePercentage)
+    private void SetVatRate(InvoiceItemFormModel item, int ratePercentage)
     {
-        item.VatRate = ratePercentage / 100.0m;
+        item.VatRatePercent = ratePercentage;
     }
 
     private async Task AddNewEntity()
