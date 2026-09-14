@@ -1,0 +1,10 @@
+/* Handwritten-signature line with the signer's name under it, bottom right like on the PDF */
+.signature-block {
+    width: 16rem;
+}
+
+.signature-line {
+    height: 2.5rem;
+    border-bottom: 1px solid #000;
+    margin-bottom: 0.25rem;
+}

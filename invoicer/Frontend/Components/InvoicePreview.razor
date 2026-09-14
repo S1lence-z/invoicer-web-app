@@ -26,7 +26,6 @@
                     {
                         <p><strong>@L["DeliveryMethodLabel"]</strong> @EnumL.Localize(deliveryMethod)</p>
                     }
-                    <p><strong>@L["SignedByLabel"]</strong> @Invoice.SignedBy</p>
                 </div>
             </div>
 
@@ -99,6 +98,14 @@
             <!-- Final Price -->
             <div class="text-end">
                 <h5><strong>@L["FinalPriceLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice * (1 + i.VatRate)))</h5>
+            </div>
+
+            <!-- Signature: bottom right, same as on the PDF -->
+            <div class="d-flex justify-content-end mt-5">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <small><strong>@L["SignedByLabel"]</strong> @Invoice.SignedBy</small>
+                </div>
             </div>
         </div>
     </div>
