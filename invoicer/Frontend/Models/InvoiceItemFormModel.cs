@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
+using Frontend.Localization;
 using Frontend.Models.Base;
 
 namespace Frontend.Models
@@ -8,25 +9,25 @@ namespace Frontend.Models
 	{
 		public int InvoiceId { get; set; }
 
-		[Required(ErrorMessage = "Unit is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.UnitRequired))]
 		public string Unit { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Quantity is required")]
-		[Range(0.01, double.MaxValue, ErrorMessage = "Quantity must be greater than 0")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.QuantityRequired))]
+		[Range(0.01, double.MaxValue, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.QuantityPositive))]
 		public decimal Quantity { get; set; }
 
-		[Required(ErrorMessage = "Description is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.DescriptionRequired))]
 		public string Description { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Unit price is required")]
-		[Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than 0")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.UnitPriceRequired))]
+		[Range(0.01, double.MaxValue, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.UnitPricePositive))]
 		public decimal UnitPrice { get; set; }
 
 		/// <summary>
 		/// VAT rate as a whole percent (21 = 21 %). The DTO and storage keep the fraction (0.21).
 		/// </summary>
-		[Required(ErrorMessage = "VAT rate is required")]
-		[Range(0, 100, ErrorMessage = "VAT rate must be between 0 and 100")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.VatRateRequired))]
+		[Range(0, 100, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.VatRateRange))]
 		public int VatRatePercent { get; set; } = 21;
 
 		public override InvoiceItemDto ToDto()

@@ -2,6 +2,7 @@
 using Frontend.Validators;
 using Shared.Enums;
 using Application.DTOs;
+using Frontend.Localization;
 using Frontend.Models.Base;
 
 namespace Frontend.Models
@@ -9,41 +10,41 @@ namespace Frontend.Models
 	public class InvoiceFormModel : FormModelBase<InvoiceFormModel, InvoiceDto>
 	{
 		// Seller
-		[Required(ErrorMessage = "Seller is required")]
-		[MinValue<int>(1, "Seller is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.SellerRequired))]
+		[MinValue<int>(1, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.SellerRequired))]
 		public int SellerId { get; set; }
 
 		// Buyer
-		[Required(ErrorMessage = "Buyer is required")]
-		[MinValue<int>(1, "Buyer is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.BuyerRequired))]
+		[MinValue<int>(1, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.BuyerRequired))]
 		public int BuyerId { get; set; }
 
 		// Invoice attributes
 
-		[Required(ErrorMessage = "Invoice number is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.InvoiceNumberRequired))]
 		public string InvoiceNumber { get; set; } = string.Empty;
 
 		[Required]
 		public bool IsCustomInvoiceNumber { get; set; } = false;
 
-		[Required(ErrorMessage = "Issue date is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.IssueDateRequired))]
 		[DataType(DataType.DateTime)]
 		public DateTime IssueDate { get; set; } = DateTime.Now;
 
-		[Required(ErrorMessage = "Due date is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.DueDateRequired))]
 		[DataType(DataType.DateTime)]
 		public DateTime DueDate { get; set; } = DateTime.Now.AddDays(14);
 
-		[Required(ErrorMessage = "Vat Date is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.VatDateRequired))]
 		[DataType(DataType.DateTime)]
 		public DateTime VatDate { get; set; } = DateTime.Now;
 
-		[Required(ErrorMessage = "Status is required")]
-		[EnumDataType(typeof(InvoiceStatus), ErrorMessage = "Invalid status")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.StatusRequired))]
+		[EnumDataType(typeof(InvoiceStatus), ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.StatusInvalid))]
 		public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
 
-		[Required(ErrorMessage = "Currency is required")]
-		[EnumDataType(typeof(Currency), ErrorMessage = "Invalid currency")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.CurrencyRequired))]
+		[EnumDataType(typeof(Currency), ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.CurrencyInvalid))]
 		public Currency Currency { get; set; } = Currency.CZK;
 
 		// Optional: null means the invoice does not state a payment method
@@ -55,7 +56,7 @@ namespace Frontend.Models
 		// Optional: name of the person who signs the invoice
 		public string SignedBy { get; set; } = string.Empty;
 
-		[MinItemsRequired(1, typeof(InvoiceItemFormModel), ErrorMessage = "At least one item is required")]
+		[MinItemsRequired(1, typeof(InvoiceItemFormModel), ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.AtLeastOneItemRequired))]
 		public IList<InvoiceItemFormModel> Items { get; set; } = [];
 
 		public override InvoiceDto ToDto()
