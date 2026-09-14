@@ -173,15 +173,8 @@ public class Program
 
 	private static void SavePdf(PhotinoWindow window, string fileName, string base64Data)
 	{
-		// Photino resolves defaultPath as an existing folder (SHCreateItemFromParsingName on Windows,
-		// gtk_file_chooser_set_current_folder on Linux). Passing a not-yet-existing file path makes the
-		// dialog fail to open and ShowSaveFile returns null as if the user had cancelled, so only the
-		// folder is passed. Photino cannot prefill the file name (tryphotino/photino.NET#140); the
-		// suggested name is shown in the title instead.
-		var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
 		Log($"Opening save dialog for {fileName}");
-		var target = window.ShowSaveFile($"Save invoice - {fileName}", documents, [("PDF", ["*.pdf"])]);
+		var target = SaveFileDialog.Show(window, "Save invoice", fileName);
 		if (string.IsNullOrEmpty(target))
 		{
 			Log("Save dialog closed without a file");
@@ -231,5 +224,5 @@ public class Program
 		}
 	}
 
-	private static void Log(string message) => FileLoggerProvider.Write(LogPath, message);
+	internal static void Log(string message) => FileLoggerProvider.Write(LogPath, message);
 }
