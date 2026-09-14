@@ -2,7 +2,9 @@
 @using Microsoft.Extensions.Localization
 @using Application.DTOs
 @using Shared.Extensions
+@using Frontend.Extensions
 @inject IStringLocalizer<InvoicePreview> L
+@inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
 <div class="container my-4">
     <div class="card border-0 shadow-sm">
@@ -18,11 +20,11 @@
                 <div class="text-end">
                     @if (Invoice.PaymentMethod is { } paymentMethod)
                     {
-                        <p><strong>@L["PaymentMethodLabel"]</strong> @L[paymentMethod.ToString().SeperateCamelCase()]</p>
+                        <p><strong>@L["PaymentMethodLabel"]</strong> @EnumL.Localize(paymentMethod)</p>
                     }
                     @if (Invoice.DeliveryMethod is { } deliveryMethod)
                     {
-                        <p><strong>@L["DeliveryMethodLabel"]</strong> @L[deliveryMethod.ToString().SeperateCamelCase()]</p>
+                        <p><strong>@L["DeliveryMethodLabel"]</strong> @EnumL.Localize(deliveryMethod)</p>
                     }
                     @if (!string.IsNullOrWhiteSpace(Invoice.SignedBy))
                     {

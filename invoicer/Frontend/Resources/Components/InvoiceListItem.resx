@@ -109,19 +109,4 @@
   <data name="ExportButton" xml:space="preserve">
     <value>Export</value>
   </data>
-  <data name="StatusPending" xml:space="preserve">
-    <value>Pending</value>
-  </data>
-  <data name="StatusPaid" xml:space="preserve">
-    <value>Paid</value>
-  </data>
-  <data name="StatusOverdue" xml:space="preserve">
-    <value>Overdue</value>
-  </data>
-  <data name="StatusDraft" xml:space="preserve">
-    <value>Draft</value>
-  </data>
-  <data name="StatusCancelled" xml:space="preserve">
-    <value>Cancelled</value>
-  </data>
 </root>

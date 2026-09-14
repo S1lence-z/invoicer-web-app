@@ -3,7 +3,9 @@
 @using Application.DTOs
 @using Shared.Enums
 @using Shared.Extensions
+@using Frontend.Extensions
 @inject IStringLocalizer<InvoiceListItem> L
+@inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
 <div class="card border-1 shadow-sm">
     <div class="card-body row align-items-center">
@@ -24,7 +26,7 @@
                 @foreach (InvoiceStatus status in Enum.GetValues(typeof(InvoiceStatus)))
                 {
                     <option selected="@(Invoice.Status == status)" class="@GetStatusColorClass(status)" value="@status">
-                        @L[status.ToString()]
+                        @EnumL.Localize(status)
                     </option>
                 }
             </select>

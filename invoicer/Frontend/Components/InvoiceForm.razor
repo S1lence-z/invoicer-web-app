@@ -7,6 +7,7 @@
 @using Microsoft.Extensions.Localization
 @using Shared.Enums
 @using Shared.Extensions
+@using Frontend.Extensions
 @using static System.Web.HttpUtility
 
 @inject IInvoiceService invoiceService
@@ -15,6 +16,7 @@
 @inject LoadingService loadingService
 @inject NavigationManager navigationManager
 @inject IStringLocalizer<InvoiceForm> L
+@inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
 <EditForm Model="@InvoiceFormModel" OnValidSubmit="SubmitForm">
     <DataAnnotationsValidator />
@@ -111,7 +113,7 @@
                 <option value="">@L["NoneOption"]</option>
                 @foreach (PaymentMethod value in Enum.GetValues(typeof(PaymentMethod)))
                 {
-                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                    <option value="@value">@EnumL.Localize(value)</option>
                 }
             </select>
             <ValidationMessage For="@(() => InvoiceFormModel.PaymentMethod)" />
@@ -122,7 +124,7 @@
                 <option value="">@L["NoneOption"]</option>
                 @foreach (DeliveryMethod value in Enum.GetValues(typeof(DeliveryMethod)))
                 {
-                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                    <option value="@value">@EnumL.Localize(value)</option>
                 }
             </select>
             <ValidationMessage For="@(() => InvoiceFormModel.DeliveryMethod)" />
@@ -135,7 +137,7 @@
             <select class="form-control" id="status" @bind="InvoiceFormModel.Status">
                 @foreach (InvoiceStatus value in Enum.GetValues(typeof(InvoiceStatus)))
                 {
-                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                    <option value="@value">@EnumL.Localize(value)</option>
                 }
             </select>
             <ValidationMessage For="@(() => InvoiceFormModel.Status)" />
