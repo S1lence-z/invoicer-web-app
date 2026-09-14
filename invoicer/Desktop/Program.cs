@@ -153,6 +153,7 @@ public class Program
 		try
 		{
 			var request = JsonSerializer.Deserialize<WebMessage>(message, JsonOptions);
+			Log($"Web message received: type={request?.Type ?? "<null>"}, length={message.Length}");
 			switch (request?.Type)
 			{
 				case "savePdf" when request.Data is not null:
@@ -172,12 +173,13 @@ public class Program
 
 	private static void SavePdf(PhotinoWindow window, string fileName, string base64Data)
 	{
-		var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-		var defaultPath = Path.Combine(documents, fileName);
-
-		var target = window.ShowSaveFile("Save invoice", defaultPath, [("PDF", ["*.pdf"])]);
+		Log($"Opening save dialog for {fileName}");
+		var target = SaveFileDialog.Show(window, "Save invoice", fileName);
 		if (string.IsNullOrEmpty(target))
-			return; // user cancelled
+		{
+			Log("Save dialog closed without a file");
+			return;
+		}
 
 		if (!target.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
 			target += ".pdf";
@@ -222,5 +224,5 @@ public class Program
 		}
 	}
 
-	private static void Log(string message) => FileLoggerProvider.Write(LogPath, message);
+	internal static void Log(string message) => FileLoggerProvider.Write(LogPath, message);
 }

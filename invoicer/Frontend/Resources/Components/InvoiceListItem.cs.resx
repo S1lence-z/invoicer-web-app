@@ -109,19 +109,4 @@
   <data name="ExportButton" xml:space="preserve">
     <value>Exportovat</value>
   </data>
-  <data name="StatusPending" xml:space="preserve">
-    <value>Čeká na úhradu</value>
-  </data>
-  <data name="StatusPaid" xml:space="preserve">
-    <value>Zaplaceno</value>
-  </data>
-  <data name="StatusOverdue" xml:space="preserve">
-    <value>Po splatnosti</value>
-  </data>
-  <data name="StatusDraft" xml:space="preserve">
-    <value>Koncept</value>
-  </data>
-  <data name="StatusCancelled" xml:space="preserve">
-    <value>Zrušeno</value>
-  </data>
 </root>

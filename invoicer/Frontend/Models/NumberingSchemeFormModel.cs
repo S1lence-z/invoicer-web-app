@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
+using Frontend.Localization;
 using Frontend.Models.Base;
 using Shared.Enums;
 
@@ -7,26 +8,26 @@ namespace Frontend.Models
 {
 	public class NumberingSchemeFormModel : FormModelBase<NumberingSchemeFormModel, NumberingSchemeDto>
 	{
-		[RegularExpression(@"^.*$", ErrorMessage = "Invalid input format")]
+		[RegularExpression(@"^.*$", ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.InvalidInputFormat))]
 		public string Prefix { get; set; } = string.Empty;
 
 		public bool UseSeperator { get; set; } = true;
 
-		[RegularExpression(@"^.*$", ErrorMessage = "Invalid input format")]
+		[RegularExpression(@"^.*$", ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.InvalidInputFormat))]
 		public string Seperator { get; set; } = "-";
 
-		[EnumDataType(typeof(Position), ErrorMessage = "Invalid sequence position")]
+		[EnumDataType(typeof(Position), ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.SequencePositionInvalid))]
 		public Position SequencePosition { get; set; } = Position.Start;
 
-		[Range(1, 10, ErrorMessage = "Sequence padding must be between 1 and 10")]
+		[Range(1, 10, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.SequencePaddingRange))]
 		public int SequencePadding { get; set; } = 3;
 
-		[EnumDataType(typeof(YearFormat), ErrorMessage = "Invalid year format")]
+		[EnumDataType(typeof(YearFormat), ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.YearFormatInvalid))]
 		public YearFormat YearFormat { get; set; } = YearFormat.FourDigit;
 
 		public bool IncludeMonth { get; set; } = true;
 
-		[EnumDataType(typeof(ResetFrequency), ErrorMessage = "Invalid reset frequency")]
+		[EnumDataType(typeof(ResetFrequency), ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.ResetFrequencyInvalid))]
 		public ResetFrequency ResetFrequency { get; set; } = ResetFrequency.Yearly;
 
 		public bool IsDefault { get; set; } = false;

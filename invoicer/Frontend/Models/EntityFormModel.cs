@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
+using Frontend.Localization;
 using Frontend.Models.Base;
 
 namespace Frontend.Models
@@ -7,22 +8,25 @@ namespace Frontend.Models
 	public class EntityFormModel : FormModelBase<EntityFormModel, EntityDto>
 	{
 
-		[Required(ErrorMessage = "Ico is required")]
-		[RegularExpression(@"^\d{8}$", ErrorMessage = "Ico must be 8 digits long")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.IcoRequired))]
+		[RegularExpression(@"^\d{8}$", ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.IcoFormat))]
 		public string Ico { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Name is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.NameRequired))]
 		public string Name { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Email is required")]
-		[EmailAddress(ErrorMessage = "Invalid email format")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.EmailRequired))]
+		[EmailAddress(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.EmailFormat))]
 		public string Email { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Phone number is required")]
-		[RegularExpression(@"^\+?(\d{1,3})\)?[-. ]?(\d{1,3})[-. ]?(\d{1,4})$", ErrorMessage = "Invalid phone number format")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.PhoneRequired))]
+		[RegularExpression(@"^\+?(\d{1,3})\)?[-. ]?(\d{1,3})[-. ]?(\d{1,4})$", ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.PhoneFormat))]
 		public string PhoneNumber { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Is this a client of yours?")]
+		// Optional: printed under the invoice items when this entity is the seller
+		public string RegistrationText { get; set; } = string.Empty;
+
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.IsClientRequired))]
 		public bool IsClient { get; set; } = true;
 
 		public int CurrentNumberingSchemeId { get; set; } = 0;
@@ -30,15 +34,15 @@ namespace Frontend.Models
 		// Bank Account
 		public int BankAccountId { get; set; }
 
-		[Required(ErrorMessage = "Account number is required")]
-		[RegularExpression(@"^\d{1,}$", ErrorMessage = "Account number must be at least 1 digit long")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.AccountNumberRequired))]
+		[RegularExpression(@"^\d{1,}$", ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.AccountNumberFormat))]
 		public string AccountNumber { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Bank code is required")]
-		[RegularExpression(@"^\d{4}$", ErrorMessage = "Bank code must be 4 digits long")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.BankCodeRequired))]
+		[RegularExpression(@"^\d{4}$", ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.BankCodeFormat))]
 		public string BankCode { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Bank name is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.BankNameRequired))]
 		public string BankName { get; set; } = string.Empty;
 
 		public string IBAN { get; set; } = string.Empty;
@@ -46,16 +50,16 @@ namespace Frontend.Models
 		// Address
 		public int AddressId { get; set; }
 
-		[Required(ErrorMessage = "Street is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.StreetRequired))]
 		public string Street { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "City is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.CityRequired))]
 		public string City { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "Zip code is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.ZipCodeRequired))]
 		public int ZipCode { get; set; }
 
-		[Required(ErrorMessage = "Country is required")]
+		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.CountryRequired))]
 		public string Country { get; set; } = string.Empty;
 
 		protected override void LoadFromDto(EntityDto dto)
@@ -66,6 +70,7 @@ namespace Frontend.Models
 			Name = dto.Name;
 			Email = dto.Email;
 			PhoneNumber = dto.PhoneNumber;
+			RegistrationText = dto.RegistrationText;
 			IsClient = dto.IsClient;
 			CurrentNumberingSchemeId = dto.CurrentNumberingSchemeId;
 			if (dto.BankAccount is not null)
@@ -92,6 +97,7 @@ namespace Frontend.Models
 			Name = string.Empty;
 			Email = string.Empty;
 			PhoneNumber = string.Empty;
+			RegistrationText = string.Empty;
 			IsClient = true;
 			BankAccountId = 0;
 			AccountNumber = string.Empty;
@@ -114,6 +120,7 @@ namespace Frontend.Models
 				Name = Name,
 				Email = Email,
 				PhoneNumber = PhoneNumber,
+				RegistrationText = RegistrationText,
 				CurrentNumberingSchemeId = CurrentNumberingSchemeId,
 				BankAccountId = BankAccountId,
 				AddressId = AddressId,

@@ -197,10 +197,19 @@
   <data name="IBANPlaceholder" xml:space="preserve">
     <value>IBAN</value>
   </data>
-  <data name="SubmitButton" xml:space="preserve">
-    <value>Submit</value>
+  <data name="CreateButton" xml:space="preserve">
+    <value>Create Entity</value>
+  </data>
+  <data name="SaveButton" xml:space="preserve">
+    <value>Save Changes</value>
   </data>
   <data name="IsThisClient" xml:space="preserve">
     <value>Is this your client?</value>
+  </data>
+  <data name="RegistrationTextLabel" xml:space="preserve">
+    <value>Registration text (printed under invoice items)</value>
+  </data>
+  <data name="RegistrationTextPlaceholder" xml:space="preserve">
+    <value>e.g. Natural person registered in the Trade Register</value>
   </data>
 </root>

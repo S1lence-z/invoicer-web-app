@@ -70,6 +70,7 @@ namespace Backend.Services
 			existingInvoice.VatDate = updatedInvoice.VatDate;
 			existingInvoice.Status = updatedInvoice.Status;
 			existingInvoice.DeliveryMethod = updatedInvoice.DeliveryMethod;
+			existingInvoice.SignedBy = updatedInvoice.SignedBy;
 			existingInvoice.BuyerId = updatedInvoice.BuyerId;
 			await UpdateInvoiceItemsAsync(existingInvoice, updatedInvoice.Items);
 

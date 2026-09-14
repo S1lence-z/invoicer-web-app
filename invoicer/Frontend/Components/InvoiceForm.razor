@@ -7,6 +7,7 @@
 @using Microsoft.Extensions.Localization
 @using Shared.Enums
 @using Shared.Extensions
+@using Frontend.Extensions
 @using static System.Web.HttpUtility
 
 @inject IInvoiceService invoiceService
@@ -15,6 +16,7 @@
 @inject LoadingService loadingService
 @inject NavigationManager navigationManager
 @inject IStringLocalizer<InvoiceForm> L
+@inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
 <EditForm Model="@InvoiceFormModel" OnValidSubmit="SubmitForm">
     <DataAnnotationsValidator />
@@ -57,7 +59,7 @@
             <ValidationMessage For="@(() => InvoiceFormModel.DueDate)" />
         </div>
         <div class="col">
-            <label for="vate-date" class="font-weight-bold">@L["VatDateLabel"]</label>
+            <label for="vat-date" class="font-weight-bold">@L["VatDateLabel"]</label>
             <input type="date" class="form-control" id="vat-date" @bind="InvoiceFormModel.VatDate" />
             <ValidationMessage For="@(() => InvoiceFormModel.VatDate)" />
         </div>
@@ -108,9 +110,10 @@
         <div class="col">
             <label for="payment-method" class="font-weight-bold">@L["PaymentMethodLabel"]</label>
             <select class="form-control" id="payment-method" @bind="InvoiceFormModel.PaymentMethod">
+                <option value="">@L["NoneOption"]</option>
                 @foreach (PaymentMethod value in Enum.GetValues(typeof(PaymentMethod)))
                 {
-                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                    <option value="@value">@EnumL.Localize(value)</option>
                 }
             </select>
             <ValidationMessage For="@(() => InvoiceFormModel.PaymentMethod)" />
@@ -118,9 +121,10 @@
         <div class="col">
             <label for="delivery-method" class="font-weight-bold">@L["DeliveryMethodLabel"]</label>
             <select class="form-control" id="delivery-method" @bind="InvoiceFormModel.DeliveryMethod">
+                <option value="">@L["NoneOption"]</option>
                 @foreach (DeliveryMethod value in Enum.GetValues(typeof(DeliveryMethod)))
                 {
-                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                    <option value="@value">@EnumL.Localize(value)</option>
                 }
             </select>
             <ValidationMessage For="@(() => InvoiceFormModel.DeliveryMethod)" />
@@ -133,10 +137,14 @@
             <select class="form-control" id="status" @bind="InvoiceFormModel.Status">
                 @foreach (InvoiceStatus value in Enum.GetValues(typeof(InvoiceStatus)))
                 {
-                    <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                    <option value="@value">@EnumL.Localize(value)</option>
                 }
             </select>
             <ValidationMessage For="@(() => InvoiceFormModel.Status)" />
+        </div>
+        <div class="col">
+            <label for="signed-by" class="font-weight-bold">@L["SignedByLabel"]</label>
+            <input type="text" class="form-control" id="signed-by" placeholder="@L["SignedByPlaceholder"]" @bind="InvoiceFormModel.SignedBy" />
         </div>
     </div>
 
@@ -173,12 +181,11 @@
             </div>
             <div class="col-md-2">
                 <label for="item-vat-rate-@uniqueItemHash" class="form-label small">@L["ItemVatRateLabel"]</label>
-                <input id="item-vat-rate-@uniqueItemHash" type="number" min="0" class="form-control form-control-sm" @bind="item.VatRate" step="0.01" />
-                <ValidationMessage For="@(() => item.VatRate)" />
+                <input id="item-vat-rate-@uniqueItemHash" type="number" min="0" max="100" step="1" class="form-control form-control-sm" @bind="item.VatRatePercent" />
+                <ValidationMessage For="@(() => item.VatRatePercent)" />
                 <div class="btn-group btn-group-sm mt-1 d-flex flex-grow-1" role="group" aria-label="@L["VatPresetAriaLabel"]">
                     <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 0)">0</button>
-                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 15)">15</button>
-                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 18)">18</button>
+                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 12)">12</button>
                     <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 21)">21</button>
                 </div>
             </div>
@@ -193,7 +200,7 @@
     <button type="button" class="btn btn-success float-start" @onclick="AddInvoiceItem">
         @L["AddItemButtonText"]
     </button>
-    <button type="submit" class="btn btn-primary float-end">@L["SubmitInvoiceButtonText"]</button>
+    <button type="submit" class="btn btn-primary float-end">@(InvoiceInstance is null ? L["CreateButtonText"] : L["SaveButtonText"])</button>
 </EditForm>
 
 @code {
@@ -337,9 +344,9 @@
         }
     }
 
-    private void SetVatRate(InvoiceItemFormModel item, decimal ratePercentage)
+    private void SetVatRate(InvoiceItemFormModel item, int ratePercentage)
     {
-        item.VatRate = ratePercentage / 100.0m;
+        item.VatRatePercent = ratePercentage;
     }
 
     private async Task AddNewEntity()
