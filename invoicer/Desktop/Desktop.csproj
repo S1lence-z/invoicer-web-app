@@ -11,6 +11,34 @@
     <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
 
+  <!-- Shell metadata. Product / Company / Authors / Copyright / Version come from
+       ..\Directory.Build.props. Forward slash in ApplicationIcon so the linux-x64
+       leg can read it too. -->
+  <PropertyGroup>
+    <AssemblyTitle>Invoicer</AssemblyTitle>
+    <Description>Invoicer - create and manage invoices offline</Description>
+    <ApplicationIcon>Assets/icon.ico</ApplicationIcon>
+    <!-- This is a desktop app, never IIS-hosted: skip the generated web.config. -->
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+  </PropertyGroup>
+
+  <!-- Windows ships as one self-contained executable. Managed assemblies and native
+       libraries go inside the bundle; content (wwwroot\, Assets\, LatoFont\) stays on
+       disk next to the exe, which is what Program.cs expects from
+       AppContext.BaseDirectory - that keeps returning the *install* folder for a
+       single-file app, not the extraction folder.
+       Linux keeps the plain self-contained folder layout so that the workflow's
+       `ldd Photino.Native.so` assertion keeps working. -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' or '$(RuntimeIdentifier)' == 'win-x86' or '$(RuntimeIdentifier)' == 'win-arm64'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- Would roughly halve the exe, but the Inno Setup package is LZMA2/solid
+         compressed anyway, so it buys nothing on download size while costing
+         startup time and memory (compressed bundles cannot be memory-mapped). -->
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.*" />
     <PackageReference Include="Photino.NET" Version="4.0.16" />
@@ -24,7 +52,45 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+    <!-- ExcludeFromSingleFile guarantees icon.ico / icon.png stay on disk, because
+         Program.cs loads the window icon from AppContext.BaseDirectory\Assets\. -->
+    <None Update="Assets\**" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
 
+  <!-- Backend is an exe project, so its apphost and host config files ride along into
+       the Desktop publish output. Setting UseAppHost=false in Backend.csproj is NOT an
+       option: the self-contained publish flag flows down to referenced projects as a
+       global property, and the SDK rejects self-contained together with no apphost
+       (NETSDK1067). Prune the strays here instead, along with the Development
+       appsettings the desktop host can never read (Program.cs pins
+       EnvironmentName = Production). -->
+  <Target Name="RemoveBackendHostFilesFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <_DesktopPublishStrays Include="@(ResolvedFileToPublish)"
+                             Condition="'%(ResolvedFileToPublish.RelativePath)' == 'Backend.exe'
+                                     or '%(ResolvedFileToPublish.RelativePath)' == 'Backend'
+                                     or '%(ResolvedFileToPublish.RelativePath)' == 'Backend.deps.json'
+                                     or '%(ResolvedFileToPublish.RelativePath)' == 'Backend.runtimeconfig.json'
+                                     or '%(ResolvedFileToPublish.RelativePath)' == 'Backend.staticwebassets.endpoints.json'
+                                     or '%(ResolvedFileToPublish.RelativePath)' == 'appsettings.Development.json'" />
+      <!-- Blazor WASM debug proxy, pulled in by Components.WebAssembly.Server. -->
+      <_DesktopPublishStrays Include="@(ResolvedFileToPublish)"
+                             Condition="$([System.String]::new('%(ResolvedFileToPublish.RelativePath)').StartsWith('BlazorDebugProxy'))" />
+      <!-- Only emitted by SDK 9+; inert on net8.0, which has no MapStaticAssets. -->
+      <_DesktopPublishStrays Include="@(ResolvedFileToPublish)"
+                             Condition="'%(ResolvedFileToPublish.RelativePath)' == 'Invoicer.staticwebassets.endpoints.json'" />
+      <ResolvedFileToPublish Remove="@(_DesktopPublishStrays)" />
+    </ItemGroup>
+  </Target>
+
+
+  <!-- SDK 9+ writes this manifest straight into the publish folder, bypassing
+       ResolvedFileToPublish, so the prune above cannot catch it. Only MapStaticAssets
+       reads it and that does not exist on net8.0, so here it is 700 KB of dead weight.
+       The TFM condition makes this stop deleting the file the moment the project moves
+       to a framework where the manifest actually matters. -->
+  <Target Name="RemoveStaticWebAssetsEndpointsManifest" AfterTargets="Publish"
+          Condition="'$(TargetFramework)' == 'net8.0'">
+    <Delete Files="$(PublishDir)$(AssemblyName).staticwebassets.endpoints.json" />
+  </Target>
 </Project>

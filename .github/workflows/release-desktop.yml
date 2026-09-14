@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build, without the leading v (e.g. 1.2.0)'
+        required: true
 
 permissions:
   contents: write
@@ -25,13 +30,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # v1.2.0 -> 1.2.0. Pre-release tags (v1.2.0-beta.1) pass through as-is: the SDK
+      # strips the suffix for FileVersion, and the .iss strips it for VersionInfoVersion.
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [[ -n "${{ inputs.version }}" ]]; then
+            v="${{ inputs.version }}"
+          else
+            v="${GITHUB_REF_NAME#v}"
+          fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "Building Invoicer $v"
+
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
       # Desktop references the Frontend project, so this single publish also builds the
-      # Blazor WASM client and places it under publish-desktop/wwwroot
+      # Blazor WASM client and places it under publish-desktop/wwwroot.
+      # Windows publishes as a single file (see Desktop.csproj); Linux stays a plain
+      # self-contained folder. DebugType is a CLI property on purpose: it has to reach
+      # the referenced projects too, or their .pdb files land loose next to the exe.
       - name: Publish Desktop (self-contained)
         working-directory: invoicer
         run: >
@@ -39,6 +61,7 @@ jobs:
           -c Release
           -r ${{ matrix.rid }}
           --self-contained
+          -p:Version=${{ steps.version.outputs.version }}
           -p:DebugType=none
           -o publish-desktop
 
@@ -46,30 +69,68 @@ jobs:
         shell: bash
         working-directory: invoicer/publish-desktop
         run: |
+          ls -la
           test -f wwwroot/index.html
           test -f wwwroot/_framework/blazor.webassembly.js
           test -f Assets/icon.ico
-          if [[ "${{ matrix.rid }}" == linux-* ]]; then
+          # QuestPDF's default font family; loose by design, PDF export needs it
+          test -f LatoFont/Lato-Regular.ttf
+          if [[ "${{ matrix.rid }}" == win-* ]]; then
+            test -f Invoicer.exe
+            [ ! -f Backend.exe ]
+            [ ! -f web.config ]
+            # Managed and native code must all be inside the bundle
+            if compgen -G "*.dll" > /dev/null; then
+              echo "unexpected loose DLLs next to the single file:"; ls *.dll; exit 1
+            fi
+          else
+            test -f Invoicer
+            [ ! -f Backend ]
             # Fail here, not on a user's machine, if the native webview library cannot be linked
             sudo apt-get update -q && sudo apt-get install -y -q libwebkit2gtk-4.1-0 libgtk-3-0 libnotify4
             ldd Photino.Native.so | grep -q 'not found' && { ldd Photino.Native.so; exit 1; } || true
           fi
 
-      - name: Archive release
+      # Inno Setup ships on the windows runner image but is not on PATH. The choco
+      # fallback covers a future image change without adding a third-party action to
+      # a workflow that holds contents: write.
+      - name: Build Windows installer
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        working-directory: invoicer
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            Write-Host "Inno Setup not found on the image, installing via Chocolatey..."
+            choco install innosetup --no-progress -y
+          }
+          if (-not (Test-Path $iscc)) { throw "ISCC.exe not found at $iscc" }
+          & $iscc "/DMyAppVersion=${{ steps.version.outputs.version }}" "installer\Invoicer.iss"
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+          Get-ChildItem artifacts
+
+      - name: Stage release assets
         shell: bash
         run: |
-          cd invoicer/publish-desktop
+          mkdir -p release-assets
+          name="${{ matrix.artifact }}-${{ steps.version.outputs.version }}"
+          (cd invoicer/publish-desktop && \
+            if [[ "${{ matrix.rid }}" == win-* ]]; then
+              7z a -tzip "../../release-assets/$name.zip" .
+            else
+              tar czf "../../release-assets/$name.tar.gz" .
+            fi)
           if [[ "${{ matrix.rid }}" == win-* ]]; then
-            7z a -tzip ../../${{ matrix.artifact }}.zip .
-          else
-            tar czf ../../${{ matrix.artifact }}.tar.gz .
+            cp invoicer/artifacts/InvoicerSetup-*.exe release-assets/
           fi
+          ls -la release-assets
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ${{ matrix.artifact }}.*
+          path: release-assets/*
+          if-no-files-found: error
 
   release:
     needs: build
@@ -88,3 +149,4 @@ jobs:
           files: |
             artifacts/**/*.zip
             artifacts/**/*.tar.gz
+            artifacts/**/InvoicerSetup-*.exe
