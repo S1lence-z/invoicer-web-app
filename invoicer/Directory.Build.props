@@ -1,0 +1,30 @@
+<Project>
+
+  <!--
+    Shared product identity for every project in the solution.
+
+    $(Version) is deliberately overridable from the command line:
+        dotnet publish ... -p:Version=1.2.0
+    CI derives it from the git tag (v1.2.0 -> 1.2.0). The default below is only
+    ever used by local builds, so it is obviously-not-a-release on purpose.
+
+    AssemblyVersion / FileVersion are NOT set here. The SDK derives them from
+    $(Version) via the GetAssemblyVersion task, which parses it as a NuGet
+    version and keeps only the numeric part - so a tag like v1.2.0-beta.1 gives
+    FileVersion 1.2.0.0 and InformationalVersion 1.2.0-beta.1.
+  -->
+  <PropertyGroup>
+    <Version Condition="'$(Version)' == ''">0.0.0-dev</Version>
+
+    <Product>Invoicer</Product>
+    <Company>Jiří Zelenka</Company>
+    <Authors>Jiří Zelenka</Authors>
+    <Copyright>Copyright © 2025 Jiří Zelenka</Copyright>
+
+    <!-- Czech resources and full ICU data are required; never let a future
+         template default turn these on. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+</Project>
