@@ -26,10 +26,7 @@
                     {
                         <p><strong>@L["DeliveryMethodLabel"]</strong> @EnumL.Localize(deliveryMethod)</p>
                     }
-                    @if (!string.IsNullOrWhiteSpace(Invoice.SignedBy))
-                    {
-                        <p><strong>@L["SignedByLabel"]</strong> @Invoice.SignedBy</p>
-                    }
+                    <p><strong>@L["SignedByLabel"]</strong> @Invoice.SignedBy</p>
                 </div>
             </div>
 
