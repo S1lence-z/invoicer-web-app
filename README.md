@@ -114,7 +114,7 @@ The same application can run as a standalone desktop program. The `Desktop` proj
 
 ### Prerequisites
 
-*   **Windows 10/11 (x64):** the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/). It is preinstalled on Windows 11 and on up-to-date Windows 10.
+*   **Windows 10 (1809+) / 11 (x64):** the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/). It is preinstalled on Windows 11 and on up-to-date Windows 10, and the installer below fetches it automatically if it is missing.
 *   **Linux (x64, Debian/Ubuntu):**
     ```bash
     sudo apt install libwebkit2gtk-4.1-0 libgtk-3-0 libnotify4 libfontconfig1
@@ -122,7 +122,13 @@ The same application can run as a standalone desktop program. The `Desktop` proj
 
 ### Download
 
-Prebuilt archives for each tagged release are on the [Releases](https://github.com/S1lence-z/invoicer-web-app/releases) page. Unpack and run `Invoicer.exe` (Windows) or `./Invoicer` (Linux).
+Every tagged release on the [Releases](https://github.com/S1lence-z/invoicer-web-app/releases) page ships:
+
+*   **`InvoicerSetup-x.y.z.exe`** — the Windows installer. Recommended. It installs for the current user only, so it needs no administrator rights, and it adds Start Menu and (optionally) desktop shortcuts plus an entry in **Apps & features** for clean uninstallation. Because the installer is not code-signed, SmartScreen shows a "Windows protected your PC" notice on first run — choose **More info → Run anyway**.
+*   **`invoicer-win-x64-x.y.z.zip`** — the same app as a portable folder. Unpack and run `Invoicer.exe`.
+*   **`invoicer-linux-x64-x.y.z.tar.gz`** — unpack and run `./Invoicer`.
+
+Your invoices are never stored in the install folder (see [Where data is stored](#where-data-is-stored)), so upgrading and uninstalling leave them untouched.
 
 ### Build from source
 
@@ -133,6 +139,13 @@ cd invoicer
 
 The output lands in `invoicer/publish-desktop/`. For development, `dotnet run --project Desktop` opens the window directly from the build output.
 
+To build the Windows installer as well, use the PowerShell script instead — it publishes and then compiles `installer/Invoicer.iss`, writing `invoicer/artifacts/InvoicerSetup-<version>.exe`. It needs [Inno Setup 6](https://jrsoftware.org/isinfo.php) (`winget install -e --id JRSoftware.InnoSetup`):
+
+```powershell
+cd invoicer
+.\build-installer.ps1 -Version 1.2.0
+```
+
 ### Where data is stored
 
 The desktop app always uses SQLite. The database and a diagnostic log live in the per-user application data folder:
@@ -141,6 +154,8 @@ The desktop app always uses SQLite. The database and a diagnostic log live in th
 |----|----------|
 | Windows | `%LOCALAPPDATA%\Invoicer\` |
 | Linux | `~/.local/share/Invoicer/` |
+
+Because nothing is written into the install folder, upgrading over an existing install keeps your data, and the Windows uninstaller asks before deleting it — answering No (the default) keeps the database for a future reinstall.
 
 Invoice PDFs are saved through the native "Save file" dialog.
 
