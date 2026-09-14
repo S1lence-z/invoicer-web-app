@@ -153,6 +153,7 @@ public class Program
 		try
 		{
 			var request = JsonSerializer.Deserialize<WebMessage>(message, JsonOptions);
+			Log($"Web message received: type={request?.Type ?? "<null>"}, length={message.Length}");
 			switch (request?.Type)
 			{
 				case "savePdf" when request.Data is not null:
@@ -172,12 +173,20 @@ public class Program
 
 	private static void SavePdf(PhotinoWindow window, string fileName, string base64Data)
 	{
+		// Photino resolves defaultPath as an existing folder (SHCreateItemFromParsingName on Windows,
+		// gtk_file_chooser_set_current_folder on Linux). Passing a not-yet-existing file path makes the
+		// dialog fail to open and ShowSaveFile returns null as if the user had cancelled, so only the
+		// folder is passed. Photino cannot prefill the file name (tryphotino/photino.NET#140); the
+		// suggested name is shown in the title instead.
 		var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-		var defaultPath = Path.Combine(documents, fileName);
 
-		var target = window.ShowSaveFile("Save invoice", defaultPath, [("PDF", ["*.pdf"])]);
+		Log($"Opening save dialog for {fileName}");
+		var target = window.ShowSaveFile($"Save invoice - {fileName}", documents, [("PDF", ["*.pdf"])]);
 		if (string.IsNullOrEmpty(target))
-			return; // user cancelled
+		{
+			Log("Save dialog closed without a file");
+			return;
+		}
 
 		if (!target.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
 			target += ".pdf";
