@@ -6,12 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>d69d3d1d-5ee0-4a30-b250-6df43ce8d43a</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <!-- Backend is only ever launched as "dotnet Backend.dll" (Dockerfile ENTRYPOINT,
-         docker-compose dev watch, VS/dotnet run). Suppressing the apphost keeps
-         Backend.exe out of the Desktop publish output, where it would otherwise be
-         bundled into the single file as a native binary and self-extracted on
-         every launch. -->
-    <UseAppHost>false</UseAppHost>
   </PropertyGroup>
 
   <ItemGroup>

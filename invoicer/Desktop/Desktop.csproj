@@ -18,6 +18,8 @@
     <AssemblyTitle>Invoicer</AssemblyTitle>
     <Description>Invoicer - create and manage invoices offline</Description>
     <ApplicationIcon>Assets/icon.ico</ApplicationIcon>
+    <!-- This is a desktop app, never IIS-hosted: skip the generated web.config. -->
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
   </PropertyGroup>
 
   <!-- Windows ships as one self-contained executable. Managed assemblies and native
@@ -56,9 +58,12 @@
   </ItemGroup>
 
   <!-- Backend is an exe project, so its apphost and host config files ride along into
-       the Desktop publish output. UseAppHost=false in Backend.csproj removes Backend.exe;
-       this removes the rest, plus the Development appsettings the desktop host can never
-       read (Program.cs pins EnvironmentName = Production). -->
+       the Desktop publish output. Setting UseAppHost=false in Backend.csproj is NOT an
+       option: the self-contained publish flag flows down to referenced projects as a
+       global property, and the SDK rejects self-contained together with no apphost
+       (NETSDK1067). Prune the strays here instead, along with the Development
+       appsettings the desktop host can never read (Program.cs pins
+       EnvironmentName = Production). -->
   <Target Name="RemoveBackendHostFilesFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
     <ItemGroup>
       <_DesktopPublishStrays Include="@(ResolvedFileToPublish)"
@@ -68,8 +73,24 @@
                                      or '%(ResolvedFileToPublish.RelativePath)' == 'Backend.runtimeconfig.json'
                                      or '%(ResolvedFileToPublish.RelativePath)' == 'Backend.staticwebassets.endpoints.json'
                                      or '%(ResolvedFileToPublish.RelativePath)' == 'appsettings.Development.json'" />
+      <!-- Blazor WASM debug proxy, pulled in by Components.WebAssembly.Server. -->
+      <_DesktopPublishStrays Include="@(ResolvedFileToPublish)"
+                             Condition="$([System.String]::new('%(ResolvedFileToPublish.RelativePath)').StartsWith('BlazorDebugProxy'))" />
+      <!-- Only emitted by SDK 9+; inert on net8.0, which has no MapStaticAssets. -->
+      <_DesktopPublishStrays Include="@(ResolvedFileToPublish)"
+                             Condition="'%(ResolvedFileToPublish.RelativePath)' == 'Invoicer.staticwebassets.endpoints.json'" />
       <ResolvedFileToPublish Remove="@(_DesktopPublishStrays)" />
     </ItemGroup>
   </Target>
 
+
+  <!-- SDK 9+ writes this manifest straight into the publish folder, bypassing
+       ResolvedFileToPublish, so the prune above cannot catch it. Only MapStaticAssets
+       reads it and that does not exist on net8.0, so here it is 700 KB of dead weight.
+       The TFM condition makes this stop deleting the file the moment the project moves
+       to a framework where the manifest actually matters. -->
+  <Target Name="RemoveStaticWebAssetsEndpointsManifest" AfterTargets="Publish"
+          Condition="'$(TargetFramework)' == 'net8.0'">
+    <Delete Files="$(PublishDir)$(AssemblyName).staticwebassets.endpoints.json" />
+  </Target>
 </Project>
