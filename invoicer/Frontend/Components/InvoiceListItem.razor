@@ -3,7 +3,9 @@
 @using Application.DTOs
 @using Shared.Enums
 @using Shared.Extensions
+@using Frontend.Extensions
 @inject IStringLocalizer<InvoiceListItem> L
+@inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
 <div class="card border-1 shadow-sm">
     <div class="card-body row align-items-center">
@@ -24,7 +26,7 @@
                 @foreach (InvoiceStatus status in Enum.GetValues(typeof(InvoiceStatus)))
                 {
                     <option selected="@(Invoice.Status == status)" class="@GetStatusColorClass(status)" value="@status">
-                        @L[status.ToString()]
+                        @EnumL.Localize(status)
                     </option>
                 }
             </select>
@@ -35,19 +37,12 @@
             </span>
         </div>
         <div class="col">
-            <div class="row gx-1 gy-1">
-                <div class="col-6">
-                    <button class="btn btn-outline-primary btn-sm w-100" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">@L["EditButton"]</button>
-                </div>
-                <div class="col-6">
-                    <button class="btn btn-outline-danger btn-sm w-100" @onclick="() => OnDeleteInvoice.InvokeAsync(Invoice)">@L["DeleteButton"]</button>
-                </div>
-                <div class="col-6">
-                    <button class="btn btn-outline-dark btn-sm w-100" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">@L["PreviewButton"]</button>
-                </div>
-                <div class="col-6">
-                    <button class="btn btn-outline-success btn-sm w-100" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">@L["ExportButton"]</button>
-                </div>
+            @* Two buttons per row while the labels fit; a label too long for half the column pushes its button onto its own row *@
+            <div class="d-flex flex-wrap gap-1 invoice-actions">
+                <button class="btn btn-outline-primary btn-sm" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">@L["EditButton"]</button>
+                <button class="btn btn-outline-danger btn-sm" @onclick="() => OnDeleteInvoice.InvokeAsync(Invoice)">@L["DeleteButton"]</button>
+                <button class="btn btn-outline-dark btn-sm" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">@L["PreviewButton"]</button>
+                <button class="btn btn-outline-success btn-sm" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">@L["ExportButton"]</button>
             </div>
         </div>
     </div>

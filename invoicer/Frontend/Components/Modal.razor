@@ -1,9 +1,10 @@
-﻿<div class="modal" tabindex="-1" role="dialog" style="display:@(IsVisible ? "block" : "none"); background: rgba(0, 0, 0, 0.5);">
-    <div class="modal-@Size" role="document" style="margin: auto;">
+﻿@* Clicking the dark backdrop closes the modal; clicks inside the dialog must not bubble up to it. *@
+<div class="modal" tabindex="-1" role="dialog" style="display:@(IsVisible ? "block" : "none"); background: rgba(0, 0, 0, 0.5);" @onclick="Close">
+    <div class="modal-@Size" role="document" style="margin: auto;" @onclick:stopPropagation="true">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">@Title</h5>
-                <button class="btn btn-close" aria-label="Close" @onclick="() => OnClose.InvokeAsync(false)">
+                <button class="btn btn-close" aria-label="Close" @onclick="Close">
                 </button>
             </div>
             <div class="modal-body">
@@ -28,4 +29,6 @@
 
     [Parameter]
     public string Size { get; set; } = "lg";
+
+    private Task Close() => OnClose.InvokeAsync(false);
 }

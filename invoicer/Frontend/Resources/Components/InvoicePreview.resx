@@ -155,12 +155,15 @@
     <value>Total Price without VAT:</value>
   </data>
   <data name="TotalVatLabel" xml:space="preserve">
-    <value>Total VAT:</value>
+    <value>VAT:</value>
   </data>
   <data name="TotalPriceWithVatLabel" xml:space="preserve">
     <value>Total Price with VAT:</value>
   </data>
   <data name="FinalPriceLabel" xml:space="preserve">
-    <value>Final Price:</value>
+    <value>Total Price:</value>
+  </data>
+  <data name="SignedByLabel" xml:space="preserve">
+    <value>Signed by:</value>
   </data>
 </root>

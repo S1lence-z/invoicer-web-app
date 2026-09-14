@@ -116,7 +116,7 @@
     <value>Datum splatnosti</value>
   </data>
   <data name="VatDateLabel" xml:space="preserve">
-    <value>Datum DPH</value>
+    <value>Datum zdanitelného plnění</value>
   </data>
   <data name="SellerLabel" xml:space="preserve">
     <value>Dodavatel</value>
@@ -187,7 +187,19 @@
   <data name="AddItemButtonText" xml:space="preserve">
     <value>Přidat položku</value>
   </data>
-  <data name="SubmitInvoiceButtonText" xml:space="preserve">
-    <value>Odeslat fakturu</value>
+  <data name="CreateButtonText" xml:space="preserve">
+    <value>Vytvořit fakturu</value>
+  </data>
+  <data name="SaveButtonText" xml:space="preserve">
+    <value>Uložit změny</value>
+  </data>
+  <data name="NoneOption" xml:space="preserve">
+    <value>Nezadáno</value>
+  </data>
+  <data name="SignedByLabel" xml:space="preserve">
+    <value>Podepsal</value>
+  </data>
+  <data name="SignedByPlaceholder" xml:space="preserve">
+    <value>Jméno osoby, která fakturu podepisuje</value>
   </data>
 </root>

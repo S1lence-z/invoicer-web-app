@@ -21,7 +21,8 @@ namespace Frontend.Validators
 				return ValidationResult.Success;
 			}
 
-			return new ValidationResult($"At least {minCount} item is required");
+			// Localized through ErrorMessage / ErrorMessageResource* on the attribute usage
+			return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
 		}
 	}
 }

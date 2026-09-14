@@ -5,11 +5,13 @@
 @using Application.DTOs
 @using Shared.Enums
 @using Shared.Extensions
+@using Frontend.Extensions
 @using Application.ServiceInterfaces
 @inject INumberingSchemeService numberingService
 @inject LoadingService loadingService
 @inject ErrorService errorService
 @inject IStringLocalizer<NumberingSchemeForm> L
+@inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
 <div>
     <EditForm Model="@SchemeFormModel" OnValidSubmit="SubmitForm">
@@ -70,7 +72,7 @@
                 <select id="sequence-pos" class="form-select" @bind="SchemeFormModel.SequencePosition">
                     @foreach (Position value in Enum.GetValues(typeof(Position)))
                     {
-                        <option value="@value">@value</option>
+                        <option value="@value">@EnumL.Localize(value)</option>
                     }
                 </select>
                 <ValidationMessage For="@(() => SchemeFormModel.SequencePosition)" />
@@ -81,7 +83,7 @@
                 <select id="reset-frequency" class="form-select" @bind="SchemeFormModel.ResetFrequency">
                     @foreach (ResetFrequency value in Enum.GetValues(typeof(ResetFrequency)))
                     {
-                        <option value="@value">@value</option>
+                        <option value="@value">@EnumL.Localize(value)</option>
                     }
                 </select>
                 <ValidationMessage For="@(() => SchemeFormModel.ResetFrequency)" />
@@ -94,7 +96,7 @@
                 <select id="year-format" class="form-select" @bind="SchemeFormModel.YearFormat">
                     @foreach (YearFormat value in Enum.GetValues(typeof(YearFormat)))
                     {
-                        <option value="@value">@value.ToString()!.SeperateCamelCase()</option>
+                        <option value="@value">@EnumL.Localize(value)</option>
                     }
                 </select>
                 <ValidationMessage For="@(() => SchemeFormModel.YearFormat)" />
@@ -109,7 +111,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">@L["SubmitButtonText"]</button>
+        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">@(NumberingSchemeInstance is null ? L["CreateButtonText"] : L["SaveButtonText"])</button>
     </EditForm>
 </div>
 

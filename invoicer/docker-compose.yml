@@ -39,10 +39,17 @@ services:
             - ConnectionStrings__pgsqlConnection=${ConnectionStrings__pgsqlConnection:-}
         volumes:
             - invoicer-data:/data
+        networks:
+            - default
+            - db_network
         restart: unless-stopped
 
 volumes:
     invoicer-data:
+
+networks:
+    db_network:
+        external: true
 
 # To connect to an external PostgreSQL instance on another Docker network:
 # 1. Set DatabaseProvider=PostgreSql and ConnectionStrings__pgsqlConnection in .env

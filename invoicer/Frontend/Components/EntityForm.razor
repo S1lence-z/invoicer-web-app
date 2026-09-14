@@ -62,6 +62,12 @@
                 <ValidationMessage For="@(() => entityFormModel.PhoneNumber)" />
             </div>
         </div>
+        <div class="row mt-4">
+            <div class="col">
+                <label for="entity-registration-text" class="font-weight-bold">@L["RegistrationTextLabel"]</label>
+                <textarea class="form-control" id="entity-registration-text" rows="2" placeholder="@L["RegistrationTextPlaceholder"]" @bind="entityFormModel.RegistrationText"></textarea>
+            </div>
+        </div>
         <hr />
         @* ADDRESS FORM *@
         <div class="row">
@@ -114,7 +120,7 @@
                 <ValidationMessage For="@(() => entityFormModel.IBAN)" />
             </div>
         </div>
-        <button type="submit" class="btn btn-primary float-end" disabled="@loadingService.IsLoading">@L["SubmitButton"]</button>
+        <button type="submit" class="btn btn-primary float-end" disabled="@loadingService.IsLoading">@(EntityInstance is null ? L["CreateButton"] : L["SaveButton"])</button>
     </EditForm>
 </div>
 

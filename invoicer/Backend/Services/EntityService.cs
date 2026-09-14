@@ -45,6 +45,7 @@ namespace Backend.Services
 			existingEntity.Ico = newEntityData.Ico;
 			existingEntity.Email = newEntityData.Email;
 			existingEntity.PhoneNumber = newEntityData.PhoneNumber;
+			existingEntity.RegistrationText = newEntityData.RegistrationText;
 			existingEntity.BankAccountId = newEntityData.BankAccountId;
 			existingEntity.AddressId = newEntityData.AddressId;
 			existingEntity.CurrentNumberingSchemeId = newEntityData.CurrentNumberingSchemeId;

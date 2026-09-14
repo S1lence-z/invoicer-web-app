@@ -21,6 +21,7 @@ namespace Application.Mappers
 				Currency = invoice.Currency,
 				PaymentMethod = invoice.PaymentMethod,
 				DeliveryMethod = invoice.DeliveryMethod,
+				SignedBy = invoice.SignedBy,
 				NumberingSchemeId = invoice.NumberingSchemeId,
 				Status = invoice.Status,
 				Items = invoice.Items.Select(InvoiceItemMapper.MapToDto).ToList()
@@ -41,6 +42,7 @@ namespace Application.Mappers
 				Currency = invoiceDto.Currency,
 				PaymentMethod = invoiceDto.PaymentMethod,
 				DeliveryMethod = invoiceDto.DeliveryMethod,
+				SignedBy = invoiceDto.SignedBy,
 				NumberingSchemeId = invoiceDto.NumberingSchemeId,
 				Status = invoiceDto.Status,
 				Items = invoiceDto.Items.Select(InvoiceItemMapper.MapToDomain).ToList()

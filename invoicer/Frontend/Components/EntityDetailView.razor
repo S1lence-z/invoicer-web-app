@@ -9,6 +9,10 @@
         <p><strong>@L["IcoLabel"]</strong> @SelectedEntity.Ico</p>
         <p><strong>@L["EmailLabel"]</strong> @SelectedEntity.Email</p>
         <p><strong>@L["PhoneLabel"]</strong> @SelectedEntity.PhoneNumber</p>
+        @if (!string.IsNullOrWhiteSpace(SelectedEntity.RegistrationText))
+        {
+            <p><strong>@L["RegistrationTextLabel"]</strong> @SelectedEntity.RegistrationText</p>
+        }
     </div>
     @* Address and Bank Account*@
     <div class="d-flex flex-row gap-5">

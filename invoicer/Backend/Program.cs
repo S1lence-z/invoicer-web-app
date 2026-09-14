@@ -21,6 +21,17 @@ namespace Backend
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
+			ConfigureServices(builder);
+
+			var app = builder.Build();
+
+			ConfigurePipeline(app);
+
+			app.Run();
+		}
+
+		public static void ConfigureServices(WebApplicationBuilder builder)
+		{
 			// Add db context with provider-specific subclass for migrations
 			DatabaseType databaseType = builder.Configuration.GetValue("DatabaseProvider", DatabaseType.Sqlite);
 			switch (databaseType)
@@ -61,7 +72,9 @@ namespace Backend
 			builder.Services.AddScoped<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
 
 			// Add controllers after all the services
-			builder.Services.AddControllers();
+			// Register this assembly explicitly so controllers are found even when another
+			// executable (e.g. the Desktop host) is the entry assembly
+			builder.Services.AddControllers().AddApplicationPart(typeof(Program).Assembly);
 
 			// Swagger only in Development
 			if (builder.Environment.IsDevelopment())
@@ -69,9 +82,10 @@ namespace Backend
 				builder.Services.AddEndpointsApiExplorer();
 				builder.Services.AddSwaggerGen();
 			}
+		}
 
-			var app = builder.Build();
-
+		public static void ConfigurePipeline(WebApplication app)
+		{
 			// Create the db migrations and apply them
 			using (var scope = app.Services.CreateScope())
 			{
@@ -116,11 +130,24 @@ namespace Backend
 			// Enable CORS (frontend and backend are on different origins)
 			EnableCors(app);
 
+			// Serve the Blazor WASM frontend from this process when explicitly enabled
+			// (the Desktop host sets ServeFrontend=true; the web deployment uses nginx instead)
+			bool serveFrontend = app.Configuration.GetValue("ServeFrontend", false);
+			if (serveFrontend)
+			{
+				app.UseBlazorFrameworkFiles();
+				app.UseStaticFiles();
+			}
+
 			app.UseAuthorization();
 
 			app.MapControllers();
 
-			app.Run();
+			// SPA fallback: serve index.html for non-API, non-file routes
+			if (serveFrontend)
+			{
+				app.MapFallbackToFile("index.html");
+			}
 		}
 
 		private static void EnableCors(IApplicationBuilder app)

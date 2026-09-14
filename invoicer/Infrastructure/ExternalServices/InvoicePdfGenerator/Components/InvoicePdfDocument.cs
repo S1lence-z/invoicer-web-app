@@ -60,7 +60,7 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 
 						col.Item().Text(text =>
 						{
-							text.Span(GetLocalizedText("VAT Date: ", "Datum DPH: ", languageTag));
+							text.Span(GetLocalizedText("Date of Taxable Supply: ", "Datum zdanitelného plnění: ", languageTag));
 							text.Span(invoiceModel.VatDate.FormatByCurrencyLocale(invoiceCurrency)).Bold();
 						});
 					});
@@ -80,17 +80,23 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 							text.Span(invoiceModel.InvoiceNumber).Bold();
 						});
 
-						col.Item().Text(text =>
+						if (invoiceModel.PaymentMethod is { } paymentMethod)
 						{
-							text.Span(GetLocalizedText("Payment Method: ", "Způsob platby: ", languageTag));
-							text.Span(invoiceModel.PaymentMethod.ToString().SeperateCamelCase()).Bold();
-						});
+							col.Item().Text(text =>
+							{
+								text.Span(GetLocalizedText("Payment Method: ", "Způsob platby: ", languageTag));
+								text.Span(paymentMethod.ToString().SeperateCamelCase()).Bold();
+							});
+						}
 
-						col.Item().Text(text =>
+						if (invoiceModel.DeliveryMethod is { } deliveryMethod)
 						{
-							text.Span(GetLocalizedText("Delivery Method: ", "Způsob doručení: ", languageTag));
-							text.Span(invoiceModel.DeliveryMethod.ToString().SeperateCamelCase()).Bold();
-						});
+							col.Item().Text(text =>
+							{
+								text.Span(GetLocalizedText("Delivery Method: ", "Způsob doručení: ", languageTag));
+								text.Span(deliveryMethod.ToString().SeperateCamelCase()).Bold();
+							});
+						}
 					});
 				});
 
@@ -113,13 +119,21 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 				});
 
 				// Invoice Items Data
-				col.Item().Component(new InvoiceItemsComponent(invoiceModel.Items, invoiceModel.Currency, languageTag));
+				col.Item().Component(new InvoiceItemsComponent(invoiceModel.Items, invoiceModel.Currency, languageTag, invoiceModel.Seller!.RegistrationText));
 			});
 		}
 
 		private void ComposeFooter(IContainer container)
 		{
-			container.AlignCenter().Text(x => x.CurrentPageNumber());
+			const float signatureWidth = 200;
+			container.Row(row =>
+			{
+				// Empty item of the same width as the signature block keeps the page number centered
+				row.ConstantItem(signatureWidth);
+				row.RelativeItem().AlignBottom().AlignCenter().Text(x => x.CurrentPageNumber());
+				// Bottom right of the last page
+				row.ConstantItem(signatureWidth).Dynamic(new SignatureBlockComponent(invoiceModel.SignedBy, languageTag));
+			});
 		}
 	}
 }

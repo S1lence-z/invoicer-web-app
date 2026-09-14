@@ -1,0 +1,90 @@
+name: Release Desktop App
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            artifact: invoicer-win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+            artifact: invoicer-linux-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Desktop references the Frontend project, so this single publish also builds the
+      # Blazor WASM client and places it under publish-desktop/wwwroot
+      - name: Publish Desktop (self-contained)
+        working-directory: invoicer
+        run: >
+          dotnet publish Desktop/Desktop.csproj
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained
+          -p:DebugType=none
+          -o publish-desktop
+
+      - name: Verify publish output
+        shell: bash
+        working-directory: invoicer/publish-desktop
+        run: |
+          test -f wwwroot/index.html
+          test -f wwwroot/_framework/blazor.webassembly.js
+          test -f Assets/icon.ico
+          if [[ "${{ matrix.rid }}" == linux-* ]]; then
+            # Fail here, not on a user's machine, if the native webview library cannot be linked
+            sudo apt-get update -q && sudo apt-get install -y -q libwebkit2gtk-4.1-0 libgtk-3-0 libnotify4
+            ldd Photino.Native.so | grep -q 'not found' && { ldd Photino.Native.so; exit 1; } || true
+          fi
+
+      - name: Archive release
+        shell: bash
+        run: |
+          cd invoicer/publish-desktop
+          if [[ "${{ matrix.rid }}" == win-* ]]; then
+            7z a -tzip ../../${{ matrix.artifact }}.zip .
+          else
+            tar czf ../../${{ matrix.artifact }}.tar.gz .
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            artifacts/**/*.zip
+            artifacts/**/*.tar.gz

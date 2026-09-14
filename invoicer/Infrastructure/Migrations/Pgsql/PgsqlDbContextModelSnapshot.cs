@@ -123,6 +123,12 @@ namespace Infrastructure.Migrations.Pgsql
                         .HasColumnType("text")
                         .HasDefaultValue("");
 
+                    b.Property<string>("RegistrationText")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
@@ -176,10 +182,7 @@ namespace Infrastructure.Migrations.Pgsql
                         .HasDefaultValue("CZK");
 
                     b.Property<string>("DeliveryMethod")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("PersonalPickUp");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("timestamp with time zone");
@@ -195,13 +198,16 @@ namespace Infrastructure.Migrations.Pgsql
                         .HasColumnType("integer");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("BankTransfer");
+                        .HasColumnType("text");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SignedBy")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("");
 
                     b.Property<string>("Status")
                         .IsRequired()

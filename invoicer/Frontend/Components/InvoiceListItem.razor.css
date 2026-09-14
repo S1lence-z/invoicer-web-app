@@ -1,0 +1,5 @@
+/* Invoice list action buttons: two per row, or one per row when a label would overflow */
+.invoice-actions > .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    white-space: nowrap;
+}

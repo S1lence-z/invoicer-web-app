@@ -2,8 +2,10 @@
 @using Frontend.Services
 @using Frontend.Utils
 @using Frontend.Components
+@using Microsoft.Extensions.Localization
 @inject LoadingService LoadingService
 @inject ErrorService ErrorService
+@inject IStringLocalizer<MainLayout> L
 
 <div class="page">
     <div class="sidebar w-auto">
@@ -21,7 +23,7 @@
             {
                 <div class="spinner-overlay">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="visually-hidden">@L["LoadingLabel"]</span>
                     </div>
                 </div>
             }
@@ -31,11 +33,11 @@
 </div>
 
 @* ERROR MESSAGE MODAL *@
-<Modal Title="Error" IsVisible="ErrorService.EmittedError" OnClose="ErrorService.ClearError">
+<Modal Title="@L["ErrorModalTitle"]" IsVisible="ErrorService.EmittedError" OnClose="ErrorService.ClearError">
     <div class="alert alert-danger" role="alert">
         @ErrorService.ErrorMessage
     </div>
-    <button class="btn btn-primary" @onclick="ErrorService.ClearError">Close</button>
+    <button class="btn btn-primary" @onclick="ErrorService.ClearError">@L["CloseButton"]</button>
 </Modal>
 
 @code {

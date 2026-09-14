@@ -7,7 +7,7 @@ using Shared.Extensions;
 
 namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 {
-	public class InvoiceItemsComponent(ICollection<InvoiceItem> items, Currency invoiceCurrency, string languageTag) : ComponentBase, IComponent
+	public class InvoiceItemsComponent(ICollection<InvoiceItem> items, Currency invoiceCurrency, string languageTag, string footnote) : ComponentBase, IComponent
 	{
 		private void ComposeInvoiceItemsTable(IContainer container)
 		{
@@ -61,7 +61,7 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 				table.Header(header =>
 				{
 					header.Cell().Text(GetLocalizedText("Total Price without VAT", "Celková cena bez DPH", languageTag)).Bold().AlignCenter();
-					header.Cell().Text(GetLocalizedText("Total VAT", "Celkové DPH", languageTag)).Bold().AlignCenter();
+					header.Cell().Text(GetLocalizedText("VAT", "DPH", languageTag)).Bold().AlignCenter();
 					header.Cell().Text(GetLocalizedText("Total Price with VAT", "Celková cena s DPH", languageTag)).Bold().AlignCenter();
 				});
 				// Row with prices
@@ -75,7 +75,7 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 					.Padding(10)
 					.Text(text =>
 					{
-						text.Span(GetLocalizedText("Final Price: ", "Konečná cena: ", languageTag)).Bold().FontSize(14);
+						text.Span(GetLocalizedText("Total Price: ", "Celková cena: ", languageTag)).Bold().FontSize(14);
 						text.Span(invoiceCurrency.FormatAmount(totalPriceWithVat)).FontSize(14);
 					});
 			});
@@ -85,8 +85,11 @@ namespace Infrastructure.ExternalServices.InvoicePdfGenerator.Components
 		{
 			container.Column(col =>
 			{
-				col.Item().PaddingBottom(100).Element(ComposeInvoiceItemsTable);
-				col.Item().Element(ComposeInvoicePriceTable);
+				col.Item().Element(ComposeInvoiceItemsTable);
+				// Seller's standard registry statement, directly under the item breakdown
+				if (!string.IsNullOrWhiteSpace(footnote))
+					col.Item().PaddingTop(8).Text(footnote).FontSize(9).Italic();
+				col.Item().PaddingTop(100).Element(ComposeInvoicePriceTable);
 			});
 		}
 	}

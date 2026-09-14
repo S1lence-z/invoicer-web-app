@@ -1,7 +1,7 @@
 # Invoicer
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![.NET Version](https://img.shields.io/badge/.NET-8.0-blueviolet)](https://dotnet.microsoft.com/download/dotnet/8.0) [![Blazor](https://img.shields.io/badge/Blazor-WebAssembly-blue)](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) [![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-8.0-blue)](https://dotnet.microsoft.com/apps/aspnet) [![QuestPDF](https://img.shields.io/badge/QuestPDF-PDF%20Generation-green)](https://github.com/QuestPDF/QuestPDF)
 
-Simple and effective web application for creating and managing invoices.
+Simple and effective application for creating and managing invoices, available as a web app or a Windows/Linux desktop app.
 
 ## Description
 
@@ -108,6 +108,42 @@ Once the application is running, navigate to the web interface in your browser. 
 
 For detailed usage instructions, see the [User Documentation](./docs/user_docs.md).
 
+## Desktop App
+
+The same application can run as a standalone desktop program. The `Desktop` project hosts the ASP.NET Core backend in-process and shows the Blazor UI in a native window using [Photino](https://www.tryphotino.io/), so there is no separate server or browser to manage.
+
+### Prerequisites
+
+*   **Windows 10/11 (x64):** the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/). It is preinstalled on Windows 11 and on up-to-date Windows 10.
+*   **Linux (x64, Debian/Ubuntu):**
+    ```bash
+    sudo apt install libwebkit2gtk-4.1-0 libgtk-3-0 libnotify4 libfontconfig1
+    ```
+
+### Download
+
+Prebuilt archives for each tagged release are on the [Releases](https://github.com/S1lence-z/invoicer-web-app/releases) page. Unpack and run `Invoicer.exe` (Windows) or `./Invoicer` (Linux).
+
+### Build from source
+
+```bash
+cd invoicer
+./build-desktop.sh linux-x64   # or win-x64
+```
+
+The output lands in `invoicer/publish-desktop/`. For development, `dotnet run --project Desktop` opens the window directly from the build output.
+
+### Where data is stored
+
+The desktop app always uses SQLite. The database and a diagnostic log live in the per-user application data folder:
+
+| OS | Location |
+|----|----------|
+| Windows | `%LOCALAPPDATA%\Invoicer\` |
+| Linux | `~/.local/share/Invoicer/` |
+
+Invoice PDFs are saved through the native "Save file" dialog.
+
 ## Project Architecture
 
 The application follows a layered architecture approach:
@@ -116,6 +152,7 @@ The application follows a layered architecture approach:
 *   **Application:** Use case orchestration, application-specific logic, DTOs, and infrastructure interfaces.
 *   **Backend:** ASP.NET Core API, Infrastructure implementations (currently, including EF Core, PDF gen), Dependency Injection setup.
 *   **Frontend:** Blazor WASM User Interface.
+*   **Desktop:** Photino window that hosts Backend and Frontend in one process for the desktop build.
 *   **Shared:** Common DTOs, Enums, Extensions (scope to be refined).
 
 For a detailed breakdown, see the [Developer Documentation](./docs/developer_docs.md).

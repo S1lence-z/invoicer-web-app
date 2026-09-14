@@ -116,7 +116,7 @@
     <value>Due Date</value>
   </data>
   <data name="VatDateLabel" xml:space="preserve">
-    <value>Vat Date</value>
+    <value>Date of Taxable Supply</value>
   </data>
   <data name="SellerLabel" xml:space="preserve">
     <value>Seller</value>
@@ -187,7 +187,19 @@
   <data name="AddItemButtonText" xml:space="preserve">
     <value>Add Item</value>
   </data>
-  <data name="SubmitInvoiceButtonText" xml:space="preserve">
-    <value>Submit Invoice</value>
+  <data name="CreateButtonText" xml:space="preserve">
+    <value>Create Invoice</value>
+  </data>
+  <data name="SaveButtonText" xml:space="preserve">
+    <value>Save Changes</value>
+  </data>
+  <data name="NoneOption" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="SignedByLabel" xml:space="preserve">
+    <value>Signed by</value>
+  </data>
+  <data name="SignedByPlaceholder" xml:space="preserve">
+    <value>Name of the person signing the invoice</value>
   </data>
 </root>
