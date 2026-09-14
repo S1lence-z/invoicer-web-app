@@ -187,8 +187,11 @@
   <data name="AddItemButtonText" xml:space="preserve">
     <value>Add Item</value>
   </data>
-  <data name="SubmitInvoiceButtonText" xml:space="preserve">
-    <value>Submit Invoice</value>
+  <data name="CreateButtonText" xml:space="preserve">
+    <value>Create Invoice</value>
+  </data>
+  <data name="SaveButtonText" xml:space="preserve">
+    <value>Save Changes</value>
   </data>
   <data name="NoneOption" xml:space="preserve">
     <value>None</value>

@@ -187,8 +187,11 @@
   <data name="AddItemButtonText" xml:space="preserve">
     <value>Přidat položku</value>
   </data>
-  <data name="SubmitInvoiceButtonText" xml:space="preserve">
-    <value>Odeslat fakturu</value>
+  <data name="CreateButtonText" xml:space="preserve">
+    <value>Vytvořit fakturu</value>
+  </data>
+  <data name="SaveButtonText" xml:space="preserve">
+    <value>Uložit změny</value>
   </data>
   <data name="NoneOption" xml:space="preserve">
     <value>Nezadáno</value>

@@ -200,7 +200,7 @@
     <button type="button" class="btn btn-success float-start" @onclick="AddInvoiceItem">
         @L["AddItemButtonText"]
     </button>
-    <button type="submit" class="btn btn-primary float-end">@L["SubmitInvoiceButtonText"]</button>
+    <button type="submit" class="btn btn-primary float-end">@(InvoiceInstance is null ? L["CreateButtonText"] : L["SaveButtonText"])</button>
 </EditForm>
 
 @code {

@@ -153,8 +153,11 @@
   <data name="IncludeMonthLabel" xml:space="preserve">
     <value>Zahrnout měsíc</value>
   </data>
-  <data name="SubmitButtonText" xml:space="preserve">
-    <value>Odeslat schéma</value>
+  <data name="CreateButtonText" xml:space="preserve">
+    <value>Vytvořit číselnou řadu</value>
+  </data>
+  <data name="SaveButtonText" xml:space="preserve">
+    <value>Uložit změny</value>
   </data>
   <data name="IsDefaultInformationLabel" xml:space="preserve">
     <value>Výchozí</value>

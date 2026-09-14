@@ -197,8 +197,11 @@
   <data name="IBANPlaceholder" xml:space="preserve">
     <value>IBAN</value>
   </data>
-  <data name="SubmitButton" xml:space="preserve">
-    <value>Submit</value>
+  <data name="CreateButton" xml:space="preserve">
+    <value>Create Entity</value>
+  </data>
+  <data name="SaveButton" xml:space="preserve">
+    <value>Save Changes</value>
   </data>
   <data name="IsThisClient" xml:space="preserve">
     <value>Is this your client?</value>

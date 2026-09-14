@@ -195,8 +195,11 @@
   <data name="IBANPlaceholder" xml:space="preserve">
     <value>IBAN</value>
   </data>
-  <data name="SubmitButton" xml:space="preserve">
-    <value>Odeslat</value>
+  <data name="CreateButton" xml:space="preserve">
+    <value>Vytvořit subjekt</value>
+  </data>
+  <data name="SaveButton" xml:space="preserve">
+    <value>Uložit změny</value>
   </data>
   <data name="IsThisClient" xml:space="preserve">
     <value>Je to váš zákazník?</value>
