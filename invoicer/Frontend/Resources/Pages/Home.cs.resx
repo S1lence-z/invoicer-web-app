@@ -138,4 +138,19 @@
   <data name="WelcomeTitle" xml:space="preserve">
     <value>Vítejte v Invoiceru</value>
   </data>
+  <data name="NewInvoiceButton" xml:space="preserve">
+    <value>Nová faktura</value>
+  </data>
+  <data name="NewEntityButton" xml:space="preserve">
+    <value>Nový subjekt</value>
+  </data>
+  <data name="FeatureAutomationText" xml:space="preserve">
+    <value>Čísla faktur podle vaší číselné řady, bez ručního přepisování.</value>
+  </data>
+  <data name="FeatureClientsText" xml:space="preserve">
+    <value>Údaje odběratele načtete z ARESu podle IČO.</value>
+  </data>
+  <data name="FeatureReportsText" xml:space="preserve">
+    <value>Průběžný přehled uhrazených a neuhrazených částek.</value>
+  </data>
 </root>

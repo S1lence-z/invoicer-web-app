@@ -20,187 +20,246 @@
 
 <EditForm Model="@InvoiceFormModel" OnValidSubmit="SubmitForm">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
-    <div class="row mb-4">
-        <div class="col">
-            <div class="d-flex flex-row gap-4 align-items-end">
-                <div class="d-flex flex-column">
-                    <label for="invoice-number" class="font-weight-bold">@L["InvoiceNumberLabel"]</label>
-                    <input type="text" class="form-control" id="invoice-number"
-                    value="@((isFetchingNextInvoiceNumber ? L["LoadingMessage"] : InvoiceFormModel.InvoiceNumber))"
-                    @oninput="e => InvoiceFormModel.InvoiceNumber = e.Value?.ToString()!"
-                    disabled="@(!isCustomInvoiceNumber)" />
+    <div class="iv-form">
+        @* INVOICE *@
+        <div class="iv-card">
+            <span class="iv-label">@L["SectionInvoice"]</span>
+            <div class="iv-grid-3">
+                <div class="iv-field">
+                    <label class="iv-field-label" for="invoice-number">@L["InvoiceNumberLabel"]</label>
+                    <div class="iv-field-row">
+                        <input type="text" class="form-control iv-num" id="invoice-number"
+                               value="@((isFetchingNextInvoiceNumber ? L["LoadingMessage"] : InvoiceFormModel.InvoiceNumber))"
+                               @oninput="e => InvoiceFormModel.InvoiceNumber = e.Value?.ToString()!"
+                               disabled="@(!isCustomInvoiceNumber)" />
+                        <button type="button" class="btn btn-outline-secondary" @onclick="ToggleCustomInvoiceNumber">
+                            @(isCustomInvoiceNumber ? L["InvoiceNumberUseDefaultButton"] : L["InvoiceNumberCustomizeButton"])
+                        </button>
+                    </div>
+                    <ValidationMessage For="@(() => InvoiceFormModel.InvoiceNumber)" />
                 </div>
-                <button type="button" class="btn btn-outline-secondary align-self-end" @onclick="ToggleCustomInvoiceNumber">
-                    @if (isCustomInvoiceNumber)
-                    {
-                        <span>@L["InvoiceNumberUseDefaultButton"]</span>
-                    }
-                    else
-                    {
-                        <span>@L["InvoiceNumberCustomizeButton"]</span>
-                    }
-                </button>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="issue-date">@L["IssueDateLabel"]</label>
+                    <input type="date" class="form-control" id="issue-date" @bind="InvoiceFormModel.IssueDate" />
+                    <ValidationMessage For="@(() => InvoiceFormModel.IssueDate)" />
+                </div>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="due-date">@L["DueDateLabel"]</label>
+                    <input type="date" class="form-control" id="due-date" @bind="InvoiceFormModel.DueDate" />
+                    <ValidationMessage For="@(() => InvoiceFormModel.DueDate)" />
+                </div>
             </div>
-            <ValidationMessage For="@(() => InvoiceFormModel.InvoiceNumber)" />
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col">
-            <label for="issue-date" class="font-weight-bold">@L["IssueDateLabel"]</label>
-            <input type="date" class="form-control" id="issue-date" @bind="InvoiceFormModel.IssueDate" />
-            <ValidationMessage For="@(() => InvoiceFormModel.IssueDate)" />
-        </div>
-        <div class="col">
-            <label for="due-date" class="font-weight-bold">@L["DueDateLabel"]</label>
-            <input type="date" class="form-control" id="due-date" @bind="InvoiceFormModel.DueDate" />
-            <ValidationMessage For="@(() => InvoiceFormModel.DueDate)" />
-        </div>
-        <div class="col">
-            <label for="vat-date" class="font-weight-bold">@L["VatDateLabel"]</label>
-            <input type="date" class="form-control" id="vat-date" @bind="InvoiceFormModel.VatDate" />
-            <ValidationMessage For="@(() => InvoiceFormModel.VatDate)" />
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col">
-            <label for="seller" class="font-weight-bold">@L["SellerLabel"]</label>
-            <select class="form-control" id="seller" @bind="InvoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind" disabled="@(InvoiceInstance is not null)">
-                <option value="0">@L["SellerSelectOption"]</option>
-                @foreach (EntityDto entity in AllSellers)
-                {
-                    <option value="@entity.Id">@entity.Name</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => InvoiceFormModel.SellerId)" />
-        </div>
-        <div class="col d-flex flex-row align-items-end gap-2">
-            <div class="flex-grow-1">
-                <label for="buyer" class="font-weight-bold">@L["BuyerLabel"]</label>
-                <select class="form-control" id="buyer" @bind="InvoiceFormModel.BuyerId">
-                    <option value="0">@L["BuyerSelectOption"]</option>
-                    @foreach (EntityDto entity in AllBuyers)
-                    {
-                        <option value="@entity.Id">@entity.Name</option>
-                    }
-                </select>
-                <ValidationMessage For="@(() => InvoiceFormModel.BuyerId)" />
+            <div class="iv-grid-3">
+                <div class="iv-field">
+                    <label class="iv-field-label" for="vat-date">@L["VatDateLabel"]</label>
+                    <input type="date" class="form-control" id="vat-date" @bind="InvoiceFormModel.VatDate" />
+                    <ValidationMessage For="@(() => InvoiceFormModel.VatDate)" />
+                </div>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="currency">@L["CurrencyLabel"]</label>
+                    <select class="form-select" id="currency" @bind="InvoiceFormModel.Currency">
+                        @foreach (Currency value in Enum.GetValues<Currency>())
+                        {
+                            <option value="@value">@value</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => InvoiceFormModel.Currency)" />
+                </div>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="status">@L["StatusLabel"]</label>
+                    <select class="form-select" id="status" @bind="InvoiceFormModel.Status">
+                        @foreach (InvoiceStatus value in Enum.GetValues<InvoiceStatus>())
+                        {
+                            <option value="@value">@EnumL.Localize(value)</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => InvoiceFormModel.Status)" />
+                </div>
             </div>
-            @if (InvoiceInstance is null)
+        </div>
+
+        @* PARTIES *@
+        <div class="iv-card">
+            <span class="iv-label">@L["SectionParties"]</span>
+            <div class="iv-grid-2">
+                <div class="iv-field">
+                    <label class="iv-field-label" for="seller">@L["SellerLabel"]</label>
+                    <select class="form-select" id="seller" @bind="InvoiceFormModel.SellerId" @bind:after="OnChosenSellerChangedAfterBind" disabled="@(InvoiceInstance is not null)">
+                        <option value="0">@L["SellerSelectOption"]</option>
+                        @foreach (EntityDto entity in AllSellers)
+                        {
+                            <option value="@entity.Id">@entity.Name</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => InvoiceFormModel.SellerId)" />
+                </div>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="buyer">@L["BuyerLabel"]</label>
+                    <div class="iv-field-row">
+                        <select class="form-select" id="buyer" @bind="InvoiceFormModel.BuyerId">
+                            <option value="0">@L["BuyerSelectOption"]</option>
+                            @foreach (EntityDto entity in AllBuyers)
+                            {
+                                <option value="@entity.Id">@entity.Name</option>
+                            }
+                        </select>
+                        @if (InvoiceInstance is null)
+                        {
+                            <button type="button" class="btn btn-outline-secondary iv-btn-square" title="@L["AddEntityButtonTitle"]" @onclick="AddNewEntity">
+                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M12 5v14" />
+                                    <path d="M5 12h14" />
+                                </svg>
+                            </button>
+                        }
+                    </div>
+                    <ValidationMessage For="@(() => InvoiceFormModel.BuyerId)" />
+                </div>
+            </div>
+        </div>
+
+        @* PAYMENT AND SIGNATURE *@
+        <div class="iv-card">
+            <span class="iv-label">@L["SectionPayment"]</span>
+            <div class="iv-grid-3">
+                <div class="iv-field">
+                    <label class="iv-field-label" for="payment-method">@L["PaymentMethodLabel"]</label>
+                    <select class="form-select" id="payment-method" @bind="InvoiceFormModel.PaymentMethod">
+                        <option value="">@L["NoneOption"]</option>
+                        @foreach (PaymentMethod value in Enum.GetValues<PaymentMethod>())
+                        {
+                            <option value="@value">@EnumL.Localize(value)</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => InvoiceFormModel.PaymentMethod)" />
+                </div>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="delivery-method">@L["DeliveryMethodLabel"]</label>
+                    <select class="form-select" id="delivery-method" @bind="InvoiceFormModel.DeliveryMethod">
+                        <option value="">@L["NoneOption"]</option>
+                        @foreach (DeliveryMethod value in Enum.GetValues<DeliveryMethod>())
+                        {
+                            <option value="@value">@EnumL.Localize(value)</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => InvoiceFormModel.DeliveryMethod)" />
+                </div>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="signed-by">@L["SignedByLabel"]</label>
+                    <input type="text" class="form-control" id="signed-by" placeholder="@L["SignedByPlaceholder"]" @bind="InvoiceFormModel.SignedBy" />
+                </div>
+            </div>
+        </div>
+
+        @* ITEMS *@
+        <div class="iv-card">
+            <span class="iv-label">@L["InvoiceItemsHeader"]</span>
+
+            @if (!InvoiceFormModel.Items.Any())
             {
-                <button type="button" class="btn btn-success" @onclick="AddNewEntity">+</button>
+                <p class="iv-empty">@L["NoItemsAddedMessage"]</p>
+                <ValidationMessage For="@(() => InvoiceFormModel.Items)" />
             }
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col">
-            <label for="currency" class="font-weight-bold">@L["CurrencyLabel"]</label>
-            <select class="form-control" id="currency" @bind="InvoiceFormModel.Currency">
-                @foreach (Currency value in Enum.GetValues(typeof(Currency)))
-                {
-                    <option value="@value">@value</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => InvoiceFormModel.Currency)" />
-        </div>
-        <div class="col">
-            <label for="payment-method" class="font-weight-bold">@L["PaymentMethodLabel"]</label>
-            <select class="form-control" id="payment-method" @bind="InvoiceFormModel.PaymentMethod">
-                <option value="">@L["NoneOption"]</option>
-                @foreach (PaymentMethod value in Enum.GetValues(typeof(PaymentMethod)))
-                {
-                    <option value="@value">@EnumL.Localize(value)</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => InvoiceFormModel.PaymentMethod)" />
-        </div>
-        <div class="col">
-            <label for="delivery-method" class="font-weight-bold">@L["DeliveryMethodLabel"]</label>
-            <select class="form-control" id="delivery-method" @bind="InvoiceFormModel.DeliveryMethod">
-                <option value="">@L["NoneOption"]</option>
-                @foreach (DeliveryMethod value in Enum.GetValues(typeof(DeliveryMethod)))
-                {
-                    <option value="@value">@EnumL.Localize(value)</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => InvoiceFormModel.DeliveryMethod)" />
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col">
-            <label for="status" class="font-weight-bold">@L["StatusLabel"]</label>
-            <select class="form-control" id="status" @bind="InvoiceFormModel.Status">
-                @foreach (InvoiceStatus value in Enum.GetValues(typeof(InvoiceStatus)))
-                {
-                    <option value="@value">@EnumL.Localize(value)</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => InvoiceFormModel.Status)" />
-        </div>
-        <div class="col">
-            <label for="signed-by" class="font-weight-bold">@L["SignedByLabel"]</label>
-            <input type="text" class="form-control" id="signed-by" placeholder="@L["SignedByPlaceholder"]" @bind="InvoiceFormModel.SignedBy" />
-        </div>
-    </div>
-
-    <hr class="my-4" />
-    <h4>@L["InvoiceItemsHeader"]</h4>
-    @if (!InvoiceFormModel.Items.Any())
-    {
-        <p class="text-muted">@L["NoItemsAddedMessage"]</p>
-        <ValidationMessage For="@(() => InvoiceFormModel.Items)" />
-    }
-    @foreach (InvoiceItemFormModel item in InvoiceFormModel.Items)
-    {
-        int uniqueItemHash = item.GetHashCode();
-        <div class="row g-2 mb-3 pb-3 border-bottom align-items-start">
-            <div class="col-md-4">
-                <label for="item-description-@uniqueItemHash" class="form-label small">@L["ItemDescriptionLabel"]</label>
-                <input id="item-description-@uniqueItemHash" type="text" class="form-control form-control-sm" placeholder="@L["ItemDescriptionPlaceholder"]" @bind="item.Description" />
-                <ValidationMessage For="@(() => item.Description)" />
-            </div>
-            <div class="col-md-1 col-6">
-                <label for="item-quantity-@uniqueItemHash" class="form-label small">@L["ItemQuantityLabel"]</label>
-                <input id="item-quantity-@uniqueItemHash" type="number" min="1" class="form-control form-control-sm" placeholder="@L["ItemQuantityPlaceholder"]" @bind="item.Quantity" />
-                <ValidationMessage For="@(() => item.Quantity)" />
-            </div>
-            <div class="col-md-2 col-6">
-                <label for="item-unit-@uniqueItemHash" class="form-label small">@L["ItemUnitLabel"]</label>
-                <input id="item-unit-@uniqueItemHash" type="text" class="form-control form-control-sm" placeholder="@L["ItemUnitPlaceholder"]" @bind="item.Unit" />
-                <ValidationMessage For="@(() => item.Unit)" />
-            </div>
-            <div class="col-md-2">
-                <label for="item-unit-price-@uniqueItemHash" class="form-label small">@L["ItemUnitPriceLabel"]</label>
-                <input id="item-unit-price-@uniqueItemHash" type="number" min="0" step="any" class="form-control form-control-sm" placeholder="@L["ItemUnitPricePlaceholder"]" @bind="item.UnitPrice" />
-                <ValidationMessage For="@(() => item.UnitPrice)" />
-            </div>
-            <div class="col-md-2">
-                <label for="item-vat-rate-@uniqueItemHash" class="form-label small">@L["ItemVatRateLabel"]</label>
-                <input id="item-vat-rate-@uniqueItemHash" type="number" min="0" max="100" step="1" class="form-control form-control-sm" @bind="item.VatRatePercent" />
-                <ValidationMessage For="@(() => item.VatRatePercent)" />
-                <div class="btn-group btn-group-sm mt-1 d-flex flex-grow-1" role="group" aria-label="@L["VatPresetAriaLabel"]">
-                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 0)">0</button>
-                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 12)">12</button>
-                    <button type="button" class="btn btn-outline-secondary flex-fill" @onclick="() => SetVatRate(item, 21)">21</button>
+            else
+            {
+                <div class="iv-item-grid iv-item-head iv-label">
+                    <span>@L["ItemDescriptionLabel"]</span>
+                    <span>@L["ItemQuantityLabel"]</span>
+                    <span>@L["ItemUnitLabel"]</span>
+                    <span>@L["ItemUnitPriceLabel"]</span>
+                    <span>@L["ItemVatRateLabel"]</span>
+                    <span class="iv-right">@L["ItemTotalLabel"]</span>
+                    <span></span>
                 </div>
+            }
+
+            @foreach (InvoiceItemFormModel item in InvoiceFormModel.Items)
+            {
+                int uniqueItemHash = item.GetHashCode();
+                <div class="iv-item-grid iv-item-row">
+                    <div class="iv-field">
+                        <input id="item-description-@uniqueItemHash" type="text" class="form-control form-control-sm" placeholder="@L["ItemDescriptionPlaceholder"]" @bind="item.Description" />
+                        <ValidationMessage For="@(() => item.Description)" />
+                    </div>
+                    <div class="iv-field">
+                        <input id="item-quantity-@uniqueItemHash" type="number" min="1" class="form-control form-control-sm iv-num" placeholder="@L["ItemQuantityPlaceholder"]" @bind="item.Quantity" />
+                        <ValidationMessage For="@(() => item.Quantity)" />
+                    </div>
+                    <div class="iv-field">
+                        <input id="item-unit-@uniqueItemHash" type="text" class="form-control form-control-sm" placeholder="@L["ItemUnitPlaceholder"]" @bind="item.Unit" />
+                        <ValidationMessage For="@(() => item.Unit)" />
+                    </div>
+                    <div class="iv-field">
+                        <input id="item-unit-price-@uniqueItemHash" type="number" min="0" step="any" class="form-control form-control-sm iv-num" placeholder="@L["ItemUnitPricePlaceholder"]" @bind="item.UnitPrice" />
+                        <ValidationMessage For="@(() => item.UnitPrice)" />
+                    </div>
+                    <div class="iv-field">
+                        @* Three Czech rates cover almost every line; "other" opens a plain number box. *@
+                        @if (IsCustomVat(item))
+                        {
+                            <div class="iv-field-row">
+                                <input id="item-vat-rate-@uniqueItemHash" type="number" min="0" max="100" step="1" class="form-control form-control-sm iv-num" @bind="item.VatRatePercent" />
+                                <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => SetVatRate(item, DefaultVatRate)">%</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="iv-segmented" role="group" aria-label="@L["VatPresetAriaLabel"]">
+                                @foreach (int rate in VatPresets)
+                                {
+                                    <button type="button" class="iv-segment @(item.VatRatePercent == rate ? "active" : null)" @onclick="() => SetVatRate(item, rate)">@rate</button>
+                                }
+                                <button type="button" class="iv-segment" @onclick="() => EnableCustomVat(item)">@L["VatCustomOption"]</button>
+                            </div>
+                        }
+                        <ValidationMessage For="@(() => item.VatRatePercent)" />
+                    </div>
+                    <span class="iv-num iv-item-total">@InvoiceFormModel.Currency.FormatAmount(LineTotal(item))</span>
+                    <button type="button" class="iv-icon-btn iv-icon-btn-danger" title="@L["RemoveItemButtonTitle"]" @onclick="() => RemoveInvoiceItem(item)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 7h14" />
+                            <path d="M9.5 7V5h5v2" />
+                            <path d="M6.5 7 7.5 20h9L17.5 7" />
+                        </svg>
+                    </button>
+                </div>
+            }
+
+            <button type="button" class="btn iv-btn-dashed" @onclick="AddInvoiceItem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+                    <path d="M12 5v14" />
+                    <path d="M5 12h14" />
+                </svg>
+                @L["AddItemButtonText"]
+            </button>
+        </div>
+    </div>
+
+    @* The running total stays in view while the items are typed. *@
+    <div class="iv-formbar">
+        <div class="iv-formbar-totals">
+            <div class="iv-total-block">
+                <span class="iv-total-label">@L["TotalNetLabel"]</span>
+                <span class="iv-num iv-total-value">@InvoiceFormModel.Currency.FormatAmount(TotalNet)</span>
             </div>
-            <div class="col-md-1 text-end">
-                <label class="form-label small d-block invisible">@L["RemoveItemButtonTitle"]</label>
-                <button type="button" title="@L["RemoveItemButtonTitle"]" class="btn btn-danger btn-sm" @onclick="() => RemoveInvoiceItem(item)">
-                    @L["RemoveItemButtonText"]
-                </button>
+            <div class="iv-total-block">
+                <span class="iv-total-label">@L["TotalVatLabel"]</span>
+                <span class="iv-num iv-total-value">@InvoiceFormModel.Currency.FormatAmount(TotalVat)</span>
+            </div>
+            <div class="iv-total-block">
+                <span class="iv-total-label">@L["TotalGrossLabel"]</span>
+                <span class="iv-num iv-total-value iv-total-strong">@InvoiceFormModel.Currency.FormatAmount(TotalNet + TotalVat)</span>
             </div>
         </div>
-    }
-    <button type="button" class="btn btn-success float-start" @onclick="AddInvoiceItem">
-        @L["AddItemButtonText"]
-    </button>
-    <button type="submit" class="btn btn-primary float-end">@(InvoiceInstance is null ? L["CreateButtonText"] : L["SaveButtonText"])</button>
+        <div class="iv-formbar-actions">
+            @if (CancelCallback.HasDelegate)
+            {
+                <button type="button" class="btn btn-outline-secondary" @onclick="() => CancelCallback.InvokeAsync()">@L["CancelButtonText"]</button>
+            }
+            <button type="submit" class="btn btn-primary">@(InvoiceInstance is null ? L["CreateButtonText"] : L["SaveButtonText"])</button>
+        </div>
+    </div>
 </EditForm>
 
 @code {
@@ -209,6 +268,7 @@
     [Parameter] public EventCallback OnSubmitCallback { get; set; }
     [Parameter, EditorRequired] public bool IsActive { get; set; }
     [Parameter, EditorRequired] public EventCallback AddNewEntityCallback { get; set; }
+    [Parameter] public EventCallback CancelCallback { get; set; }
 
     // Form Models
     private InvoiceFormModel InvoiceFormModel { get; set; } = new();
@@ -223,6 +283,22 @@
 
     // Constants
     private const string LOADING_MESSAGE = "Loading...";
+    private const int DefaultVatRate = 21;
+    private static readonly int[] VatPresets = [0, 12, 21];
+
+    // Items whose rate is typed in by hand rather than picked from the presets.
+    private readonly HashSet<InvoiceItemFormModel> customVatItems = [];
+
+    private decimal TotalNet => InvoiceFormModel.Items.Sum(LineTotal);
+
+    private decimal TotalVat => InvoiceFormModel.Items.Sum(i => LineTotal(i) * i.VatRatePercent / 100m);
+
+    private static decimal LineTotal(InvoiceItemFormModel item) => item.Quantity * item.UnitPrice;
+
+    private bool IsCustomVat(InvoiceItemFormModel item)
+        => customVatItems.Contains(item) || !VatPresets.Contains(item.VatRatePercent);
+
+    private void EnableCustomVat(InvoiceItemFormModel item) => customVatItems.Add(item);
 
     protected override void OnParametersSet()
     {
@@ -347,6 +423,7 @@
     private void SetVatRate(InvoiceItemFormModel item, int ratePercentage)
     {
         item.VatRatePercent = ratePercentage;
+        customVatItems.Remove(item);
     }
 
     private async Task AddNewEntity()

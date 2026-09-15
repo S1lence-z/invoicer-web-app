@@ -1,0 +1,48 @@
+.iv-scheme-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 16px 18px;
+    background: var(--iv-surface);
+    border: 1px solid var(--iv-line);
+    border-radius: var(--iv-radius-lg);
+}
+
+.iv-scheme-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.iv-scheme-preview {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.iv-scheme-detail {
+    font-size: 12.5px;
+    color: var(--iv-muted);
+}
+
+.iv-scheme-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.iv-scheme-default {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--iv-soft);
+    color: var(--iv-sub);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.iv-scheme-default.on {
+    background: var(--iv-accent-tint);
+    color: var(--iv-accent);
+}

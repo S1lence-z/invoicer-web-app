@@ -109,4 +109,7 @@
   <data name="ExportButton" xml:space="preserve">
     <value>Export</value>
   </data>
+  <data name="StatusSelectTitle" xml:space="preserve">
+    <value>Change status</value>
+  </data>
 </root>

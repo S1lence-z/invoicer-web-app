@@ -129,4 +129,7 @@
   <data name="LoadEntityFailedError" xml:space="preserve">
     <value>Tento subjekt neexistuje</value>
   </data>
+  <data name="EntitiesCrumb" xml:space="preserve">
+    <value>Subjekty</value>
+  </data>
 </root>

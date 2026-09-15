@@ -23,8 +23,7 @@ namespace Frontend.Models
 		[RegularExpression(@"^\+?(\d{1,3})\)?[-. ]?(\d{1,3})[-. ]?(\d{1,4})$", ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.PhoneFormat))]
 		public string PhoneNumber { get; set; } = string.Empty;
 
-		// Optional: printed under the invoice items when this entity is the seller
-		public string RegistrationText { get; set; } = string.Empty;
+		public string RegistrationText { get; set; } = FormDefaults.EntityRegistrationText;
 
 		[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.IsClientRequired))]
 		public bool IsClient { get; set; } = true;
@@ -97,7 +96,7 @@ namespace Frontend.Models
 			Name = string.Empty;
 			Email = string.Empty;
 			PhoneNumber = string.Empty;
-			RegistrationText = string.Empty;
+			RegistrationText = FormDefaults.EntityRegistrationText;
 			IsClient = true;
 			BankAccountId = 0;
 			AccountNumber = string.Empty;

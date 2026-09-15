@@ -10,49 +10,48 @@
 @inject NavigationManager navigationManager
 @inject IStringLocalizer<Entities> L
 
-@* PAGE CONTAINER *@
-<div class="d-flex flex-column border rounded-3" style="height:90vh;">
-    @* HEADER *@
-    <div class="d-flex flex-row justify-content-between align-content-center px-4 pt-4">
-        <h3>@L["PageTitle"]</h3>
-        <div class="d-flex align-items-center gap-2">
-            @* Filter Buttons *@
-            <div class="btn-group btn-group-sm" role="group" aria-label="Filter entities">
-                <button type="button" class="btn btn-outline-secondary" @onclick="FilterAllEntities">@L["FilterAllButton"]</button>
-                <button type="button" class="btn btn-outline-secondary" @onclick="FilterMyCompanies">@L["FilterMyCompaniesButton"]</button>
-                <button type="button" class="btn btn-outline-secondary" @onclick="FilterClients">@L["FilterClientsButton"]</button>
+<div class="iv-page iv-page-fill">
+    <div class="iv-page-head">
+        <h1>@L["PageTitle"]</h1>
+        <div class="iv-page-actions">
+            <div class="iv-segmented iv-filter-group">
+                <button type="button" class="iv-segment @(filter == EntityFilter.All ? "active" : null)" @onclick="() => SetFilter(EntityFilter.All)">@L["FilterAllButton"]</button>
+                <button type="button" class="iv-segment @(filter == EntityFilter.Mine ? "active" : null)" @onclick="() => SetFilter(EntityFilter.Mine)">@L["FilterMyCompaniesButton"]</button>
+                <button type="button" class="iv-segment @(filter == EntityFilter.Clients ? "active" : null)" @onclick="() => SetFilter(EntityFilter.Clients)">@L["FilterClientsButton"]</button>
             </div>
             <button class="btn btn-primary" @onclick="AddNewEntity">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+                    <path d="M12 5v14" />
+                    <path d="M5 12h14" />
+                </svg>
                 @L["AddNewEntityButton"]
             </button>
         </div>
     </div>
-    <hr/>
-    @* CONTENT *@
-    <div class="d-flex flex-row px-4 pb-4" style="height: calc(100% - 120px);">
-        @if (isLoadingData)
-        {
-            <Spinner />
-        }
-        else if (allEntities.Count == 0)
-        {
-            <p>@L["NoEntitiesFoundMessage"]</p>
-        }
-        else
-        {
-            @* ENTITIES LIST*@
-            <div class="d-flex flex-column gap-2" style="overflow-y:auto;">
+
+    <div class="iv-split">
+        <div class="iv-split-list">
+            @if (isLoadingData)
+            {
+                <Spinner />
+            }
+            else if (shownEntities.Count == 0)
+            {
+                <p class="iv-empty">@L["NoEntitiesFoundMessage"]</p>
+            }
+            else
+            {
                 @foreach (var entity in shownEntities)
                 {
                     <EntityListItem Entity="entity" OnSelectEntity="SelectEntity" OnDeleteEntity="DeleteEntity" OnEditEntity="EditEntity" IsSelected="IsEntitySelected(entity)" />
                 }
-            </div>
-        }
-        @* DETAILS OF THE SELECTED ENTITY *@
-        <div class="d-flex flex-column border border-black rounded ms-2 flex-grow-1">
+            }
+        </div>
+
+        <div class="iv-split-detail">
             @if (selectedEntity is null)
             {
-                <p class="px-4 pt-4 text-black">@L["SelectEntityPrompt"]</p>
+                <p class="iv-empty">@L["SelectEntityPrompt"]</p>
             }
             else
             {
@@ -67,6 +66,7 @@
     private List<EntityDto> shownEntities = new();
     private EntityDto? selectedEntity = null;
     private bool isLoadingData = true;
+    private EntityFilter filter = EntityFilter.All;
 
     protected override async Task OnInitializedAsync() {
         await LoadEntities();
@@ -144,18 +144,16 @@
     }
 
     // Filtering methods
-    private void FilterAllEntities()
-    {
-        PopulateShownEntites(allEntities);
-    }
+    private enum EntityFilter { All, Mine, Clients }
 
-    private void FilterMyCompanies()
+    private void SetFilter(EntityFilter newFilter)
     {
-        PopulateShownEntites(allEntities.Where(e => !e.IsClient).ToList());
-    }
-
-    private void FilterClients()
-    {
-        PopulateShownEntites(allEntities.Where(e => e.IsClient).ToList());
+        filter = newFilter;
+        PopulateShownEntites(filter switch
+        {
+            EntityFilter.Mine => allEntities.Where(e => !e.IsClient).ToList(),
+            EntityFilter.Clients => allEntities.Where(e => e.IsClient).ToList(),
+            _ => allEntities
+        });
     }
 }

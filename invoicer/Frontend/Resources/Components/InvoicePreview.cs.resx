@@ -121,18 +121,6 @@
   <data name="BuyerSectionTitle" xml:space="preserve">
     <value>Odběratel</value>
   </data>
-  <data name="NameLabel" xml:space="preserve">
-    <value>Název:</value>
-  </data>
-  <data name="AddressLabel" xml:space="preserve">
-    <value>Adresa:</value>
-  </data>
-  <data name="EmailLabel" xml:space="preserve">
-    <value>E-mail:</value>
-  </data>
-  <data name="PhoneNumberLabel" xml:space="preserve">
-    <value>Telefonní číslo:</value>
-  </data>
   <data name="TableHeaderDescription" xml:space="preserve">
     <value>Popis</value>
   </data>
@@ -157,13 +145,16 @@
   <data name="TotalVatLabel" xml:space="preserve">
     <value>DPH:</value>
   </data>
-  <data name="TotalPriceWithVatLabel" xml:space="preserve">
-    <value>Celková cena s DPH:</value>
-  </data>
   <data name="FinalPriceLabel" xml:space="preserve">
     <value>Celková cena:</value>
   </data>
   <data name="SignedByLabel" xml:space="preserve">
     <value>Podepsal:</value>
+  </data>
+  <data name="IcoLabel" xml:space="preserve">
+    <value>IČO:</value>
+  </data>
+  <data name="VatDateLabel" xml:space="preserve">
+    <value>Datum zdanitelného plnění:</value>
   </data>
 </root>

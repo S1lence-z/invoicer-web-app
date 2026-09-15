@@ -2,17 +2,16 @@
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<EntityListItem> L
 
-@* Entity Card *@
-<div class="list-group-item list-group-item-action border @(IsSelected ? "border-primary" : "") p-3" @onclick="() => OnSelectEntity.InvokeAsync(Entity)" style="cursor: pointer; max-width: 350px;">
-    <div class="d-flex w-100 justify-content-between">
-        <h6 class="mb-1">@Entity.Name</h6>
-        <small><span class="badge bg-secondary ms-2">@(Entity.IsClient ? @L["ClientLabel"] : @L["MeLabel"])</span></small>
+<div class="iv-entity-card @(IsSelected ? "selected" : null)" @onclick="() => OnSelectEntity.InvokeAsync(Entity)">
+    <div class="iv-entity-top">
+        <span class="iv-entity-name">@Entity.Name</span>
+        <span class="iv-entity-badge @(Entity.IsClient ? "client" : "mine")">@(Entity.IsClient ? L["ClientLabel"] : L["MeLabel"])</span>
     </div>
-    <small class="mb-1 d-block text-muted">@L["BankLabel"] @Entity.BankAccount?.BankName (@Entity.BankAccount?.AccountNumber/@Entity.BankAccount?.BankCode)</small>
-    <small class="text-muted d-block">@L["AddressLabel"] @Entity.Address?.Street, @Entity.Address?.City</small>
-    <div class="mt-2 pt-2 border-top d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm flex-grow-1" @onclick="() => OnEditEntity.InvokeAsync(Entity)" @onclick:stopPropagation="true">@L["EditButton"]</button>
-        <button class="btn btn-outline-danger btn-sm flex-grow-1" @onclick="() => OnDeleteEntity.InvokeAsync(Entity)" @onclick:stopPropagation="true">@L["DeleteButton"]</button>
+    <span class="iv-entity-line">@BankLine</span>
+    <span class="iv-entity-line">@AddressLine</span>
+    <div class="iv-entity-actions">
+        <button class="btn btn-outline-secondary btn-sm" @onclick="() => OnEditEntity.InvokeAsync(Entity)" @onclick:stopPropagation="true">@L["EditButton"]</button>
+        <button class="btn btn-outline-danger btn-sm" @onclick="() => OnDeleteEntity.InvokeAsync(Entity)" @onclick:stopPropagation="true">@L["DeleteButton"]</button>
     </div>
 </div>
 
@@ -31,4 +30,12 @@
 
     [Parameter]
     public bool IsSelected { get; set; }
+
+    private string BankLine => Entity.BankAccount is { } bank
+        ? $"{bank.BankName} ({bank.AccountNumber}/{bank.BankCode})"
+        : string.Empty;
+
+    private string AddressLine => Entity.Address is { } address
+        ? $"{address.Street}, {address.City}"
+        : string.Empty;
 }

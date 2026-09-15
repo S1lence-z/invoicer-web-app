@@ -3,6 +3,7 @@
 @using Frontend.Utils
 @using Microsoft.Extensions.Localization
 @using Application.DTOs
+@using Application.Extensions
 @using Shared.Enums
 @using Shared.Extensions
 @using Frontend.Extensions
@@ -13,109 +14,114 @@
 @inject IStringLocalizer<NumberingSchemeForm> L
 @inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
-<div>
-    <EditForm Model="@SchemeFormModel" OnValidSubmit="SubmitForm">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+<EditForm Model="@SchemeFormModel" OnValidSubmit="SubmitForm">
+    <DataAnnotationsValidator />
 
-        <div class="row mb-4">
-            <div class="col">
-                <div class="form-check mt-4">
-                    <label class="form-check-label" for="use-seperator">@L["UseSeparatorLabel"]</label>
-                    <input id="use-seperator" type="checkbox" class="form-check-input" @bind="SchemeFormModel.UseSeperator" @bind:after="AfterSeperatorChange" />
+    <div class="iv-form">
+        @* The number the scheme produces, updated as the fields change. *@
+        <div class="iv-scheme-preview-box">
+            <span class="iv-label">@L["PreviewLabel"]</span>
+            <span class="iv-num iv-scheme-preview-value">@PreviewNumber</span>
+        </div>
+
+        <div class="iv-card">
+            <span class="iv-label">@L["SectionFormat"]</span>
+            <div class="iv-grid-3">
+                <div class="iv-field">
+                    <label class="iv-field-label" for="prefix">@L["PrefixLabel"]</label>
+                    <input id="prefix" type="text" class="form-control" placeholder="@L["PrefixPlaceholder"]" @bind="SchemeFormModel.Prefix" />
+                    <ValidationMessage For="@(() => SchemeFormModel.Prefix)" />
                 </div>
-                <ValidationMessage For="@(() => SchemeFormModel.UseSeperator)" />
+                @if (SchemeFormModel.UseSeperator)
+                {
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="seperator">@L["SeparatorLabel"]</label>
+                        <input id="seperator" type="text" class="form-control" placeholder="@L["SeparatorPlaceholder"]" @bind="SchemeFormModel.Seperator" @bind:after="AfterSeperatorChange" />
+                        <ValidationMessage For="@(() => SchemeFormModel.Seperator)" />
+                    </div>
+                }
+                <div class="iv-field">
+                    <label class="iv-field-label" for="sequence-padding">@L["PaddingLabel"]</label>
+                    <input id="sequence-padding" type="number" min="1" step="1" class="form-control iv-num" placeholder="@L["PaddingPlaceholder"]" @bind="SchemeFormModel.SequencePadding" />
+                    <ValidationMessage For="@(() => SchemeFormModel.SequencePadding)" />
+                </div>
             </div>
-            <div class="col">
-                @if (NumberingSchemeInstance is not null && NumberingSchemeInstance.IsDefault)
-                {
-                    <div class="form-check mt-4">
-                        <label class="form-check-label" for="new-default">@L["IsDefaultInformationLabel"]: @(SchemeFormModel.IsDefault ? L["Yes"] : L["No"])</label>
-                    </div>
-                }
-                else
-                {
-                    <div class="form-check mt-4">
-                        <label class="form-check-label" for="new-default">@L["SetAsDefaultLabel"]</label>
-                        <input id="new-default" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IsDefault" />
-                    </div>
-                    <ValidationMessage For="@(() => SchemeFormModel.IsDefault)" />
-                }
+            <div class="iv-grid-3">
+                <div class="iv-field">
+                    <label class="iv-field-label" for="sequence-pos">@L["SequencePositionLabel"]</label>
+                    <select id="sequence-pos" class="form-select" @bind="SchemeFormModel.SequencePosition">
+                        @foreach (Position value in Enum.GetValues<Position>())
+                        {
+                            <option value="@value">@EnumL.Localize(value)</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => SchemeFormModel.SequencePosition)" />
+                </div>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="reset-frequency">@L["ResetFrequencyLabel"]</label>
+                    <select id="reset-frequency" class="form-select" @bind="SchemeFormModel.ResetFrequency">
+                        @foreach (ResetFrequency value in Enum.GetValues<ResetFrequency>())
+                        {
+                            <option value="@value">@EnumL.Localize(value)</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => SchemeFormModel.ResetFrequency)" />
+                </div>
+                <div class="iv-field">
+                    <label class="iv-field-label" for="year-format">@L["YearFormatLabel"]</label>
+                    <select id="year-format" class="form-select" @bind="SchemeFormModel.YearFormat">
+                        @foreach (YearFormat value in Enum.GetValues<YearFormat>())
+                        {
+                            <option value="@value">@EnumL.Localize(value)</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => SchemeFormModel.YearFormat)" />
+                </div>
             </div>
         </div>
 
-        <div class="row mb-4">
-            <div class="col">
-                <label for="prefix" class="font-weight-bold">@L["PrefixLabel"]</label>
-                <input id="prefix" type="text" class="form-control" placeholder="@L["PrefixPlaceholder"]" @bind="SchemeFormModel.Prefix" />
-                <ValidationMessage For="@(() => SchemeFormModel.Prefix)" />
-            </div>
-            @if (SchemeFormModel.UseSeperator)
+        <div class="iv-card">
+            <span class="iv-label">@L["SectionOptions"]</span>
+
+            <label class="iv-switch">
+                <input type="checkbox" @bind="SchemeFormModel.UseSeperator" @bind:after="AfterSeperatorChange" />
+                <span class="iv-switch-track"><span class="iv-switch-knob"></span></span>
+                <span class="iv-switch-label">@L["UseSeparatorLabel"]</span>
+            </label>
+
+            <label class="iv-switch">
+                <input type="checkbox" @bind="SchemeFormModel.IncludeMonth" />
+                <span class="iv-switch-track"><span class="iv-switch-knob"></span></span>
+                <span class="iv-switch-label">@L["IncludeMonthLabel"]</span>
+            </label>
+
+            @if (NumberingSchemeInstance is not null && NumberingSchemeInstance.IsDefault)
             {
-                <div class="col">
-                    <label for="seperator" class="font-weight-bold">@L["SeparatorLabel"]</label>
-                    <input id="seperator" type="text" class="form-control" placeholder="@L["SeparatorPlaceholder"]" @bind="SchemeFormModel.Seperator" @bind:after="AfterSeperatorChange" />
-                    <ValidationMessage For="@(() => SchemeFormModel.Seperator)" />
-                </div>
+                <span class="iv-field-hint">@L["IsDefaultInformationLabel"]: @(SchemeFormModel.IsDefault ? L["Yes"] : L["No"])</span>
+            }
+            else
+            {
+                <label class="iv-switch">
+                    <input type="checkbox" @bind="SchemeFormModel.IsDefault" />
+                    <span class="iv-switch-track"><span class="iv-switch-knob"></span></span>
+                    <span class="iv-switch-label">@L["SetAsDefaultLabel"]</span>
+                </label>
+                <ValidationMessage For="@(() => SchemeFormModel.IsDefault)" />
             }
         </div>
+    </div>
 
-        <div class="row mb-4">
-            <div class="col">
-                <label for="sequence-padding" class="font-weight-bold">@L["PaddingLabel"]</label>
-                <input id="sequence-padding" type="number" min="1" step="1" class="form-control" placeholder="@L["PaddingPlaceholder"]" @bind="SchemeFormModel.SequencePadding" />
-                <ValidationMessage For="@(() => SchemeFormModel.SequencePadding)" />
-            </div>
-
-            <div class="col">
-                <label for="sequence-pos" class="font-weight-bold">@L["SequencePositionLabel"]</label>
-                <select id="sequence-pos" class="form-select" @bind="SchemeFormModel.SequencePosition">
-                    @foreach (Position value in Enum.GetValues(typeof(Position)))
-                    {
-                        <option value="@value">@EnumL.Localize(value)</option>
-                    }
-                </select>
-                <ValidationMessage For="@(() => SchemeFormModel.SequencePosition)" />
-            </div>
-
-            <div class="col">
-                <label for="reset-frequency" class="font-weight-bold">@L["ResetFrequencyLabel"]</label>
-                <select id="reset-frequency" class="form-select" @bind="SchemeFormModel.ResetFrequency">
-                    @foreach (ResetFrequency value in Enum.GetValues(typeof(ResetFrequency)))
-                    {
-                        <option value="@value">@EnumL.Localize(value)</option>
-                    }
-                </select>
-                <ValidationMessage For="@(() => SchemeFormModel.ResetFrequency)" />
-            </div>
+    <div class="iv-formbar">
+        <div class="iv-formbar-actions">
+            <button type="submit" class="btn btn-primary" disabled="@loadingService.IsLoading">@(NumberingSchemeInstance is null ? L["CreateButtonText"] : L["SaveButtonText"])</button>
         </div>
-
-        <div class="row">
-            <div class="col">
-                <label for="year-format" class="font-weight-bold">@L["YearFormatLabel"]</label>
-                <select id="year-format" class="form-select" @bind="SchemeFormModel.YearFormat">
-                    @foreach (YearFormat value in Enum.GetValues(typeof(YearFormat)))
-                    {
-                        <option value="@value">@EnumL.Localize(value)</option>
-                    }
-                </select>
-                <ValidationMessage For="@(() => SchemeFormModel.YearFormat)" />
-            </div>
-
-            <div class="col">
-                <div class="form-check mt-4">
-                    <input id="include-month" type="checkbox" class="form-check-input" @bind="SchemeFormModel.IncludeMonth" />
-                    <label class="form-check-label" for="include-month">@L["IncludeMonthLabel"]</label>
-                </div>
-                <ValidationMessage For="@(() => SchemeFormModel.IncludeMonth)" />
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary float-end mt-4" disabled="@loadingService.IsLoading">@(NumberingSchemeInstance is null ? L["CreateButtonText"] : L["SaveButtonText"])</button>
-    </EditForm>
-</div>
+    </div>
+</EditForm>
 
 @code {
+    /// <summary>The invoice number this scheme would produce right now.</summary>
+    private string PreviewNumber => SchemeFormModel.ToDto().ShowNumberingSchemePreview();
+
     [Parameter] public EventCallback SubmitCallback { get; set; }
     [Parameter] public NumberingSchemeDto? NumberingSchemeInstance { get; set; } = null!;
     [Parameter] public bool isActive { get; set; }

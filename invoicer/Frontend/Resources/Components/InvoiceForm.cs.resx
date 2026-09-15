@@ -202,4 +202,34 @@
   <data name="SignedByPlaceholder" xml:space="preserve">
     <value>Jméno osoby, která fakturu podepisuje</value>
   </data>
+  <data name="SectionInvoice" xml:space="preserve">
+    <value>Faktura</value>
+  </data>
+  <data name="SectionParties" xml:space="preserve">
+    <value>Strany</value>
+  </data>
+  <data name="SectionPayment" xml:space="preserve">
+    <value>Platba a podpis</value>
+  </data>
+  <data name="ItemTotalLabel" xml:space="preserve">
+    <value>Celkem</value>
+  </data>
+  <data name="VatCustomOption" xml:space="preserve">
+    <value>Jiná</value>
+  </data>
+  <data name="AddEntityButtonTitle" xml:space="preserve">
+    <value>Přidat nový subjekt</value>
+  </data>
+  <data name="TotalNetLabel" xml:space="preserve">
+    <value>Základ daně</value>
+  </data>
+  <data name="TotalVatLabel" xml:space="preserve">
+    <value>DPH</value>
+  </data>
+  <data name="TotalGrossLabel" xml:space="preserve">
+    <value>Celkem s DPH</value>
+  </data>
+  <data name="CancelButtonText" xml:space="preserve">
+    <value>Zrušit</value>
+  </data>
 </root>

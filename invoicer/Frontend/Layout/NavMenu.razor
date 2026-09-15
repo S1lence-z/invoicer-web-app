@@ -1,28 +1,42 @@
-﻿@using Frontend.Utils
+@using Frontend.Components
+@using Frontend.Utils
 @using Microsoft.Extensions.Localization
 @inject NavMenuItemsProvider NavMenuContentProvider
 @inject IStringLocalizer<NavMenu> L
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Invoicer</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
+<div class="iv-brand">
+    <a class="iv-brand-link" href="">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect width="32" height="32" rx="8" fill="#16554b" />
+            <rect x="9" y="10" width="14" height="2.4" rx="1.2" fill="#ffffff" opacity="0.55" />
+            <rect x="9" y="14.4" width="10" height="2.4" rx="1.2" fill="#ffffff" opacity="0.55" />
+            <rect x="9" y="19.2" width="14" height="1" fill="#ffffff" opacity="0.8" />
+            <rect x="9" y="21.6" width="8" height="3" rx="1.5" fill="#ffffff" />
+        </svg>
+        <span>Invoicer</span>
+    </a>
+    <button class="iv-toggler" title="@L["ToggleMenu"]" @onclick="ToggleNavMenu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 7h16" />
+            <path d="M4 12h16" />
+            <path d="M4 17h16" />
+        </svg>
+    </button>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        @foreach (var item in @NavMenuContentProvider.Items) {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="@item.UrlPath" Match="NavLinkMatch.All">
-                    <span class="@item.IconClass"></span>
-                    @L[item.Label]
-                </NavLink>
-            </div>
+<div class="@NavMenuCssClass iv-nav-scroll" @onclick="ToggleNavMenu">
+    <nav class="iv-nav">
+        @foreach (var item in NavMenuContentProvider.Items)
+        {
+            <NavLink class="iv-nav-link" href="@item.UrlPath" Match="NavLinkMatch.All">
+                @((MarkupString)IconFor(item.IconClass))
+                <span>@L[item.Label]</span>
+            </NavLink>
         }
     </nav>
+    <div class="iv-nav-footer">
+        <CulturePicker />
+    </div>
 </div>
 
 @code {
@@ -33,5 +47,24 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    // Line icons drawn on a 24px grid, keyed by the IconClass in NavMenuContent.json.
+    private const string IconAttributes = "width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" "
+        + "stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"";
+
+    private static readonly Dictionary<string, string> IconPaths = new()
+    {
+        ["home"] = "<path d=\"M3 10.5 12 4l9 6.5\" /><path d=\"M5.5 9.5V20h13V9.5\" />",
+        ["invoice"] = "<path d=\"M6 3h8l4 4v14H6z\" /><path d=\"M14 3v4h4\" /><path d=\"M9 12h6\" /><path d=\"M9 16h4\" />",
+        ["entity"] = "<path d=\"M4 20V6l7-3v17\" /><path d=\"M11 9h9v11\" /><path d=\"M4 20h17\" />",
+        ["scheme"] = "<path d=\"M9 4 7 20\" /><path d=\"M17 4l-2 16\" /><path d=\"M4 9h16\" /><path d=\"M3.5 15h16\" />",
+        ["numbering"] = "<path d=\"M4 6h16\" /><path d=\"M4 12h16\" /><path d=\"M4 18h10\" />",
+    };
+
+    private static string IconFor(string iconClass)
+    {
+        string paths = IconPaths.TryGetValue(iconClass, out string? found) ? found : IconPaths["invoice"];
+        return $"<svg {IconAttributes}>{paths}</svg>";
     }
 }

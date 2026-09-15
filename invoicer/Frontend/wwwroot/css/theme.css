@@ -1,0 +1,887 @@
+/* Invoicer design system: fonts, tokens, and the primitives every screen uses. */
+
+@font-face {
+	font-family: 'IBM Plex Sans';
+	font-style: normal;
+	font-weight: 100 700;
+	font-display: swap;
+	src: url('../fonts/IBMPlexSans-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: 'IBM Plex Sans';
+	font-style: normal;
+	font-weight: 100 700;
+	font-display: swap;
+	src: url('../fonts/IBMPlexSans-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../fonts/IBMPlexMono-400-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../fonts/IBMPlexMono-400-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('../fonts/IBMPlexMono-500-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('../fonts/IBMPlexMono-500-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+	--iv-font: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+	--iv-font-mono: 'IBM Plex Mono', 'Cascadia Mono', Consolas, monospace;
+
+	--iv-ink: #1c1b19;
+	--iv-sub: #55524d;
+	--iv-muted: #76736c;
+	--iv-faint: #a3a099;
+
+	--iv-page: #ebe8e1;
+	--iv-surface: #ffffff;
+	--iv-soft: #f2f0ea;
+	--iv-head: #f8f7f3;
+
+	--iv-line: #d4cfc5;
+	--iv-hairline: #e3dfd7;
+	/* Controls sit a shade below the white card they live on, so the fill marks
+	   the target area and the border only has to define its edge. */
+	--iv-field: #bdb8ad;
+	--iv-field-bg: #f7f5f0;
+
+	--iv-accent: #16554b;
+	--iv-accent-strong: #0f3f38;
+	--iv-accent-tint: #e8f0ed;
+	--iv-accent-line: #d5e0db;
+	--iv-focus: rgba(22, 85, 75, 0.18);
+
+	--iv-ok: #1f6b4a;
+	--iv-ok-tint: #e4efe7;
+	--iv-warn: #7d5c14;
+	--iv-warn-tint: #f6efdc;
+	--iv-danger: #a8302a;
+	--iv-danger-tint: #f8e4e2;
+	--iv-danger-line: #edd6d3;
+
+	--iv-radius: 6px;
+	--iv-radius-lg: 8px;
+	--iv-control: 42px;
+	--iv-control-sm: 36px;
+	--iv-shadow: 0 18px 48px rgba(28, 27, 25, 0.22);
+}
+
+html, body {
+	font-family: var(--iv-font);
+	background: var(--iv-page);
+	color: var(--iv-ink);
+	font-size: 14px;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: var(--iv-ink);
+}
+
+h1 { font-size: 27px; }
+h2 { font-size: 23px; }
+h3 { font-size: 20px; }
+h4 { font-size: 17px; }
+h5 { font-size: 15px; }
+
+a, .btn-link { color: var(--iv-accent); }
+a:hover, .btn-link:hover { color: var(--iv-accent-strong); }
+
+hr { border-color: var(--iv-line); opacity: 1; }
+.text-muted { color: var(--iv-muted) !important; }
+
+/* Numbers line up in columns: invoice numbers, dates, amounts. */
+.iv-num {
+	font-family: var(--iv-font-mono);
+	font-variant-numeric: tabular-nums;
+}
+
+/* A small uppercase label above a group of fields or a table. */
+.iv-label {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--iv-muted);
+}
+
+/* Controls */
+.btn {
+	--bs-btn-border-radius: var(--iv-radius);
+	height: var(--iv-control);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 0 18px;
+	border-radius: var(--iv-radius);
+	font-size: 14px;
+	font-weight: 500;
+	white-space: nowrap;
+	transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.btn-sm {
+	height: var(--iv-control-sm);
+	padding: 0 14px;
+	font-size: 13px;
+	font-weight: 400;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+	box-shadow: 0 0 0 3px var(--iv-focus);
+	border-color: var(--iv-accent);
+	outline: none;
+}
+
+.btn-primary, .btn-success {
+	background-color: var(--iv-accent);
+	border-color: var(--iv-accent);
+	color: #ffffff;
+}
+
+.btn-primary:hover, .btn-success:hover,
+.btn-primary:active, .btn-success:active {
+	background-color: var(--iv-accent-strong);
+	border-color: var(--iv-accent-strong);
+	color: #ffffff;
+}
+
+.btn-primary:disabled, .btn-success:disabled {
+	background-color: var(--iv-accent);
+	border-color: var(--iv-accent);
+	opacity: 0.55;
+}
+
+.btn-secondary, .btn-outline-secondary, .btn-outline-dark, .btn-outline-primary {
+	background-color: var(--iv-surface);
+	border: 1px solid var(--iv-field);
+	color: var(--iv-sub);
+}
+
+.btn-secondary:hover, .btn-outline-secondary:hover,
+.btn-outline-dark:hover, .btn-outline-primary:hover {
+	background-color: var(--iv-soft);
+	border-color: var(--iv-field);
+	color: var(--iv-ink);
+}
+
+.btn-outline-primary:active, .btn-outline-secondary:active,
+.btn-outline-secondary.active, .btn-check:checked + .btn-outline-secondary {
+	background-color: var(--iv-accent);
+	border-color: var(--iv-accent);
+	color: #ffffff;
+}
+
+.btn-danger, .btn-outline-danger {
+	background-color: var(--iv-surface);
+	border: 1px solid var(--iv-danger-line);
+	color: var(--iv-danger);
+}
+
+.btn-danger:hover, .btn-outline-danger:hover {
+	background-color: var(--iv-danger-tint);
+	border-color: var(--iv-danger-line);
+	color: var(--iv-danger);
+}
+
+.form-control, .form-select {
+	height: var(--iv-control);
+	padding: 0 12px;
+	background-color: var(--iv-field-bg);
+	border: 1px solid var(--iv-field);
+	border-radius: var(--iv-radius);
+	color: var(--iv-ink);
+	font-size: 14px;
+}
+
+textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
+
+.form-control:focus, .form-select:focus { background-color: var(--iv-surface); }
+
+.form-control-sm, .form-select-sm {
+	height: 40px;
+	padding: 0 11px;
+	font-size: 13.5px;
+	border-radius: var(--iv-radius);
+}
+
+.form-control::placeholder { color: var(--iv-faint); }
+.form-control:disabled, .form-control[readonly] { background-color: var(--iv-page); border-color: var(--iv-line); color: var(--iv-muted); }
+
+.form-label, label.font-weight-bold {
+	margin-bottom: 6px;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--iv-sub);
+}
+
+.form-check-input { border-color: var(--iv-field); }
+.form-check-input:checked { background-color: var(--iv-accent); border-color: var(--iv-accent); }
+
+.input-group > .form-control:not(:last-child),
+.input-group > .form-select:not(:last-child) { border-right: 0; }
+
+/* Surfaces */
+.card {
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+.card + .card { margin-top: 0; }
+.shadow-sm { box-shadow: none !important; }
+
+.list-group-item { border-color: var(--iv-line); border-radius: var(--iv-radius-lg) !important; }
+
+.modal-content {
+	border: 0;
+	border-radius: var(--iv-radius-lg);
+	box-shadow: var(--iv-shadow);
+}
+
+.modal-header { padding: 18px 24px; border-bottom: 1px solid var(--iv-line); }
+.modal-title { font-size: 16px; font-weight: 600; }
+.modal-body { padding: 22px 24px; }
+
+.alert-danger {
+	background: var(--iv-danger-tint);
+	border-color: var(--iv-danger-line);
+	color: var(--iv-danger);
+	border-radius: var(--iv-radius);
+}
+
+.spinner-border { color: var(--iv-accent) !important; }
+
+.valid.modified:not([type=checkbox]) { outline: none; border-color: var(--iv-accent); }
+.invalid { outline: none; border-color: var(--iv-danger); }
+.validation-message { color: var(--iv-danger); font-size: 12px; }
+
+/* Invoice list: the header row and every invoice row share one grid. */
+.iv-invoice-grid {
+	display: grid;
+	grid-template-columns: 124px minmax(0, 1fr) 112px 140px 132px 150px;
+	gap: 14px;
+	align-items: center;
+	padding: 0 18px;
+}
+
+.iv-table {
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+	overflow: hidden;
+}
+
+.iv-table-head {
+	height: 42px;
+	background: var(--iv-head);
+	border-bottom: 1px solid var(--iv-line);
+}
+
+/* The status control keeps working as a select while reading as a pill. */
+.iv-status {
+	height: 28px;
+	width: 100%;
+	max-width: 140px;
+	padding: 0 24px 0 10px;
+	border: 0;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 500;
+	appearance: none;
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 10px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355524d' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	cursor: pointer;
+}
+
+.iv-status-pending { background-color: var(--iv-warn-tint); color: var(--iv-warn); }
+.iv-status-paid { background-color: var(--iv-ok-tint); color: var(--iv-ok); }
+.iv-status-overdue { background-color: var(--iv-danger-tint); color: var(--iv-danger); }
+.iv-status-draft, .iv-status-cancelled { background-color: var(--iv-soft); color: #615e58; }
+
+/* Square icon-only button used in table rows. */
+.iv-icon-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	background: transparent;
+	border: 0;
+	border-radius: var(--iv-radius);
+	color: var(--iv-sub);
+	cursor: pointer;
+}
+
+.iv-icon-btn:hover { background: var(--iv-soft); color: var(--iv-ink); }
+.iv-icon-btn-danger { color: var(--iv-danger); }
+.iv-icon-btn-danger:hover { background: var(--iv-danger-tint); color: var(--iv-danger); }
+
+.iv-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.iv-search {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	flex-grow: 1;
+	max-width: 360px;
+	height: var(--iv-control);
+	padding: 0 13px;
+	background: var(--iv-field-bg);
+	border: 1px solid var(--iv-field);
+	border-radius: var(--iv-radius);
+}
+
+.iv-search input {
+	flex-grow: 1;
+	min-width: 0;
+	border: 0;
+	outline: none;
+	background: transparent;
+	font-size: 14px;
+	color: var(--iv-ink);
+}
+
+.iv-search input::placeholder { color: var(--iv-faint); }
+
+.iv-filter {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: var(--iv-control);
+	padding: 0 6px 0 13px;
+	background: var(--iv-field-bg);
+	border: 1px solid var(--iv-field);
+	border-radius: var(--iv-radius);
+	font-size: 14px;
+	color: var(--iv-muted);
+}
+
+.iv-filter select {
+	height: 30px;
+	border: 0;
+	outline: none;
+	background: transparent;
+	color: var(--iv-ink);
+	font-size: 14px;
+	cursor: pointer;
+}
+
+@media (max-width: 900px) {
+	.iv-invoice-grid {
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 8px;
+		padding: 14px 16px;
+	}
+
+	.iv-table-head { display: none; }
+}
+
+/* Page scaffolding shared by every screen. */
+.iv-page {
+	display: flex;
+	flex-direction: column;
+	gap: 22px;
+}
+
+.iv-page-head {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 24px;
+	flex-wrap: wrap;
+}
+
+.iv-page-head h1 {
+	margin: 0;
+}
+
+.iv-page-title {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.iv-page-sub {
+	font-size: 13.5px;
+	color: var(--iv-muted);
+}
+
+.iv-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	font-size: 13px;
+	color: #6c6962;
+}
+
+.iv-summary-amount {
+	font-weight: 600;
+	color: var(--iv-ink);
+}
+
+.iv-table-message {
+	padding: 26px 18px;
+	color: var(--iv-muted);
+}
+
+.iv-right {
+	text-align: right;
+}
+
+/* Forms: cards of fields, an item table, and a sticky totals bar. */
+.iv-form {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.iv-card {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 20px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+.iv-grid-2, .iv-grid-3 {
+	display: grid;
+	gap: 16px;
+}
+
+.iv-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.iv-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.iv-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.iv-field-label {
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--iv-sub);
+}
+
+.iv-field-row {
+	display: flex;
+	gap: 8px;
+}
+
+.iv-field-row > .form-control,
+.iv-field-row > .form-select {
+	flex-grow: 1;
+	min-width: 0;
+}
+
+.iv-btn-square {
+	width: var(--iv-control);
+	padding: 0;
+	flex-shrink: 0;
+}
+
+.iv-btn-dashed {
+	align-self: flex-start;
+	background: transparent;
+	border: 1px dashed #c8c4bc;
+	color: var(--iv-accent);
+}
+
+.iv-btn-dashed:hover {
+	background: var(--iv-accent-tint);
+	border-color: var(--iv-accent-line);
+	color: var(--iv-accent-strong);
+}
+
+.iv-empty {
+	margin: 0;
+	color: var(--iv-muted);
+}
+
+/* One rate picker per item: the three Czech rates plus a way out. */
+.iv-segmented {
+	display: flex;
+	height: 40px;
+	border: 1px solid var(--iv-field);
+	border-radius: var(--iv-radius);
+	overflow: hidden;
+}
+
+.iv-segment {
+	flex: 1 1 0;
+	min-width: 0;
+	padding: 0 4px;
+	background: var(--iv-field-bg);
+	border: 0;
+	border-left: 1px solid var(--iv-field);
+	color: var(--iv-sub);
+	font-size: 12.5px;
+	cursor: pointer;
+}
+
+.iv-segment:first-child { border-left: 0; }
+.iv-segment:hover { background: var(--iv-soft); }
+
+.iv-segment.active {
+	background: var(--iv-accent);
+	color: #ffffff;
+	font-weight: 600;
+}
+
+.iv-item-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 90px 100px 140px 156px 130px 36px;
+	gap: 12px;
+	align-items: start;
+}
+
+.iv-item-head {
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--iv-line);
+	align-items: center;
+}
+
+.iv-item-row > .iv-icon-btn { margin-top: 2px; }
+
+.iv-item-total {
+	align-self: center;
+	font-size: 13.5px;
+	font-weight: 500;
+	text-align: right;
+}
+
+.iv-formbar {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	flex-wrap: wrap;
+	margin-top: 20px;
+	padding: 14px 20px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+	box-shadow: 0 -6px 18px rgba(28, 27, 25, 0.06);
+}
+
+.iv-formbar-totals {
+	display: flex;
+	align-items: center;
+	gap: 28px;
+	flex-wrap: wrap;
+}
+
+.iv-formbar-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-left: auto;
+}
+
+.iv-total-block {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.iv-total-label {
+	font-size: 11.5px;
+	color: var(--iv-muted);
+}
+
+.iv-total-value {
+	font-size: 14px;
+}
+
+.iv-total-strong {
+	font-size: 18px;
+	font-weight: 600;
+}
+
+/* Breadcrumb above a form page. */
+.iv-crumb {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	color: var(--iv-muted);
+}
+
+.iv-crumb a {
+	color: var(--iv-muted);
+	text-decoration: none;
+}
+
+.iv-crumb a:hover {
+	color: var(--iv-ink);
+}
+
+.iv-crumb-current {
+	color: var(--iv-ink);
+}
+
+@media (max-width: 1100px) {
+	.iv-item-grid {
+		grid-template-columns: minmax(0, 1fr) 80px 80px 120px 140px 110px 36px;
+		gap: 10px;
+	}
+}
+
+@media (max-width: 900px) {
+	.iv-grid-2, .iv-grid-3 { grid-template-columns: minmax(0, 1fr); }
+
+	.iv-item-grid {
+		grid-template-columns: minmax(0, 1fr) 36px;
+		row-gap: 8px;
+	}
+
+	.iv-item-head { display: none; }
+
+	.iv-item-row {
+		padding: 14px;
+		border: 1px solid var(--iv-line);
+		border-radius: var(--iv-radius);
+	}
+
+	.iv-item-total { text-align: left; }
+}
+
+/* A page whose content fills the window: a list beside a detail pane. */
+.iv-page-fill {
+	height: 100%;
+	min-height: 0;
+}
+
+.iv-page-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.iv-filter-group {
+	height: var(--iv-control);
+}
+
+.iv-split {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+	min-height: 0;
+}
+
+.iv-split-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 330px;
+	flex-shrink: 0;
+}
+
+.iv-split-detail {
+	flex-grow: 1;
+	min-width: 0;
+	padding: 22px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+@media (max-width: 900px) {
+	.iv-split {
+		flex-direction: column;
+	}
+
+	.iv-split-list {
+		width: 100%;
+	}
+
+	.iv-split-detail {
+		width: 100%;
+	}
+}
+
+/* Entity form: the register lookup sits above the form it fills in. */
+.iv-form-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.iv-ares {
+	display: flex;
+	align-items: flex-end;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 20px;
+	background: var(--iv-accent-tint);
+	border: 1px solid var(--iv-accent-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+.iv-ares-field {
+	width: 280px;
+}
+
+.iv-ares-hint {
+	padding-bottom: 12px;
+	font-size: 12.5px;
+	color: var(--iv-sub);
+}
+
+.iv-ares-error {
+	padding-bottom: 12px;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--iv-danger);
+}
+
+.iv-field-hint {
+	font-size: 11.5px;
+	color: var(--iv-muted);
+}
+
+/* Switch: a checkbox that reads as on or off at a glance. */
+.iv-switch {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	cursor: pointer;
+}
+
+.iv-switch input {
+	position: absolute;
+	width: 0;
+	height: 0;
+	opacity: 0;
+}
+
+.iv-switch-track {
+	display: flex;
+	align-items: center;
+	width: 40px;
+	height: 24px;
+	flex-shrink: 0;
+	padding: 3px;
+	box-sizing: border-box;
+	background: #b4b0a8;
+	border: 1px solid rgba(28, 27, 25, 0.12);
+	border-radius: 999px;
+	transition: background-color 0.12s ease;
+}
+
+.iv-switch-knob {
+	width: 18px;
+	height: 18px;
+	background: #ffffff;
+	border-radius: 999px;
+	transition: margin-left 0.12s ease;
+}
+
+.iv-switch input:checked + .iv-switch-track {
+	background: var(--iv-accent);
+}
+
+.iv-switch input:checked + .iv-switch-track .iv-switch-knob {
+	margin-left: auto;
+}
+
+.iv-switch input:focus-visible + .iv-switch-track {
+	box-shadow: 0 0 0 3px var(--iv-focus);
+}
+
+.iv-switch-label {
+	font-size: 14px;
+}
+
+/* Simple vertical list of rows or cards. */
+.iv-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.iv-assign-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	flex-wrap: wrap;
+	padding: 18px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+.iv-assign-name {
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.iv-assign-select {
+	width: 320px;
+	max-width: 100%;
+	font-family: var(--iv-font-mono);
+}
+
+.iv-scheme-preview-box {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 14px 16px;
+	background: var(--iv-accent-tint);
+	border-radius: var(--iv-radius-lg);
+}
+
+.iv-scheme-preview-box .iv-label {
+	color: var(--iv-accent);
+}
+
+.iv-scheme-preview-value {
+	font-size: 22px;
+	font-weight: 500;
+}

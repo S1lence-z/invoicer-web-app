@@ -14,113 +14,130 @@
 @inject ErrorService errorService
 @inject IStringLocalizer<EntityForm> L
 
-<div>
+<div class="iv-form-wrap">
     @if (EntityInstance is null)
     {
-        @* ARES API WINDOW *@
+        @* ARES fills in the public register data from the company number. *@
         <AresApiLookup UserInputIco="@userInputIco"
-        UserInputIcoChanged="@((string ico) => userInputIco = ico)"
-        AresApiService="aresApiService"
-        AresApiErrorMessage="@aresApiErrorMessage"
-        OnFillInAresData="FillInAresData"
-        />
+                       UserInputIcoChanged="@((string ico) => userInputIco = ico)"
+                       AresApiService="aresApiService"
+                       AresApiErrorMessage="@aresApiErrorMessage"
+                       OnFillInAresData="FillInAresData" />
     }
-    @* ENTITY FORM *@
+
     <EditForm Model="@entityFormModel" OnValidSubmit="SubmitForm">
         <DataAnnotationsValidator />
-        <div class="row mt-4">
-            <div class="col">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="entity-isClient" @bind="entityFormModel.IsClient" />
-                    <label for="entity-isClient" class="form-check-label font-weight-bold">@L["IsThisClient"]</label>
-                    <ValidationMessage For="@(() => entityFormModel.IsClient)" />
+
+        <div class="iv-form">
+            <div class="iv-card">
+                <span class="iv-label">@L["SectionBasics"]</span>
+
+                <label class="iv-switch">
+                    <input type="checkbox" @bind="entityFormModel.IsClient" />
+                    <span class="iv-switch-track"><span class="iv-switch-knob"></span></span>
+                    <span class="iv-switch-label">@L["IsThisClient"]</span>
+                </label>
+
+                <div class="iv-grid-2">
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="entity-name">@L["NameLabel"]</label>
+                        <input type="text" class="form-control" id="entity-name" placeholder="@L["NamePlaceholder"]" @bind="entityFormModel.Name" />
+                        <ValidationMessage For="@(() => entityFormModel.Name)" />
+                    </div>
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="entity-ico">@L["IcoLabel"]</label>
+                        <input type="text" class="form-control iv-num" id="entity-ico" placeholder="@L["IcoPlaceholder"]" value="@entityFormModel.Ico" @oninput="HandleIcoInput" />
+                        <ValidationMessage For="@(() => entityFormModel.Ico)" />
+                    </div>
+                </div>
+                <div class="iv-grid-2">
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="entity-email">@L["EmailLabel"]</label>
+                        <input type="email" class="form-control" id="entity-email" placeholder="@L["EmailPlaceholder"]" @bind="entityFormModel.Email" />
+                        <ValidationMessage For="@(() => entityFormModel.Email)" />
+                    </div>
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="entity-phone">@L["PhoneLabel"]</label>
+                        <input type="tel" class="form-control iv-num" id="entity-phone" placeholder="@L["PhonePlaceholder"]" @bind="entityFormModel.PhoneNumber" />
+                        <ValidationMessage For="@(() => entityFormModel.PhoneNumber)" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="iv-card">
+                <span class="iv-label">@L["SectionRegistrationText"]</span>
+                <div class="iv-field">
+                    <textarea class="form-control" id="entity-registration-text" rows="2" placeholder="@L["RegistrationTextPlaceholder"]" @bind="entityFormModel.RegistrationText"></textarea>
+                    <span class="iv-field-hint">@L["RegistrationTextHint"]</span>
+                </div>
+            </div>
+
+            <div class="iv-card">
+                <span class="iv-label">@L["SectionAddress"]</span>
+                <div class="iv-grid-2">
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="address-street">@L["AddressStreetLabel"]</label>
+                        <input type="text" class="form-control" id="address-street" placeholder="@L["AddressStreetPlaceholder"]" @bind="entityFormModel.Street" />
+                        <ValidationMessage For="@(() => entityFormModel.Street)" />
+                    </div>
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="address-zipcode">@L["AddressZipCodeLabel"]</label>
+                        <input type="number" class="form-control iv-num" id="address-zipcode" placeholder="@L["AddressZipCodePlaceholder"]" @bind="entityFormModel.ZipCode" />
+                        <ValidationMessage For="@(() => entityFormModel.ZipCode)" />
+                    </div>
+                </div>
+                <div class="iv-grid-2">
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="address-city">@L["AddressCityLabel"]</label>
+                        <input type="text" class="form-control" id="address-city" placeholder="@L["AddressCityPlaceholder"]" @bind="entityFormModel.City" />
+                        <ValidationMessage For="@(() => entityFormModel.City)" />
+                    </div>
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="address-country">@L["AddressCountryLabel"]</label>
+                        <input type="text" class="form-control" id="address-country" placeholder="@L["AddressCountryPlaceholder"]" @bind="entityFormModel.Country" />
+                        <ValidationMessage For="@(() => entityFormModel.Country)" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="iv-card">
+                <span class="iv-label">@L["SectionBankAccount"]</span>
+                <div class="iv-grid-2">
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="bank-acc-accNumber">@L["BankAccountNumberLabel"]</label>
+                        <input type="text" class="form-control iv-num" id="bank-acc-accNumber" placeholder="@L["BankAccountNumberPlaceholder"]" @bind="entityFormModel.AccountNumber" />
+                        <ValidationMessage For="@(() => entityFormModel.AccountNumber)" />
+                    </div>
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="bank-acc-accCode">@L["BankCodeLabel"]</label>
+                        <input type="text" class="form-control iv-num" id="bank-acc-accCode" placeholder="@L["BankCodePlaceholder"]" @bind="entityFormModel.BankCode" />
+                        <ValidationMessage For="@(() => entityFormModel.BankCode)" />
+                    </div>
+                </div>
+                <div class="iv-grid-2">
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="bank-acc-name">@L["BankNameLabel"]</label>
+                        <input type="text" class="form-control" id="bank-acc-name" placeholder="@L["BankNamePlaceholder"]" @bind="entityFormModel.BankName" />
+                        <ValidationMessage For="@(() => entityFormModel.BankName)" />
+                    </div>
+                    <div class="iv-field">
+                        <label class="iv-field-label" for="bank-acc-iban">@L["IBANLabel"]</label>
+                        <input type="text" class="form-control iv-num" id="bank-acc-iban" placeholder="@L["IBANPlaceholder"]" @bind="entityFormModel.IBAN" />
+                        <ValidationMessage For="@(() => entityFormModel.IBAN)" />
+                    </div>
                 </div>
             </div>
         </div>
-        <hr />
-        <div class="row">
-            <div class="col">
-                <label for="entity-name" class="font-weight-bold">@L["NameLabel"]</label>
-                <input type="text" class="form-control" id="entity-name" placeholder="@L["NamePlaceholder"]" @bind="entityFormModel.Name" />
-                <ValidationMessage For="@(() => entityFormModel.Name)" />
-            </div>
-            <div class="col">
-                <label for="entity-ico" class="font-weight-bold">@L["IcoLabel"]</label>
-                <input type="text" class="form-control" id="entity-ico" placeholder="@L["IcoPlaceholder"]" @bind="entityFormModel.Ico" />
-                <ValidationMessage For="@(() => entityFormModel.Ico)" />
+
+        <div class="iv-formbar">
+            <div class="iv-formbar-actions">
+                @if (CancelCallback.HasDelegate)
+                {
+                    <button type="button" class="btn btn-outline-secondary" @onclick="() => CancelCallback.InvokeAsync()">@L["CancelButtonText"]</button>
+                }
+                <button type="submit" class="btn btn-primary" disabled="@loadingService.IsLoading">@(EntityInstance is null ? L["CreateButton"] : L["SaveButton"])</button>
             </div>
         </div>
-        <div class="row mt-4">
-            <div class="col">
-                <label for="entity-email" class="font-weight-bold">@L["EmailLabel"]</label>
-                <input type="email" class="form-control" id="entity-email" placeholder="@L["EmailPlaceholder"]" @bind="entityFormModel.Email" />
-                <ValidationMessage For="@(() => entityFormModel.Email)" />
-            </div>
-            <div class="col">
-                <label for="entity-phone" class="font-weight-bold">@L["PhoneLabel"]</label>
-                <input type="tel" class="form-control" id="entity-phone" placeholder="@L["PhonePlaceholder"]" @bind="entityFormModel.PhoneNumber" />
-                <ValidationMessage For="@(() => entityFormModel.PhoneNumber)" />
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col">
-                <label for="entity-registration-text" class="font-weight-bold">@L["RegistrationTextLabel"]</label>
-                <textarea class="form-control" id="entity-registration-text" rows="2" placeholder="@L["RegistrationTextPlaceholder"]" @bind="entityFormModel.RegistrationText"></textarea>
-            </div>
-        </div>
-        <hr />
-        @* ADDRESS FORM *@
-        <div class="row">
-            <div class="col">
-                <label for="address-street" class="font-weight-bold">@L["AddressStreetLabel"]</label>
-                <input type="text" class="form-control" id="address-street" placeholder="@L["AddressStreetPlaceholder"]" @bind="entityFormModel.Street" />
-                <ValidationMessage For="@(() => entityFormModel.Street)" />
-            </div>
-            <div class="col">
-                <label for="address-zipcode" class="font-weight-bold">@L["AddressZipCodeLabel"]</label>
-                <input type="number" class="form-control" id="address-zipcode" placeholder="@L["AddressZipCodePlaceholder"]" @bind="entityFormModel.ZipCode" />
-                <ValidationMessage For="@(() => entityFormModel.ZipCode)" />
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col">
-                <label for="address-city" class="font-weight-bold">@L["AddressCityLabel"]</label>
-                <input type="text" class="form-control" id="address-city" placeholder="@L["AddressCityPlaceholder"]" @bind="entityFormModel.City" />
-                <ValidationMessage For="@(() => entityFormModel.City)" />
-            </div>
-            <div class="col">
-                <label for="address-country" class="font-weight-bold">@L["AddressCountryLabel"]</label>
-                <input type="text" class="form-control" id="address-country" placeholder="@L["AddressCountryPlaceholder"]" @bind="entityFormModel.Country" />
-                <ValidationMessage For="@(() => entityFormModel.Country)" />
-            </div>
-        </div>
-        <hr />
-        @* BANK ACCOUNT FORM *@
-        <div class="row">
-            <div class="col">
-                <label for="bank-acc-accNumber" class="font-weight-bold">@L["BankAccountNumberLabel"]</label>
-                <input type="text" class="form-control" id="bank-acc-accNumber" placeholder="@L["BankAccountNumberPlaceholder"]" @bind="entityFormModel.AccountNumber" />
-                <ValidationMessage For="@(() => entityFormModel.AccountNumber)" />
-            </div>
-            <div class="col">
-                <label for="bank-acc-accCode" class="font-weight-bold">@L["BankCodeLabel"]</label>
-                <input type="text" class="form-control" id="bank-acc-accCode" placeholder="@L["BankCodePlaceholder"]" @bind="entityFormModel.BankCode" />
-                <ValidationMessage For="@(() => entityFormModel.BankCode)" />
-            </div>
-        </div>
-        <div class="row my-4">
-            <div class="col">
-                <label for="bank-acc-name" class="font-weight-bold">@L["BankNameLabel"]</label>
-                <input type="text" class="form-control" id="bank-acc-name" placeholder="@L["BankNamePlaceholder"]" @bind="entityFormModel.BankName" />
-                <ValidationMessage For="@(() => entityFormModel.BankName)" />
-            </div>
-            <div class="col">
-                <label for="bank-acc-iban" class="font-weight-bold">@L["IBANLabel"]</label>
-                <input type="text" class="form-control" id="bank-acc-iban" placeholder="@L["IBANPlaceholder"]" @bind="entityFormModel.IBAN" />
-                <ValidationMessage For="@(() => entityFormModel.IBAN)" />
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary float-end" disabled="@loadingService.IsLoading">@(EntityInstance is null ? L["CreateButton"] : L["SaveButton"])</button>
     </EditForm>
 </div>
 
@@ -129,6 +146,7 @@
     [Parameter] public EventCallback OnSubmitCallback { get; set; }
     [Parameter] public EntityDto? EntityInstance { get; set; } = null;
     [Parameter, EditorRequired] public bool isActive { get; set; }
+    [Parameter] public EventCallback CancelCallback { get; set; }
 
     // For ARES API call
     private string userInputIco { get; set; } = string.Empty;
@@ -178,6 +196,11 @@
         {
             loadingService.StopLoading();
         }
+    }
+
+    private void HandleIcoInput(ChangeEventArgs e)
+    {
+        entityFormModel.Ico = InputFormat.StripWhitespace(e.Value?.ToString());
     }
 
     private void FillInForm(SubjectInformation newData)

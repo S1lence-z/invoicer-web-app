@@ -1,112 +1,131 @@
 ﻿@using Frontend.Utils
 @using Microsoft.Extensions.Localization
 @using Application.DTOs
+@using Shared.Enums
 @using Shared.Extensions
 @using Frontend.Extensions
 @inject IStringLocalizer<InvoicePreview> L
 @inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
-<div class="container my-4">
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            <!-- Invoice Header -->
-            <h5 class="text-center">@L["HeaderTitle"]</h5>
-            <div class="d-flex justify-content-between">
-                <div>
-                    <h5>@L["InvoiceNumberLabel"] @Invoice.InvoiceNumber</h5>
-                    <p><strong>@L["IssueDateLabel"]</strong> @Invoice.IssueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
-                    <p><strong>@L["DueDateLabel"]</strong> @Invoice.DueDate.FormatByCurrencyLocale(Invoice.Currency)</p>
-                </div>
-                <div class="text-end">
-                    @if (Invoice.PaymentMethod is { } paymentMethod)
-                    {
-                        <p><strong>@L["PaymentMethodLabel"]</strong> @EnumL.Localize(paymentMethod)</p>
-                    }
-                    @if (Invoice.DeliveryMethod is { } deliveryMethod)
-                    {
-                        <p><strong>@L["DeliveryMethodLabel"]</strong> @EnumL.Localize(deliveryMethod)</p>
-                    }
-                </div>
+@* Mirrors the exported PDF: parties, items, registration text, totals, signature bottom right. *@
+<div class="iv-doc">
+    <div class="iv-doc-head">
+        <div class="iv-doc-title">
+            <span class="iv-doc-kind">@L["HeaderTitle"]</span>
+            <span class="iv-num iv-doc-number">@L["InvoiceNumberLabel"] @Invoice.InvoiceNumber</span>
+            <span class="iv-doc-status @StatusClass">@EnumL.Localize(Invoice.Status)</span>
+        </div>
+        <div class="iv-doc-meta">
+            <div class="iv-doc-meta-row">
+                <span>@L["IssueDateLabel"]</span>
+                <span class="iv-num">@Invoice.IssueDate.FormatByCurrencyLocale(Invoice.Currency)</span>
             </div>
-
-            <hr />
-
-            <!-- Seller and Buyer Information -->
-            <div class="d-flex justify-content-between">
-                <div>
-                    <h5>@L["SellerSectionTitle"]</h5>
-                    <p><strong>@L["NameLabel"]</strong> @Invoice.Seller?.Name</p>
-                    <p><strong>@L["AddressLabel"]</strong> @Invoice.Seller?.Address?.Street, @Invoice.Seller?.Address?.City @Invoice.Seller?.Address?.ZipCode, @Invoice.Seller?.Address?.Country</p>
-                    <p><strong>@L["EmailLabel"]</strong> @Invoice.Seller?.Email</p>
-                    <p><strong>@L["PhoneNumberLabel"]</strong> @Invoice.Seller?.PhoneNumber</p>
-                </div>
-                <div>
-                    <h5>@L["BuyerSectionTitle"]</h5>
-                    <p><strong>@L["NameLabel"]</strong> @Invoice.Buyer?.Name</p>
-                    <p><strong>@L["AddressLabel"]</strong> @Invoice.Buyer?.Address?.Street, @Invoice.Buyer?.Address?.City @Invoice.Buyer?.Address?.ZipCode, @Invoice.Buyer?.Address?.Country </p>
-                    <p><strong>@L["EmailLabel"]</strong> @Invoice.Buyer?.Email</p>
-                    <p><strong>@L["PhoneNumberLabel"]</strong> @Invoice.Buyer?.PhoneNumber</p>
-                </div>
+            <div class="iv-doc-meta-row">
+                <span>@L["DueDateLabel"]</span>
+                <span class="iv-num">@Invoice.DueDate.FormatByCurrencyLocale(Invoice.Currency)</span>
             </div>
-
-            <hr />
-
-            <!-- Invoice Items Table -->
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>@L["TableHeaderDescription"]</th>
-                            <th>@L["TableHeaderQty"]</th>
-                            <th>@L["TableHeaderUnit"]</th>
-                            <th>@L["TableHeaderUnitPrice"]</th>
-                            <th>@L["TableHeaderTotal"]</th>
-                            <th>@L["TableHeaderVatRate"]</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Invoice.Items)
-                        {
-                            <tr>
-                                <td>@item.Description</td>
-                                <td>@item.Quantity</td>
-                                <td>@item.Unit</td>
-                                <td>@Invoice.Currency.FormatAmount(item.UnitPrice)</td>
-                                <td>@Invoice.Currency.FormatAmount(item.Quantity * item.UnitPrice)</td>
-                                <td>@((item.VatRate * 100).ToString("F0")) %</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="iv-doc-meta-row">
+                <span>@L["VatDateLabel"]</span>
+                <span class="iv-num">@Invoice.VatDate.FormatByCurrencyLocale(Invoice.Currency)</span>
             </div>
-
-            <hr />
-
-            <!-- Totals Section -->
-            <div class="d-flex justify-content-between">
-                <div>
-                    <p><strong>@L["TotalPriceWithoutVatLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice))</p>
-                    <p><strong>@L["TotalVatLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice * i.VatRate))</p>
+            @if (Invoice.PaymentMethod is { } paymentMethod)
+            {
+                <div class="iv-doc-meta-row">
+                    <span>@L["PaymentMethodLabel"]</span>
+                    <span>@EnumL.Localize(paymentMethod)</span>
                 </div>
-                <div>
-                    <p><strong>@L["TotalPriceWithVatLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice * (1 + i.VatRate)))</p>
+            }
+            @if (Invoice.DeliveryMethod is { } deliveryMethod)
+            {
+                <div class="iv-doc-meta-row">
+                    <span>@L["DeliveryMethodLabel"]</span>
+                    <span>@EnumL.Localize(deliveryMethod)</span>
                 </div>
-            </div>
+            }
+        </div>
+    </div>
 
-            <hr />
+    <div class="iv-doc-rule"></div>
 
-            <!-- Final Price -->
-            <div class="text-end">
-                <h5><strong>@L["FinalPriceLabel"]</strong> @Invoice.Currency.FormatAmount(Invoice.Items.Sum(i => i.Quantity * i.UnitPrice * (1 + i.VatRate)))</h5>
-            </div>
+    <div class="iv-doc-parties">
+        <div class="iv-doc-party">
+            <span class="iv-label">@L["SellerSectionTitle"]</span>
+            <span class="iv-doc-party-name">@Invoice.Seller?.Name</span>
+            @if (!string.IsNullOrWhiteSpace(Invoice.Seller?.Ico))
+            {
+                <span>@L["IcoLabel"] @Invoice.Seller!.Ico</span>
+            }
+            <span>@FormatAddress(Invoice.Seller)</span>
+            @if (!string.IsNullOrWhiteSpace(Invoice.Seller?.Email))
+            {
+                <span>@Invoice.Seller!.Email</span>
+            }
+            @if (Invoice.Seller?.BankAccount is { } sellerBank)
+            {
+                <span>@sellerBank.BankName · @sellerBank.AccountNumber/@sellerBank.BankCode</span>
+            }
+        </div>
+        <div class="iv-doc-party">
+            <span class="iv-label">@L["BuyerSectionTitle"]</span>
+            <span class="iv-doc-party-name">@Invoice.Buyer?.Name</span>
+            @if (!string.IsNullOrWhiteSpace(Invoice.Buyer?.Ico))
+            {
+                <span>@L["IcoLabel"] @Invoice.Buyer!.Ico</span>
+            }
+            <span>@FormatAddress(Invoice.Buyer)</span>
+            @if (!string.IsNullOrWhiteSpace(Invoice.Buyer?.Email))
+            {
+                <span>@Invoice.Buyer!.Email</span>
+            }
+        </div>
+    </div>
 
-            <!-- Signature: bottom right, same as on the PDF -->
-            <div class="d-flex justify-content-end mt-5">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <small><strong>@L["SignedByLabel"]</strong> @Invoice.SignedBy</small>
-                </div>
+    <div class="iv-doc-items">
+        <div class="iv-doc-item iv-doc-item-head iv-label">
+            <span>@L["TableHeaderDescription"]</span>
+            <span class="iv-right">@L["TableHeaderQty"]</span>
+            <span class="iv-right">@L["TableHeaderUnitPrice"]</span>
+            <span class="iv-right">@L["TableHeaderVatRate"]</span>
+            <span class="iv-right">@L["TableHeaderTotal"]</span>
+        </div>
+        @foreach (var item in Invoice.Items)
+        {
+            <div class="iv-doc-item">
+                <span>@item.Description</span>
+                <span class="iv-num iv-right">@item.Quantity @item.Unit</span>
+                <span class="iv-num iv-right">@Invoice.Currency.FormatAmount(item.UnitPrice)</span>
+                <span class="iv-num iv-right">@((item.VatRate * 100).ToString("F0")) %</span>
+                <span class="iv-num iv-right iv-doc-item-total">@Invoice.Currency.FormatAmount(item.Quantity * item.UnitPrice)</span>
             </div>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Invoice.Seller?.RegistrationText))
+    {
+        <span class="iv-doc-note">@Invoice.Seller!.RegistrationText</span>
+    }
+
+    <div class="iv-doc-totals">
+        <div class="iv-doc-totals-inner">
+            <div class="iv-doc-total-row">
+                <span>@L["TotalPriceWithoutVatLabel"]</span>
+                <span class="iv-num">@Invoice.Currency.FormatAmount(TotalNet)</span>
+            </div>
+            <div class="iv-doc-total-row">
+                <span>@L["TotalVatLabel"]</span>
+                <span class="iv-num">@Invoice.Currency.FormatAmount(TotalVat)</span>
+            </div>
+            <div class="iv-doc-total-row iv-doc-total-final">
+                <span>@L["FinalPriceLabel"]</span>
+                <span class="iv-num">@Invoice.Currency.FormatAmount(TotalNet + TotalVat)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="iv-doc-signature">
+        <div class="iv-doc-signature-block">
+            <div class="iv-doc-signature-line"></div>
+            <span>@L["SignedByLabel"] <strong>@Invoice.SignedBy</strong></span>
         </div>
     </div>
 </div>
@@ -115,4 +134,24 @@
 {
     [Parameter]
     public InvoiceDto Invoice { get; set; } = null!;
+
+    private decimal TotalNet => Invoice.Items.Sum(i => i.Quantity * i.UnitPrice);
+
+    private decimal TotalVat => Invoice.Items.Sum(i => i.Quantity * i.UnitPrice * i.VatRate);
+
+    private string StatusClass => Invoice.Status switch
+    {
+        InvoiceStatus.Pending => "iv-status-pending",
+        InvoiceStatus.Paid => "iv-status-paid",
+        InvoiceStatus.Overdue => "iv-status-overdue",
+        _ => "iv-status-draft"
+    };
+
+    private static string FormatAddress(EntityDto? entity)
+    {
+        if (entity?.Address is not { } address)
+            return string.Empty;
+
+        return $"{address.Street}, {address.ZipCode} {address.City}, {address.Country}";
+    }
 }

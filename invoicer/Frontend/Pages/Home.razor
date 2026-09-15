@@ -1,17 +1,51 @@
 ﻿@page "/"
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Home> L
+@inject NavigationManager navigationManager
 
-<h1>@L["WelcomeTitle"]</h1>
+<div class="iv-home">
+    <svg width="52" height="52" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="8" fill="#16554b" />
+        <rect x="9" y="10" width="14" height="2.4" rx="1.2" fill="#ffffff" opacity="0.55" />
+        <rect x="9" y="14.4" width="10" height="2.4" rx="1.2" fill="#ffffff" opacity="0.55" />
+        <rect x="9" y="19.2" width="14" height="1" fill="#ffffff" opacity="0.8" />
+        <rect x="9" y="21.6" width="8" height="3" rx="1.5" fill="#ffffff" />
+    </svg>
 
-<p>@L["WelcomeSubtitle"]</p>
+    <div class="iv-home-title">
+        <h1>@L["WelcomeTitle"]</h1>
+        <span class="iv-home-subtitle">@L["WelcomeSubtitle"]</span>
+    </div>
 
-<p>@L["DescriptionIntro"]</p>
+    <div class="iv-home-actions">
+        <button class="btn btn-primary" @onclick="@(() => navigationManager.NavigateTo("invoice/add"))">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+            </svg>
+            @L["NewInvoiceButton"]
+        </button>
+        <button class="btn btn-outline-secondary" @onclick="@(() => navigationManager.NavigateTo("entity/add"))">@L["NewEntityButton"]</button>
+    </div>
 
-<ul>
-    <li>@L["FeatureAutomation"]</li>
-    <li>@L["FeatureClients"]</li>
-    <li>@L["FeatureReports"]</li>
-</ul>
+    <div class="iv-doc-rule"></div>
 
-<p>@L["ClosingStatement"]</p>
+    <span class="iv-home-intro">@L["DescriptionIntro"]</span>
+
+    <div class="iv-home-features">
+        <div class="iv-home-feature">
+            <span class="iv-home-feature-title">@L["FeatureAutomation"]</span>
+            <span class="iv-home-feature-text">@L["FeatureAutomationText"]</span>
+        </div>
+        <div class="iv-home-feature">
+            <span class="iv-home-feature-title">@L["FeatureClients"]</span>
+            <span class="iv-home-feature-text">@L["FeatureClientsText"]</span>
+        </div>
+        <div class="iv-home-feature">
+            <span class="iv-home-feature-title">@L["FeatureReports"]</span>
+            <span class="iv-home-feature-text">@L["FeatureReportsText"]</span>
+        </div>
+    </div>
+
+    <span class="iv-home-closing">@L["ClosingStatement"]</span>
+</div>

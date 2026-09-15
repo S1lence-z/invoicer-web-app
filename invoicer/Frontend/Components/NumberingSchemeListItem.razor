@@ -1,23 +1,21 @@
-﻿@using Application.Extensions
+﻿@using Application.DTOs
+@using Application.Extensions
+@using Frontend.Utils
 @using Microsoft.Extensions.Localization
-@using Application.DTOs
-@using Shared.Extensions
 @inject IStringLocalizer<NumberingSchemeListItem> L
 
-<div class="card border-1 shadow-sm">
-    <div class="card-body row align-items-center">
-        <div class="d-flex justify-content-between">
-            <div class="d-flex flex-grow-1">
-                <span class="fw-bold">@NumberingScheme.ShowNumberingSchemePreview()</span>
-            </div>
-            <div class="d-flex flex-grow-1 justify-content-end pe-lg-5">
-                <span class="text-muted">@L["DefaultLabel"] @(NumberingScheme.IsDefault ? L["YesOption"] : L["NoOption"])</span>
-            </div>
-        </div>
+@* A scheme is easiest to judge by the number it produces. *@
+<div class="iv-scheme-row">
+    <div class="iv-scheme-main">
+        <span class="iv-num iv-scheme-preview">@NumberingScheme.ShowNumberingSchemePreview()</span>
+        <span class="iv-scheme-detail">@Summary</span>
     </div>
-    <div class="card-footer bg-white border-0 d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm w-25" @onclick="() => OnEditNumberingScheme.InvokeAsync(NumberingScheme)">@L["EditButton"]</button>
-        <button class="btn btn-outline-danger btn-sm w-25" @onclick="() => OnDeleteNumberingScheme.InvokeAsync(NumberingScheme)">@L["DeleteButton"]</button>
+    <div class="iv-scheme-actions">
+        <span class="iv-scheme-default @(NumberingScheme.IsDefault ? "on" : null)">
+            @L["DefaultLabel"] @(NumberingScheme.IsDefault ? L["YesOption"] : L["NoOption"])
+        </span>
+        <button class="btn btn-outline-secondary btn-sm" @onclick="() => OnEditNumberingScheme.InvokeAsync(NumberingScheme)">@L["EditButton"]</button>
+        <button class="btn btn-outline-danger btn-sm" @onclick="() => OnDeleteNumberingScheme.InvokeAsync(NumberingScheme)">@L["DeleteButton"]</button>
     </div>
 </div>
 
@@ -30,4 +28,17 @@
 
     [Parameter]
     public EventCallback<NumberingSchemeDto> OnEditNumberingScheme { get; set; }
+
+    private string Summary
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(NumberingScheme.Prefix))
+                parts.Add($"{L["SummaryPrefix"]} {NumberingScheme.Prefix}");
+            parts.Add($"{L["SummaryPadding"]} {NumberingScheme.SequencePadding}");
+            parts.Add($"{L["SummaryReset"]} {NumberingScheme.ResetFrequency.ToString().ToLowerInvariant()}");
+            return string.Join(" · ", parts);
+        }
+    }
 }

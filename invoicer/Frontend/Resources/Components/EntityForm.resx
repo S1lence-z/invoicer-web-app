@@ -206,10 +206,25 @@
   <data name="IsThisClient" xml:space="preserve">
     <value>Is this your client?</value>
   </data>
-  <data name="RegistrationTextLabel" xml:space="preserve">
-    <value>Registration text (printed under invoice items)</value>
-  </data>
   <data name="RegistrationTextPlaceholder" xml:space="preserve">
-    <value>e.g. Natural person registered in the Trade Register</value>
+    <value>e.g. An entitiy registered in the Trade Register</value>
+  </data>
+  <data name="SectionBasics" xml:space="preserve">
+    <value>Basic details</value>
+  </data>
+  <data name="SectionRegistrationText" xml:space="preserve">
+    <value>Register entry text</value>
+  </data>
+  <data name="SectionAddress" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="SectionBankAccount" xml:space="preserve">
+    <value>Bank account</value>
+  </data>
+  <data name="CancelButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="RegistrationTextHint" xml:space="preserve">
+    <value>Printed under the invoice items.</value>
   </data>
 </root>

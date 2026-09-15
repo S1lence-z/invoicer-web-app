@@ -9,37 +9,35 @@
 @inject ErrorService errorService;
 @inject IStringLocalizer<NumberingSchemes> L;
 
-@* PAGE CONTAINER *@
-<div class="d-flex flex-column border rounded-3">
-    @* HEADER *@
-    <div class="d-flex justify-content-between align-items-center px-4 pt-4">
-        <h3>@L["PageTitle"]</h3>
+<div class="iv-page">
+    <div class="iv-page-head">
+        <h1>@L["PageTitle"]</h1>
         <button class="btn btn-primary" @onclick="ShowNewNumberingSchemeModal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+            </svg>
             @L["AddSchemeButton"]
         </button>
     </div>
-    <hr />
-    @* CONTENT *@
-    <div class="d-flex flex-column pb-4">
-        @* NUMBERING SCHEMES LIST *@
-        <div class="d-flex flex-column overflow-auto px-4 gap-2">
-            @if (isLoadingData)
+
+    <div class="iv-stack">
+        @if (isLoadingData)
+        {
+            <Spinner />
+        }
+        else if (allNumberingSchemes.Count == 0)
+        {
+            <p class="iv-empty">@L["NoSchemesFoundMessage"]</p>
+        }
+        else
+        {
+            foreach (NumberingSchemeDto numberingScheme in allNumberingSchemes)
             {
-                <Spinner />
+                int numberingSchemeHash = numberingScheme.GetHashCode();
+                <NumberingSchemeListItem @key="numberingSchemeHash" NumberingScheme="numberingScheme" OnDeleteNumberingScheme="DeleteScheme" OnEditNumberingScheme="EditScheme" />
             }
-            else if (allNumberingSchemes.Count == 0)
-            {
-                <p>@L["NoSchemesFoundMessage"]</p>
-            }
-            else
-            {
-                foreach (NumberingSchemeDto numberingScheme in allNumberingSchemes)
-                {
-                    int numberingSchemeHash = numberingScheme.GetHashCode();
-                    <NumberingSchemeListItem @key="numberingSchemeHash" NumberingScheme="numberingScheme" OnDeleteNumberingScheme="DeleteScheme" OnEditNumberingScheme="EditScheme" />
-                }
-            }
-        </div>
+        }
     </div>
 </div>
 

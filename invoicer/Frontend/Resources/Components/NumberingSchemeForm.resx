@@ -168,4 +168,13 @@
   <data name="No" xml:space="preserve">
     <value>No</value>
   </data>
+  <data name="PreviewLabel" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="SectionFormat" xml:space="preserve">
+    <value>Number format</value>
+  </data>
+  <data name="SectionOptions" xml:space="preserve">
+    <value>Options</value>
+  </data>
 </root>
