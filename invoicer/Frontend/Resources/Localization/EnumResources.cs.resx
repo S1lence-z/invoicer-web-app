@@ -136,7 +136,7 @@
     <value>Čeká na úhradu</value>
   </data>
   <data name="InvoiceStatus.Paid" xml:space="preserve">
-    <value>Zaplaceno</value>
+    <value>Uhrazeno</value>
   </data>
   <data name="InvoiceStatus.Overdue" xml:space="preserve">
     <value>Po splatnosti</value>
