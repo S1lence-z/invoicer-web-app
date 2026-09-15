@@ -112,4 +112,13 @@
   <data name="DeleteButton" xml:space="preserve">
     <value>Smazat</value>
   </data>
+  <data name="SummaryPrefix" xml:space="preserve">
+    <value>prefix</value>
+  </data>
+  <data name="SummaryPadding" xml:space="preserve">
+    <value>počet míst</value>
+  </data>
+  <data name="SummaryReset" xml:space="preserve">
+    <value>reset</value>
+  </data>
 </root>

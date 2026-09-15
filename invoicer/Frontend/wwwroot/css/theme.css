@@ -831,3 +831,51 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 .iv-switch-label {
 	font-size: 14px;
 }
+
+/* Simple vertical list of rows or cards. */
+.iv-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.iv-assign-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	flex-wrap: wrap;
+	padding: 18px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+.iv-assign-name {
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.iv-assign-select {
+	width: 320px;
+	max-width: 100%;
+	font-family: var(--iv-font-mono);
+}
+
+.iv-scheme-preview-box {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 14px 16px;
+	background: var(--iv-accent-tint);
+	border-radius: var(--iv-radius-lg);
+}
+
+.iv-scheme-preview-box .iv-label {
+	color: var(--iv-accent);
+}
+
+.iv-scheme-preview-value {
+	font-size: 22px;
+	font-weight: 500;
+}
