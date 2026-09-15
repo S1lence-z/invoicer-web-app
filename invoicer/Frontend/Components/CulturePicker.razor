@@ -1,38 +1,37 @@
 ﻿@using System.Globalization
-@using Frontend.Extensions
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
-<div class="d-inline-block">
-    <select class="form-select form-select-sm" @onchange="OnCultureChanged">
-        @foreach (var culture in supportedCultures)
-        {
-            <option value="@culture.Name" selected="@(CultureInfo.CurrentCulture.Name == culture.Name)">
-                @culture.FormatDisplayName()
-            </option>
-        }
-    </select>
+@* Two pills rather than a select: there are only ever two languages. *@
+<div class="iv-culture">
+    @foreach (var culture in supportedCultures)
+    {
+        <button type="button"
+                class="iv-culture-option @(IsCurrent(culture) ? "active" : null)"
+                title="@culture.NativeName"
+                @onclick="() => SwitchCulture(culture.Name)">
+            @ShortName(culture)
+        </button>
+    }
 </div>
 
 @code {
-    private CultureInfo[] supportedCultures = new[]
-    {
-        new CultureInfo("en-US"),
-        new CultureInfo("cs-CZ")
-    };
+    private readonly CultureInfo[] supportedCultures =
+    [
+        new CultureInfo("cs-CZ"),
+        new CultureInfo("en-US")
+    ];
 
-    private async Task OnCultureChanged(ChangeEventArgs e)
-    {
-        var newCultureName = e.Value?.ToString();
-        if (!string.IsNullOrEmpty(newCultureName))
-        {
-            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "blazorCulture", newCultureName);
-            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
-        }
-    }
+    private static bool IsCurrent(CultureInfo culture) => CultureInfo.CurrentCulture.Name == culture.Name;
 
-    protected override async Task OnInitializedAsync()
+    private static string ShortName(CultureInfo culture) => culture.TwoLetterISOLanguageName.ToUpperInvariant();
+
+    private async Task SwitchCulture(string cultureName)
     {
-        var persistedCulture = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "blazorCulture");
+        if (CultureInfo.CurrentCulture.Name == cultureName)
+            return;
+
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "blazorCulture", cultureName);
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
     }
 }

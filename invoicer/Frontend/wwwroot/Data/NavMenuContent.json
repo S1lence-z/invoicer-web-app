@@ -2,26 +2,26 @@
 	{
 		"Label": "Home",
 		"UrlPath": "",
-		"IconClass": "bi bi-house-door-fill-nav-menu"
-	},
-	{
-		"Label": "Entities",
-		"UrlPath": "entities",
-		"IconClass": "bi bi-plus-square-fill-nav-menu"
+		"IconClass": "home"
 	},
 	{
 		"Label": "Invoices",
 		"UrlPath": "invoices",
-		"IconClass": "bi bi-plus-square-fill-nav-menu"
+		"IconClass": "invoice"
 	},
 	{
-		"Label": "Invoice Numbering",
-		"UrlPath": "invoicenumbering",
-		"IconClass": "bi bi-plus-square-fill-nav-menu"
+		"Label": "Entities",
+		"UrlPath": "entities",
+		"IconClass": "entity"
 	},
 	{
 		"Label": "Numbering Schemes",
 		"UrlPath": "numberingschemes",
-		"IconClass": "bi bi-plus-square-fill-nav-menu"
+		"IconClass": "scheme"
+	},
+	{
+		"Label": "Invoice Numbering",
+		"UrlPath": "invoicenumbering",
+		"IconClass": "numbering"
 	}
 ]

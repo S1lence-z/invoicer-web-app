@@ -1,0 +1,30 @@
+.iv-culture {
+    display: flex;
+    gap: 6px;
+}
+
+.iv-culture-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    height: 32px;
+    padding: 0 10px;
+    background: transparent;
+    border: 0;
+    border-radius: var(--iv-radius);
+    color: var(--iv-muted);
+    font-size: 12.5px;
+    cursor: pointer;
+}
+
+.iv-culture-option:hover {
+    background: var(--iv-soft);
+    color: var(--iv-ink);
+}
+
+.iv-culture-option.active {
+    background: var(--iv-soft);
+    color: var(--iv-ink);
+    font-weight: 600;
+}

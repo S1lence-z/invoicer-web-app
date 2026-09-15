@@ -132,4 +132,7 @@
   <data name="Numbering Schemes" xml:space="preserve">
     <value>Numbering Schemes</value>
   </data>
+  <data name="ToggleMenu" xml:space="preserve">
+    <value>Toggle menu</value>
+  </data>
 </root>
