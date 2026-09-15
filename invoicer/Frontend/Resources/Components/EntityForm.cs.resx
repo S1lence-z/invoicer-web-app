@@ -204,10 +204,25 @@
   <data name="IsThisClient" xml:space="preserve">
     <value>Je to váš zákazník?</value>
   </data>
-  <data name="RegistrationTextLabel" xml:space="preserve">
-    <value>Text o zápisu do rejstříku (tiskne se pod položky faktury)</value>
-  </data>
   <data name="RegistrationTextPlaceholder" xml:space="preserve">
     <value>např. Fyzická osoba zapsaná v živnostenském rejstříku</value>
+  </data>
+  <data name="SectionBasics" xml:space="preserve">
+    <value>Základní údaje</value>
+  </data>
+  <data name="SectionRegistrationText" xml:space="preserve">
+    <value>Text o zápisu do rejstříku</value>
+  </data>
+  <data name="SectionAddress" xml:space="preserve">
+    <value>Adresa</value>
+  </data>
+  <data name="SectionBankAccount" xml:space="preserve">
+    <value>Bankovní účet</value>
+  </data>
+  <data name="CancelButtonText" xml:space="preserve">
+    <value>Zrušit</value>
+  </data>
+  <data name="RegistrationTextHint" xml:space="preserve">
+    <value>Tiskne se pod položkami faktury.</value>
   </data>
 </root>

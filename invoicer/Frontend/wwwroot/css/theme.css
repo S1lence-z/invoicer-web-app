@@ -738,3 +738,96 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 		width: 100%;
 	}
 }
+
+/* Entity form: the register lookup sits above the form it fills in. */
+.iv-form-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.iv-ares {
+	display: flex;
+	align-items: flex-end;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 20px;
+	background: var(--iv-accent-tint);
+	border: 1px solid var(--iv-accent-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+.iv-ares-field {
+	width: 280px;
+}
+
+.iv-ares-hint {
+	padding-bottom: 12px;
+	font-size: 12.5px;
+	color: var(--iv-sub);
+}
+
+.iv-ares-error {
+	padding-bottom: 12px;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--iv-danger);
+}
+
+.iv-field-hint {
+	font-size: 11.5px;
+	color: var(--iv-muted);
+}
+
+/* Switch: a checkbox that reads as on or off at a glance. */
+.iv-switch {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	cursor: pointer;
+}
+
+.iv-switch input {
+	position: absolute;
+	width: 0;
+	height: 0;
+	opacity: 0;
+}
+
+.iv-switch-track {
+	display: flex;
+	align-items: center;
+	width: 40px;
+	height: 24px;
+	flex-shrink: 0;
+	padding: 3px;
+	box-sizing: border-box;
+	background: #b4b0a8;
+	border: 1px solid rgba(28, 27, 25, 0.12);
+	border-radius: 999px;
+	transition: background-color 0.12s ease;
+}
+
+.iv-switch-knob {
+	width: 18px;
+	height: 18px;
+	background: #ffffff;
+	border-radius: 999px;
+	transition: margin-left 0.12s ease;
+}
+
+.iv-switch input:checked + .iv-switch-track {
+	background: var(--iv-accent);
+}
+
+.iv-switch input:checked + .iv-switch-track .iv-switch-knob {
+	margin-left: auto;
+}
+
+.iv-switch input:focus-visible + .iv-switch-track {
+	box-shadow: 0 0 0 3px var(--iv-accent-tint);
+}
+
+.iv-switch-label {
+	font-size: 14px;
+}

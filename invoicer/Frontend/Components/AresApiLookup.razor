@@ -3,16 +3,24 @@
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<AresApiLookup> L
 
-@* ARES API WINDOW *@
-<div class="border border-primary rounded bg-gradient p-2 mb-2 d-flex flex-column justify-content-center">
-    <h4 class="text-primary mx-auto">@L["SectionTitle"]</h4>
-    <div class="d-flex flex-row gap-4 text-center align-items-center my-2">
-        <input type="text" class="form-control" placeholder="@L["IcoInputPlaceholder"]" value="@UserInputIco" @oninput="HandleUserInputChange" />
-        <button disabled="@(string.IsNullOrEmpty(UserInputIco) || UserInputIco.Length != IcoLength)" class="btn btn-success w-50" @onclick="OnFillInAresData.InvokeAsync">@L["FillInButton"]</button>
+@* Typing a company number fills the form from the public register. *@
+<div class="iv-ares">
+    <div class="iv-field iv-ares-field">
+        <span class="iv-field-label">@L["SectionTitle"]</span>
+        <input type="text" class="form-control iv-num" placeholder="@L["IcoInputPlaceholder"]" value="@UserInputIco" @oninput="HandleUserInputChange" />
     </div>
-    @if (!string.IsNullOrEmpty(AresApiErrorMessage))
+    <button type="button" class="btn btn-primary"
+            disabled="@(string.IsNullOrEmpty(UserInputIco) || UserInputIco.Length != IcoLength)"
+            @onclick="OnFillInAresData.InvokeAsync">
+        @L["FillInButton"]
+    </button>
+    @if (string.IsNullOrEmpty(AresApiErrorMessage))
     {
-        <p class="text-danger mx-auto">@AresApiErrorMessage</p>
+        <span class="iv-ares-hint">@L["LookupHint"]</span>
+    }
+    else
+    {
+        <span class="iv-ares-error">@AresApiErrorMessage</span>
     }
 </div>
 
