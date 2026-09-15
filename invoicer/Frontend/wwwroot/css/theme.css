@@ -278,3 +278,185 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 .valid.modified:not([type=checkbox]) { outline: none; border-color: var(--iv-accent); }
 .invalid { outline: none; border-color: var(--iv-danger); }
 .validation-message { color: var(--iv-danger); font-size: 12px; }
+
+/* Invoice list: the header row and every invoice row share one grid. */
+.iv-invoice-grid {
+	display: grid;
+	grid-template-columns: 124px minmax(0, 1fr) 112px 140px 132px 150px;
+	gap: 14px;
+	align-items: center;
+	padding: 0 18px;
+}
+
+.iv-table {
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+	overflow: hidden;
+}
+
+.iv-table-head {
+	height: 42px;
+	background: var(--iv-head);
+	border-bottom: 1px solid var(--iv-line);
+}
+
+/* The status control keeps working as a select while reading as a pill. */
+.iv-status {
+	height: 28px;
+	width: 100%;
+	max-width: 140px;
+	padding: 0 24px 0 10px;
+	border: 0;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 500;
+	appearance: none;
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 10px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355524d' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	cursor: pointer;
+}
+
+.iv-status-pending { background-color: var(--iv-warn-tint); color: var(--iv-warn); }
+.iv-status-paid { background-color: var(--iv-ok-tint); color: var(--iv-ok); }
+.iv-status-overdue { background-color: var(--iv-danger-tint); color: var(--iv-danger); }
+.iv-status-draft, .iv-status-cancelled { background-color: var(--iv-soft); color: #615e58; }
+
+/* Square icon-only button used in table rows. */
+.iv-icon-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	background: transparent;
+	border: 0;
+	border-radius: var(--iv-radius);
+	color: var(--iv-sub);
+	cursor: pointer;
+}
+
+.iv-icon-btn:hover { background: var(--iv-soft); color: var(--iv-ink); }
+.iv-icon-btn-danger { color: var(--iv-danger); }
+.iv-icon-btn-danger:hover { background: var(--iv-danger-tint); color: var(--iv-danger); }
+
+.iv-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.iv-search {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	flex-grow: 1;
+	max-width: 360px;
+	height: var(--iv-control);
+	padding: 0 13px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-field);
+	border-radius: var(--iv-radius);
+}
+
+.iv-search input {
+	flex-grow: 1;
+	min-width: 0;
+	border: 0;
+	outline: none;
+	background: transparent;
+	font-size: 14px;
+	color: var(--iv-ink);
+}
+
+.iv-search input::placeholder { color: var(--iv-faint); }
+
+.iv-filter {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: var(--iv-control);
+	padding: 0 6px 0 13px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-field);
+	border-radius: var(--iv-radius);
+	font-size: 14px;
+	color: var(--iv-muted);
+}
+
+.iv-filter select {
+	height: 30px;
+	border: 0;
+	outline: none;
+	background: transparent;
+	color: var(--iv-ink);
+	font-size: 14px;
+	cursor: pointer;
+}
+
+@media (max-width: 900px) {
+	.iv-invoice-grid {
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 8px;
+		padding: 14px 16px;
+	}
+
+	.iv-table-head { display: none; }
+}
+
+/* Page scaffolding shared by every screen. */
+.iv-page {
+	display: flex;
+	flex-direction: column;
+	gap: 22px;
+}
+
+.iv-page-head {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 24px;
+	flex-wrap: wrap;
+}
+
+.iv-page-head h1 {
+	margin: 0;
+}
+
+.iv-page-title {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.iv-page-sub {
+	font-size: 13.5px;
+	color: var(--iv-muted);
+}
+
+.iv-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	font-size: 13px;
+	color: #6c6962;
+}
+
+.iv-summary-amount {
+	font-weight: 600;
+	color: var(--iv-ink);
+}
+
+.iv-table-message {
+	padding: 26px 18px;
+	color: var(--iv-muted);
+}
+
+.iv-right {
+	text-align: right;
+}

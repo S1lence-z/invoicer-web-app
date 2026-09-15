@@ -3,74 +3,109 @@
 @using System.Globalization
 @using System.Net
 @using Application.DTOs.Pdf
+@using Application.Extensions
 @using Application.ServiceInterfaces
 @using Frontend.Components
+@using Frontend.Extensions
 @using Frontend.Services
 @using Microsoft.Extensions.Localization
 @using Application.DTOs
+@using Shared.Enums
+@using Shared.Extensions
 @inject IInvoiceService invoiceService
 @inject IJSRuntime jsRuntime
 @inject NavigationManager navigationManager
 @inject ErrorService errorService
 @inject IStringLocalizer<Invoices> L
+@inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
-@* PAGE CONTAINER *@
-<div class="d-flex flex-column border rounded-3">
-    @* HEADER *@
-    <div class="d-flex justify-content-between align-items-center px-4 pt-4">
-        <h3>@L["PageTitle"]</h3>
+<div class="iv-page">
+    <div class="iv-page-head">
+        <h1>@L["PageTitle"]</h1>
         <button class="btn btn-primary" @onclick="AddNewInvoice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+            </svg>
             @L["AddNewInvoiceButton"]
         </button>
     </div>
-    <hr />
-    @* CONTENT *@
-    <div class="d-flex flex-column pb-4">
-        @* FILTER AND SEARCH BAR *@
-        <div class="card border-0 mx-4">
-            <div class="row g-2">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="@L["SearchPlaceholder"]" @oninput="SearchInvoices" />
-                        <select class="form-select" @bind="searchType">
-                            <option value="InvoiceNumber">@L["SearchOptionInvoiceNumber"]</option>
-                            <option value="Buyer">@L["SearchOptionBuyer"]</option>
-                            <option value="Seller">@L["SearchOptionSeller"]</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+
+    <div class="iv-toolbar">
+        <div class="iv-search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#76736c" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m16 16 4.5 4.5" />
+            </svg>
+            <input type="text" placeholder="@L["SearchPlaceholder"]" value="@searchTerm" @oninput="OnSearchTermChanged" />
         </div>
-        @* LIST HEADER *@
-        <div class="card border-1 shadow-sm mx-4 my-4">
-            <div class="card-body row">
-                <div class="col fw-bold">@L["ListHeaderInvoiceNumber"]</div>
-                <div class="col fw-bold">@L["ListHeaderSeller"]</div>
-                <div class="col fw-bold">@L["ListHeaderBuyer"]</div>
-                <div class="col fw-bold">@L["ListHeaderDueDate"]</div>
-                <div class="col fw-bold">@L["ListHeaderStatus"]</div>
-                <div class="col fw-bold">@L["ListHeaderTotalWithVAT"]</div>
-                <div class="col fw-bold">@L["ListHeaderActions"]</div>
-            </div>
-        </div>
-        @* INVOICES LIST *@
-        <div class="d-flex flex-column overflow-auto px-4 gap-2">
-            @if (isLoadingData)
-            {
-                <Spinner />
-            }
-            else if (shownInvoices.Count == 0)
-            {
-                <p>@L["NoInvoicesFoundMessage"]</p>
-            }
-            else
-            {
-                @foreach (var invoice in shownInvoices)
+
+        <label class="iv-filter">
+            <span>@L["SearchInLabel"]</span>
+            <select @bind="searchType" @bind:after="ApplyFilters">
+                <option value="@SearchType.InvoiceNumber">@L["SearchOptionInvoiceNumber"]</option>
+                <option value="@SearchType.Buyer">@L["SearchOptionBuyer"]</option>
+                <option value="@SearchType.Seller">@L["SearchOptionSeller"]</option>
+            </select>
+        </label>
+
+        @* Only worth showing when the user invoices under more than one of their own entities. *@
+        @if (Sellers.Count > 1)
+        {
+            <label class="iv-filter">
+                <span>@L["SellerFilterLabel"]</span>
+                <select @bind="sellerFilterId" @bind:after="ApplyFilters">
+                    <option value="0">@L["FilterAllOption"]</option>
+                    @foreach (EntityDto seller in Sellers)
+                    {
+                        <option value="@seller.Id">@seller.Name</option>
+                    }
+                </select>
+            </label>
+        }
+
+        <label class="iv-filter">
+            <span>@L["StatusFilterLabel"]</span>
+            <select value="@(statusFilter?.ToString() ?? string.Empty)" @onchange="OnStatusFilterChanged">
+                <option value="">@L["FilterAllOption"]</option>
+                @foreach (InvoiceStatus status in Enum.GetValues<InvoiceStatus>())
                 {
-                    <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" OnExportInvoice="ExportInvoice" OnPreviewInvoice="ShowInvoicePreview" OnInvoiceStatusUpdate="UpdateInvoiceStatus" />
+                    <option value="@status">@EnumL.Localize(status)</option>
                 }
-            }
+            </select>
+        </label>
+    </div>
+
+    <div class="iv-table">
+        <div class="iv-invoice-grid iv-table-head iv-label">
+            <span>@L["ListHeaderInvoiceNumber"]</span>
+            <span>@L["ListHeaderParties"]</span>
+            <span>@L["ListHeaderDueDate"]</span>
+            <span>@L["ListHeaderStatus"]</span>
+            <span class="iv-right">@L["ListHeaderTotalWithVAT"]</span>
+            <span class="iv-right">@L["ListHeaderActions"]</span>
         </div>
+
+        @if (isLoadingData)
+        {
+            <div class="iv-table-message"><Spinner /></div>
+        }
+        else if (shownInvoices.Count == 0)
+        {
+            <div class="iv-table-message">@L["NoInvoicesFoundMessage"]</div>
+        }
+        else
+        {
+            @foreach (var invoice in shownInvoices)
+            {
+                <InvoiceListItem Invoice="invoice" OnDeleteInvoice="DeleteInvoice" OnEditInvoice="EditInvoice" OnExportInvoice="ExportInvoice" OnPreviewInvoice="ShowInvoicePreview" OnInvoiceStatusUpdate="UpdateInvoiceStatus" />
+            }
+        }
+    </div>
+
+    <div class="iv-summary">
+        <span>@L["SummaryShownLabel"] @shownInvoices.Count</span>
+        <span>@L["SummaryUnpaidLabel"] <span class="iv-num iv-summary-amount">@UnpaidTotal</span></span>
     </div>
 </div>
 
@@ -88,6 +123,8 @@
     private InvoiceDto? invoiceToPreview = null;
     private string searchTerm = string.Empty;
     private SearchType searchType = SearchType.InvoiceNumber;
+    private int sellerFilterId = 0;
+    private InvoiceStatus? statusFilter = null;
     private bool isPreviewingInvoice = false;
     private bool isLoadingData = false;
 
@@ -96,6 +133,25 @@
         InvoiceNumber,
         Buyer,
         Seller
+    }
+
+    /// <summary>The user's own entities that actually appear on an invoice.</summary>
+    private List<EntityDto> Sellers => allInvoices is null
+        ? []
+        : allInvoices.Select(i => i.Seller!).DistinctBy(s => s.Id).OrderBy(s => s.Name).ToList();
+
+    /// <summary>Money still owed in the current view, one sum per currency.</summary>
+    private string UnpaidTotal
+    {
+        get
+        {
+            var sums = shownInvoices
+                .Where(i => i.Status is InvoiceStatus.Pending or InvoiceStatus.Overdue)
+                .GroupBy(i => i.Currency)
+                .Select(g => g.Key.FormatAmount(g.Sum(i => i.GetTotalWithTax())))
+                .ToList();
+            return sums.Count == 0 ? "—" : string.Join(" · ", sums);
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -133,29 +189,46 @@
         StateHasChanged();
     }
 
-    private void SearchInvoices(ChangeEventArgs e)
+    private void OnSearchTermChanged(ChangeEventArgs e)
     {
         searchTerm = e.Value?.ToString() ?? string.Empty;
-        if (string.IsNullOrEmpty(searchTerm)) 
-        {
-            PopulateShownInvoices(allInvoices);
+        ApplyFilters();
+    }
+
+    private void OnStatusFilterChanged(ChangeEventArgs e)
+    {
+        string? raw = e.Value?.ToString();
+        statusFilter = string.IsNullOrEmpty(raw) ? null : Enum.Parse<InvoiceStatus>(raw);
+        ApplyFilters();
+    }
+
+    // Search term, issuing company and status all narrow the same list.
+    private void ApplyFilters()
+    {
+        if (allInvoices is null)
             return;
+
+        IEnumerable<InvoiceDto> filtered = allInvoices;
+
+        if (sellerFilterId != 0)
+            filtered = filtered.Where(i => i.SellerId == sellerFilterId);
+
+        if (statusFilter is { } status)
+            filtered = filtered.Where(i => i.Status == status);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            string search = searchTerm.Trim().ToLower();
+            filtered = searchType switch
+            {
+                SearchType.InvoiceNumber => filtered.Where(i => i.InvoiceNumber.ToLower().Contains(search)),
+                SearchType.Buyer => filtered.Where(i => i.Buyer!.Name.ToLower().Contains(search)),
+                SearchType.Seller => filtered.Where(i => i.Seller!.Name.ToLower().Contains(search)),
+                _ => filtered
+            };
         }
-        string search = searchTerm.ToLower();
-        switch (searchType) {
-            case SearchType.InvoiceNumber:
-                PopulateShownInvoices(allInvoices.Where(i => i.InvoiceNumber.ToLower().Contains(search)).ToList());
-                break;
-            case SearchType.Buyer:
-                PopulateShownInvoices(allInvoices.Where(i => i.Buyer!.Name.ToLower().Contains(search)).ToList());
-                break;
-            case SearchType.Seller:
-                PopulateShownInvoices(allInvoices.Where(i => i.Seller!.Name.ToLower().Contains(search)).ToList());
-                break;
-            default:
-                PopulateShownInvoices(allInvoices);
-                break;
-        }
+
+        PopulateShownInvoices(filtered.ToList());
     }
 
     private void ShowInvoicePreview(InvoiceDto invToShow)

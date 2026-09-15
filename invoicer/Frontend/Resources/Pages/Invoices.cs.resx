@@ -101,7 +101,7 @@
     <value>Faktury</value>
   </data>
   <data name="AddNewInvoiceButton" xml:space="preserve">
-    <value>Přidat novou fakturu</value>
+    <value>Nová faktura</value>
   </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Hledat faktury...</value>
@@ -117,12 +117,6 @@
   </data>
   <data name="ListHeaderInvoiceNumber" xml:space="preserve">
     <value>Číslo faktury</value>
-  </data>
-  <data name="ListHeaderSeller" xml:space="preserve">
-    <value>Dodavatel</value>
-  </data>
-  <data name="ListHeaderBuyer" xml:space="preserve">
-    <value>Odběratel</value>
   </data>
   <data name="ListHeaderDueDate" xml:space="preserve">
     <value>Datum splatnosti</value>
@@ -150,5 +144,26 @@
   </data>
   <data name="PreviewModalTitle" xml:space="preserve">
     <value>Náhled faktury</value>
+  </data>
+  <data name="SearchInLabel" xml:space="preserve">
+    <value>Hledat v:</value>
+  </data>
+  <data name="SellerFilterLabel" xml:space="preserve">
+    <value>Dodavatel:</value>
+  </data>
+  <data name="StatusFilterLabel" xml:space="preserve">
+    <value>Stav:</value>
+  </data>
+  <data name="FilterAllOption" xml:space="preserve">
+    <value>Vše</value>
+  </data>
+  <data name="ListHeaderParties" xml:space="preserve">
+    <value>Odběratel a dodavatel</value>
+  </data>
+  <data name="SummaryShownLabel" xml:space="preserve">
+    <value>Zobrazeno</value>
+  </data>
+  <data name="SummaryUnpaidLabel" xml:space="preserve">
+    <value>Neuhrazeno</value>
   </data>
 </root>

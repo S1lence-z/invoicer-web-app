@@ -7,44 +7,54 @@
 @inject IStringLocalizer<InvoiceListItem> L
 @inject IStringLocalizer<Frontend.Localization.EnumResources> EnumL
 
-<div class="card border-1 shadow-sm">
-    <div class="card-body row align-items-center">
-        <div class="col">
-            <span class="fw-bold">@Invoice.InvoiceNumber</span>
-        </div>
-        <div class="col">
-            <span class="text-muted">@Invoice.Seller!.Name</span>
-        </div>
-        <div class="col">
-            <span class="text-muted">@Invoice.Buyer!.Name</span>
-        </div>
-        <div class="col">
-            <span class="text-muted">@Invoice.DueDate.ToString("d")</span>
-        </div>
-        <div class="col">
-            <select class="form-select form-select-sm w-75" @onchange="(e) => OnInvoiceStatusUpdate.InvokeAsync(Invoice with { Status = (InvoiceStatus)Enum.Parse(typeof(InvoiceStatus), e.Value?.ToString()!) })">
-                @foreach (InvoiceStatus status in Enum.GetValues(typeof(InvoiceStatus)))
-                {
-                    <option selected="@(Invoice.Status == status)" class="@GetStatusColorClass(status)" value="@status">
-                        @EnumL.Localize(status)
-                    </option>
-                }
-            </select>
-        </div>
-        <div class="col">
-            <span class="fw-bold">
-                @Invoice.Currency.FormatAmount(Invoice.GetTotalWithTax())
-            </span>
-        </div>
-        <div class="col">
-            @* Two buttons per row while the labels fit; a label too long for half the column pushes its button onto its own row *@
-            <div class="d-flex flex-wrap gap-1 invoice-actions">
-                <button class="btn btn-outline-primary btn-sm" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">@L["EditButton"]</button>
-                <button class="btn btn-outline-danger btn-sm" @onclick="() => OnDeleteInvoice.InvokeAsync(Invoice)">@L["DeleteButton"]</button>
-                <button class="btn btn-outline-dark btn-sm" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">@L["PreviewButton"]</button>
-                <button class="btn btn-outline-success btn-sm" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">@L["ExportButton"]</button>
-            </div>
-        </div>
+<div class="iv-invoice-grid iv-row">
+    <span class="iv-num iv-number">@Invoice.InvoiceNumber</span>
+
+    @* The buyer leads; the issuing company sits under it, because one user bills from several. *@
+    <div class="iv-parties">
+        <span class="iv-buyer">@Invoice.Buyer!.Name</span>
+        <span class="iv-seller">@Invoice.Seller!.Name</span>
+    </div>
+
+    <span class="iv-num iv-due @(IsOverdue ? "iv-due-late" : null)">@Invoice.DueDate.ToString("d")</span>
+
+    <select class="iv-status @StatusClass(Invoice.Status)"
+            title="@L["StatusSelectTitle"]"
+            @onchange="OnStatusChanged">
+        @foreach (InvoiceStatus status in Enum.GetValues<InvoiceStatus>())
+        {
+            <option value="@status" selected="@(Invoice.Status == status)">@EnumL.Localize(status)</option>
+        }
+    </select>
+
+    <span class="iv-num iv-total">@Invoice.Currency.FormatAmount(Invoice.GetTotalWithTax())</span>
+
+    <div class="iv-actions">
+        <button type="button" class="iv-icon-btn" title="@L["EditButton"]" @onclick="() => OnEditInvoice.InvokeAsync(Invoice)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 20h4l10-10-4-4L4 16z" />
+            </svg>
+        </button>
+        <button type="button" class="iv-icon-btn" title="@L["PreviewButton"]" @onclick="() => OnPreviewInvoice.InvokeAsync(Invoice)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6-10-6-10-6z" />
+                <circle cx="12" cy="12" r="2.6" />
+            </svg>
+        </button>
+        <button type="button" class="iv-icon-btn" title="@L["ExportButton"]" @onclick="() => OnExportInvoice.InvokeAsync(Invoice)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v12" />
+                <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
+                <path d="M4 20h16" />
+            </svg>
+        </button>
+        <button type="button" class="iv-icon-btn iv-icon-btn-danger" title="@L["DeleteButton"]" @onclick="() => OnDeleteInvoice.InvokeAsync(Invoice)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 7h14" />
+                <path d="M9.5 7V5h5v2" />
+                <path d="M6.5 7 7.5 20h9L17.5 7" />
+            </svg>
+        </button>
     </div>
 </div>
 
@@ -67,16 +77,21 @@
     [Parameter]
     public EventCallback<InvoiceDto> OnInvoiceStatusUpdate { get; set; }
 
-    private string GetStatusColorClass(InvoiceStatus status)
+    private bool IsOverdue => Invoice.Status == InvoiceStatus.Overdue;
+
+    private Task OnStatusChanged(ChangeEventArgs e)
     {
-        return status switch
-        {
-            InvoiceStatus.Pending => "text-warning",
-            InvoiceStatus.Paid => "text-success",
-            InvoiceStatus.Overdue => "text-danger",
-            InvoiceStatus.Draft => "text-dark",
-            InvoiceStatus.Cancelled => "text-dark",
-            _ => "text-muted"
-        };
+        var status = Enum.Parse<InvoiceStatus>(e.Value?.ToString()!);
+        return OnInvoiceStatusUpdate.InvokeAsync(Invoice with { Status = status });
     }
+
+    private static string StatusClass(InvoiceStatus status) => status switch
+    {
+        InvoiceStatus.Pending => "iv-status-pending",
+        InvoiceStatus.Paid => "iv-status-paid",
+        InvoiceStatus.Overdue => "iv-status-overdue",
+        InvoiceStatus.Draft => "iv-status-draft",
+        InvoiceStatus.Cancelled => "iv-status-cancelled",
+        _ => "iv-status-draft"
+    };
 }

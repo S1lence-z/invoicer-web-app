@@ -1,5 +1,72 @@
-/* Invoice list action buttons: two per row, or one per row when a label would overflow */
-.invoice-actions > .btn {
-    flex: 1 1 calc(50% - 0.25rem);
+.iv-row {
+    height: 58px;
+    border-bottom: 1px solid var(--iv-hairline);
+}
+
+.iv-row:last-child {
+    border-bottom: 0;
+}
+
+.iv-number {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.iv-parties {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.iv-buyer {
+    font-size: 14px;
+    color: var(--iv-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.iv-seller {
+    font-size: 12px;
+    color: var(--iv-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.iv-due {
+    font-size: 12.5px;
+    color: var(--iv-sub);
+}
+
+.iv-due-late {
+    color: var(--iv-danger);
+}
+
+.iv-total {
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+}
+
+.iv-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 2px;
+}
+
+@media (max-width: 900px) {
+    .iv-row {
+        height: auto;
+        row-gap: 6px;
+    }
+
+    .iv-total {
+        text-align: left;
+    }
+
+    .iv-actions {
+        justify-content: flex-start;
+    }
 }
