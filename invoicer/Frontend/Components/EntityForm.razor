@@ -46,7 +46,7 @@
                     </div>
                     <div class="iv-field">
                         <label class="iv-field-label" for="entity-ico">@L["IcoLabel"]</label>
-                        <input type="text" class="form-control iv-num" id="entity-ico" placeholder="@L["IcoPlaceholder"]" @bind="entityFormModel.Ico" />
+                        <input type="text" class="form-control iv-num" id="entity-ico" placeholder="@L["IcoPlaceholder"]" value="@entityFormModel.Ico" @oninput="HandleIcoInput" />
                         <ValidationMessage For="@(() => entityFormModel.Ico)" />
                     </div>
                 </div>
@@ -196,6 +196,11 @@
         {
             loadingService.StopLoading();
         }
+    }
+
+    private void HandleIcoInput(ChangeEventArgs e)
+    {
+        entityFormModel.Ico = InputFormat.StripWhitespace(e.Value?.ToString());
     }
 
     private void FillInForm(SubjectInformation newData)

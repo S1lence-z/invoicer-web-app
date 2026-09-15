@@ -1,5 +1,6 @@
 ﻿@using Application.ExternalServiceInterfaces
 @using Application.ServiceInterfaces
+@using Frontend.Utils
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<AresApiLookup> L
 
@@ -35,7 +36,7 @@
 
     private async Task HandleUserInputChange(ChangeEventArgs e)
     {
-        UserInputIco = e.Value?.ToString();
+        UserInputIco = InputFormat.StripWhitespace(e.Value?.ToString());
         await UserInputIcoChanged.InvokeAsync(UserInputIco);
     }
 }
