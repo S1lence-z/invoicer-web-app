@@ -138,4 +138,19 @@
   <data name="WelcomeTitle" xml:space="preserve">
     <value>Welcome to Invoicer</value>
   </data>
+  <data name="NewInvoiceButton" xml:space="preserve">
+    <value>New Invoice</value>
+  </data>
+  <data name="NewEntityButton" xml:space="preserve">
+    <value>New Entity</value>
+  </data>
+  <data name="FeatureAutomationText" xml:space="preserve">
+    <value>Invoice numbers come from your numbering scheme, with nothing to retype.</value>
+  </data>
+  <data name="FeatureClientsText" xml:space="preserve">
+    <value>Buyer details are filled in from the public register by company number.</value>
+  </data>
+  <data name="FeatureReportsText" xml:space="preserve">
+    <value>A running total of what has been paid and what is still owed.</value>
+  </data>
 </root>

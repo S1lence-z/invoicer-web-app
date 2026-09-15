@@ -106,4 +106,7 @@
   <data name="FillInButton" xml:space="preserve">
     <value>Fill In</value>
   </data>
+  <data name="LookupHint" xml:space="preserve">
+    <value>The details are filled in from the public register.</value>
+  </data>
 </root>

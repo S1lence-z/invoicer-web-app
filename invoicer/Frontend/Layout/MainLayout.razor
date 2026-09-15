@@ -8,17 +8,12 @@
 @inject IStringLocalizer<MainLayout> L
 
 <div class="page">
-    <div class="sidebar w-auto">
+    <div class="sidebar">
         <NavMenu />
     </div>
 
     <main>
-        <div class="top-row px-4 gap-4">
-            <CulturePicker />
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About ASP.NET</a>
-        </div>
-
-        <article class="content px-4">
+        <article class="content">
             @if (LoadingService.IsLoading)
             {
                 <div class="spinner-overlay">

@@ -132,4 +132,7 @@
   <data name="LoadInvoiceFailedError" xml:space="preserve">
     <value>Tato faktura neexistuje</value>
   </data>
+  <data name="InvoicesCrumb" xml:space="preserve">
+    <value>Faktury</value>
+  </data>
 </root>

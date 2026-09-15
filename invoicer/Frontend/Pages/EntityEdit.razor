@@ -13,7 +13,7 @@
 @inject NavigationManager navigationManager
 @inject IStringLocalizer<EntityEdit> L
 
-<div class="w-75 mx-auto">
+<div class="iv-page">
     @if (IsLoadingData)
     {
         <Spinner />
@@ -25,19 +25,25 @@
     }
     else
     {
+        <div class="iv-crumb">
+            <a href="@ReturnUrl">@L["EntitiesCrumb"]</a>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8e8a82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m9 6 6 6-6 6" />
+            </svg>
+            <span class="iv-crumb-current">@(IsEditingMode ? L["EditEntityTitle"] : L["AddNewEntityTitle"])</span>
+        </div>
+        <div class="iv-page-head">
+            <h1>@(IsEditingMode ? L["EditEntityTitle"] : L["AddNewEntityTitle"])</h1>
+        </div>
+
         @if (IsEditingMode)
         {
-            <h3>@L["EditEntityTitle"]</h3>
-            <EntityForm OnSubmitCallback="OnEntityFormSubmit" EntityInstance="EntityInstance" isActive="IsEditingMode" />
+            <EntityForm OnSubmitCallback="OnEntityFormSubmit" CancelCallback="NavigateBack" EntityInstance="EntityInstance" isActive="IsEditingMode" />
         }
         else
         {
-            <h3>@L["AddNewEntityTitle"]</h3>
-            <EntityForm OnSubmitCallback="OnEntityFormSubmit" isActive="!IsEditingMode" />
-        } 
-        <button class="btn btn-outline-secondary" @onclick="NavigateBack" disabled="@(IsLoadingData)">
-            @L["BackButton"]
-        </button>
+            <EntityForm OnSubmitCallback="OnEntityFormSubmit" CancelCallback="NavigateBack" isActive="!IsEditingMode" />
+        }
     }
 </div>
 

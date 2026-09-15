@@ -109,4 +109,7 @@
   <data name="NoEntitiesFound" xml:space="preserve">
     <value>Nebyly nalezeny žádné subjekty pro přiřazení řad</value>
   </data>
+  <data name="HeadingTitle" xml:space="preserve">
+    <value>Číslování faktur</value>
+  </data>
 </root>

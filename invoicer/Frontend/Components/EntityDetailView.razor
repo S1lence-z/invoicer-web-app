@@ -2,37 +2,47 @@
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<EntityDetailView> L
 
-<div class="d-flex flex-column p-4 bg-light flex-grow-1">
-    @*Entity*@
-    <h4>@SelectedEntity.Name</h4>
-    <div class="d-flex flex-row gap-5">
-        <p><strong>@L["IcoLabel"]</strong> @SelectedEntity.Ico</p>
-        <p><strong>@L["EmailLabel"]</strong> @SelectedEntity.Email</p>
-        <p><strong>@L["PhoneLabel"]</strong> @SelectedEntity.PhoneNumber</p>
-        @if (!string.IsNullOrWhiteSpace(SelectedEntity.RegistrationText))
-        {
-            <p><strong>@L["RegistrationTextLabel"]</strong> @SelectedEntity.RegistrationText</p>
-        }
+<div class="iv-detail">
+    <div class="iv-detail-head">
+        <span class="iv-detail-name">@SelectedEntity.Name</span>
+        <span class="iv-detail-kind">@(SelectedEntity.IsClient ? L["ClientCaption"] : L["MineCaption"])</span>
     </div>
-    @* Address and Bank Account*@
-    <div class="d-flex flex-row gap-5">
-        <div class="d-flex flex-column border border-black p-3 rounded flex-grow-1 bg-white">
-            <h5 class="text-primary">@L["BankAccountSectionTitle"]</h5>
-            <p><strong>@L["BankNameLabel"]</strong> @SelectedEntity.BankAccount!.BankName</p>
-            <p>
-                <strong>@L["AccountNumberLabel"]</strong> @SelectedEntity.BankAccount.AccountNumber
-            </p>
-            <p><strong>@L["BankCodeLabel"]</strong> @SelectedEntity.BankAccount.BankCode</p>
-            <p><strong>@L["IBANLabel"]</strong> @SelectedEntity.BankAccount.IBAN</p>
-        </div>
-        <div class="d-flex flex-column border border-black p-3 rounded flex-grow-1 bg-white">
-            <h5 class="text-primary">@L["AddressSectionTitle"]</h5>
-            <p><strong>@L["StreetLabel"]</strong> @SelectedEntity.Address!.Street</p>
-            <p><strong>@L["CityLabel"]</strong> @SelectedEntity.Address!.City</p>
-            <p><strong>@L["ZipCodeLabel"]</strong> @SelectedEntity.Address!.ZipCode</p>
-            <p><strong>@L["CountryLabel"]</strong> @SelectedEntity.Address!.Country</p>
-        </div>
+
+    <div class="iv-detail-section">
+        <span class="iv-label">@L["ContactSectionTitle"]</span>
+        <div class="iv-detail-row"><span>@L["IcoLabel"]</span><span class="iv-num">@SelectedEntity.Ico</span></div>
+        <div class="iv-detail-row"><span>@L["EmailLabel"]</span><span>@SelectedEntity.Email</span></div>
+        <div class="iv-detail-row"><span>@L["PhoneLabel"]</span><span class="iv-num">@SelectedEntity.PhoneNumber</span></div>
     </div>
+
+    <div class="iv-doc-rule"></div>
+
+    <div class="iv-detail-section">
+        <span class="iv-label">@L["BankAccountSectionTitle"]</span>
+        <div class="iv-detail-row"><span>@L["BankNameLabel"]</span><span>@SelectedEntity.BankAccount?.BankName</span></div>
+        <div class="iv-detail-row"><span>@L["AccountNumberLabel"]</span><span class="iv-num">@SelectedEntity.BankAccount?.AccountNumber</span></div>
+        <div class="iv-detail-row"><span>@L["BankCodeLabel"]</span><span class="iv-num">@SelectedEntity.BankAccount?.BankCode</span></div>
+        <div class="iv-detail-row"><span>@L["IBANLabel"]</span><span class="iv-num">@SelectedEntity.BankAccount?.IBAN</span></div>
+    </div>
+
+    <div class="iv-doc-rule"></div>
+
+    <div class="iv-detail-section">
+        <span class="iv-label">@L["AddressSectionTitle"]</span>
+        <div class="iv-detail-row"><span>@L["StreetLabel"]</span><span>@SelectedEntity.Address?.Street</span></div>
+        <div class="iv-detail-row"><span>@L["CityLabel"]</span><span>@SelectedEntity.Address?.City</span></div>
+        <div class="iv-detail-row"><span>@L["ZipCodeLabel"]</span><span class="iv-num">@SelectedEntity.Address?.ZipCode</span></div>
+        <div class="iv-detail-row"><span>@L["CountryLabel"]</span><span>@SelectedEntity.Address?.Country</span></div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(SelectedEntity.RegistrationText))
+    {
+        <div class="iv-doc-rule"></div>
+        <div class="iv-detail-section">
+            <span class="iv-label">@L["RegistrationTextLabel"]</span>
+            <span class="iv-detail-note">@SelectedEntity.RegistrationText</span>
+        </div>
+    }
 </div>
 
 @code {

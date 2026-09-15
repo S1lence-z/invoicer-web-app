@@ -13,7 +13,7 @@
 @inject NavigationManager navigationManager
 @inject IStringLocalizer<InvoiceEdit> L
 
-<div class="w-75 mx-auto">
+<div class="iv-page">
     @if (IsLoadingData)
     {
         <Spinner />
@@ -25,19 +25,25 @@
     }
     else
     {
+        <div class="iv-crumb">
+            <a href="@ReturnUrl">@L["InvoicesCrumb"]</a>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8e8a82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m9 6 6 6-6 6" />
+            </svg>
+            <span class="iv-crumb-current">@(IsEditingMode ? L["EditInvoiceTitle"] : L["AddNewInvoiceTitle"])</span>
+        </div>
+        <div class="iv-page-head">
+            <h1>@(IsEditingMode ? L["EditInvoiceTitle"] : L["AddNewInvoiceTitle"])</h1>
+        </div>
+
         @if (IsEditingMode)
         {
-            <h3>@L["EditInvoiceTitle"]</h3>
-            <InvoiceForm OnSubmitCallback="OnInvoiceFormSubmit" AddNewEntityCallback="ShowAddEntityModal" InvoiceInstance="InvoiceInstance" IsActive="IsEditingMode" />
+            <InvoiceForm OnSubmitCallback="OnInvoiceFormSubmit" AddNewEntityCallback="ShowAddEntityModal" CancelCallback="NavigateBack" InvoiceInstance="InvoiceInstance" IsActive="IsEditingMode" />
         }
         else
         {
-            <h3>@L["AddNewInvoiceTitle"]</h3>
-            <InvoiceForm OnSubmitCallback="OnInvoiceFormSubmit" AddNewEntityCallback="ShowAddEntityModal" IsActive="!IsEditingMode" />
+            <InvoiceForm OnSubmitCallback="OnInvoiceFormSubmit" AddNewEntityCallback="ShowAddEntityModal" CancelCallback="NavigateBack" IsActive="!IsEditingMode" />
         }
-        <button class="btn btn-outline-secondary float-end me-2" @onclick="NavigateBack" disabled="@(IsLoadingData)">
-            @L["BackButton"]
-        </button>
     }
 </div>
 

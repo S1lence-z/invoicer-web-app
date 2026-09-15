@@ -106,4 +106,7 @@
   <data name="FillInButton" xml:space="preserve">
     <value>Vyplnit</value>
   </data>
+  <data name="LookupHint" xml:space="preserve">
+    <value>Údaje se doplní z veřejného rejstříku.</value>
+  </data>
 </root>

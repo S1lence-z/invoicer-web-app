@@ -168,4 +168,13 @@
   <data name="No" xml:space="preserve">
     <value>Ne</value>
   </data>
+  <data name="PreviewLabel" xml:space="preserve">
+    <value>Náhled</value>
+  </data>
+  <data name="SectionFormat" xml:space="preserve">
+    <value>Formát čísla</value>
+  </data>
+  <data name="SectionOptions" xml:space="preserve">
+    <value>Možnosti</value>
+  </data>
 </root>
