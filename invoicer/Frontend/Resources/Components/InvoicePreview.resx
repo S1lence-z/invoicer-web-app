@@ -121,18 +121,6 @@
   <data name="BuyerSectionTitle" xml:space="preserve">
     <value>Buyer</value>
   </data>
-  <data name="NameLabel" xml:space="preserve">
-    <value>Name:</value>
-  </data>
-  <data name="AddressLabel" xml:space="preserve">
-    <value>Address:</value>
-  </data>
-  <data name="EmailLabel" xml:space="preserve">
-    <value>Email:</value>
-  </data>
-  <data name="PhoneNumberLabel" xml:space="preserve">
-    <value>Phone Number:</value>
-  </data>
   <data name="TableHeaderDescription" xml:space="preserve">
     <value>Description</value>
   </data>
@@ -157,13 +145,16 @@
   <data name="TotalVatLabel" xml:space="preserve">
     <value>VAT:</value>
   </data>
-  <data name="TotalPriceWithVatLabel" xml:space="preserve">
-    <value>Total Price with VAT:</value>
-  </data>
   <data name="FinalPriceLabel" xml:space="preserve">
     <value>Total Price:</value>
   </data>
   <data name="SignedByLabel" xml:space="preserve">
     <value>Signed by:</value>
+  </data>
+  <data name="IcoLabel" xml:space="preserve">
+    <value>Reg. No.:</value>
+  </data>
+  <data name="VatDateLabel" xml:space="preserve">
+    <value>Date of Taxable Supply:</value>
   </data>
 </root>
