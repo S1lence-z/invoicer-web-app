@@ -49,7 +49,7 @@ code {
 
     .loading-progress circle {
         fill: none;
-        stroke: #e4e2dd;
+        stroke: #d5d0c6;
         stroke-width: 0.6rem;
         transform-origin: 50% 50%;
         transform: rotate(-90deg);

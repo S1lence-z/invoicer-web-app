@@ -58,19 +58,23 @@
 	--iv-muted: #76736c;
 	--iv-faint: #a3a099;
 
-	--iv-page: #f7f7f5;
+	--iv-page: #ebe8e1;
 	--iv-surface: #ffffff;
-	--iv-soft: #f1efeb;
-	--iv-head: #fbfaf8;
+	--iv-soft: #f2f0ea;
+	--iv-head: #f8f7f3;
 
-	--iv-line: #e4e2dd;
-	--iv-hairline: #f1efeb;
-	--iv-field: #e0ddd7;
+	--iv-line: #d4cfc5;
+	--iv-hairline: #e3dfd7;
+	/* Controls sit a shade below the white card they live on, so the fill marks
+	   the target area and the border only has to define its edge. */
+	--iv-field: #bdb8ad;
+	--iv-field-bg: #f7f5f0;
 
 	--iv-accent: #16554b;
 	--iv-accent-strong: #0f3f38;
 	--iv-accent-tint: #e8f0ed;
 	--iv-accent-line: #d5e0db;
+	--iv-focus: rgba(22, 85, 75, 0.18);
 
 	--iv-ok: #1f6b4a;
 	--iv-ok-tint: #e4efe7;
@@ -153,7 +157,7 @@ hr { border-color: var(--iv-line); opacity: 1; }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
 .form-control:focus, .form-select:focus, .form-check-input:focus {
-	box-shadow: 0 0 0 3px var(--iv-accent-tint);
+	box-shadow: 0 0 0 3px var(--iv-focus);
 	border-color: var(--iv-accent);
 	outline: none;
 }
@@ -212,7 +216,7 @@ hr { border-color: var(--iv-line); opacity: 1; }
 .form-control, .form-select {
 	height: var(--iv-control);
 	padding: 0 12px;
-	background-color: var(--iv-surface);
+	background-color: var(--iv-field-bg);
 	border: 1px solid var(--iv-field);
 	border-radius: var(--iv-radius);
 	color: var(--iv-ink);
@@ -220,6 +224,8 @@ hr { border-color: var(--iv-line); opacity: 1; }
 }
 
 textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
+
+.form-control:focus, .form-select:focus { background-color: var(--iv-surface); }
 
 .form-control-sm, .form-select-sm {
 	height: 40px;
@@ -229,7 +235,7 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 }
 
 .form-control::placeholder { color: var(--iv-faint); }
-.form-control:disabled, .form-control[readonly] { background-color: var(--iv-page); color: var(--iv-sub); }
+.form-control:disabled, .form-control[readonly] { background-color: var(--iv-page); border-color: var(--iv-line); color: var(--iv-muted); }
 
 .form-label, label.font-weight-bold {
 	margin-bottom: 6px;
@@ -358,7 +364,7 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 	max-width: 360px;
 	height: var(--iv-control);
 	padding: 0 13px;
-	background: var(--iv-surface);
+	background: var(--iv-field-bg);
 	border: 1px solid var(--iv-field);
 	border-radius: var(--iv-radius);
 }
@@ -381,7 +387,7 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 	gap: 8px;
 	height: var(--iv-control);
 	padding: 0 6px 0 13px;
-	background: var(--iv-surface);
+	background: var(--iv-field-bg);
 	border: 1px solid var(--iv-field);
 	border-radius: var(--iv-radius);
 	font-size: 14px;
@@ -547,7 +553,7 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 	flex: 1 1 0;
 	min-width: 0;
 	padding: 0 4px;
-	background: var(--iv-surface);
+	background: var(--iv-field-bg);
 	border: 0;
 	border-left: 1px solid var(--iv-field);
 	color: var(--iv-sub);
@@ -825,7 +831,7 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 }
 
 .iv-switch input:focus-visible + .iv-switch-track {
-	box-shadow: 0 0 0 3px var(--iv-accent-tint);
+	box-shadow: 0 0 0 3px var(--iv-focus);
 }
 
 .iv-switch-label {
