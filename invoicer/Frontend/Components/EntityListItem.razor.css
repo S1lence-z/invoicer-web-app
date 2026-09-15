@@ -1,0 +1,76 @@
+.iv-entity-card {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 14px;
+    background: var(--iv-surface);
+    border: 1px solid var(--iv-line);
+    border-radius: var(--iv-radius-lg);
+    cursor: pointer;
+}
+
+.iv-entity-card:hover {
+    border-color: var(--iv-field);
+    background: var(--iv-head);
+}
+
+.iv-entity-card.selected {
+    background: var(--iv-accent-tint);
+    border: 2px solid var(--iv-accent);
+    padding: 13px;
+}
+
+.iv-entity-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.iv-entity-name {
+    font-size: 14.5px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.iv-entity-badge {
+    flex-shrink: 0;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 500;
+}
+
+.iv-entity-badge.mine {
+    background: var(--iv-accent);
+    color: #ffffff;
+}
+
+.iv-entity-badge.client {
+    background: var(--iv-soft);
+    color: var(--iv-sub);
+}
+
+.iv-entity-line {
+    font-size: 12px;
+    color: var(--iv-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.iv-entity-card.selected .iv-entity-line {
+    color: #5f5c56;
+}
+
+.iv-entity-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.iv-entity-actions ::deep .btn {
+    flex: 1 1 0;
+}

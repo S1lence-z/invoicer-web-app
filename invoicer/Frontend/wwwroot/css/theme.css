@@ -683,3 +683,58 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 
 	.iv-item-total { text-align: left; }
 }
+
+/* A page whose content fills the window: a list beside a detail pane. */
+.iv-page-fill {
+	height: 100%;
+	min-height: 0;
+}
+
+.iv-page-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.iv-filter-group {
+	height: var(--iv-control);
+}
+
+.iv-split {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+	min-height: 0;
+}
+
+.iv-split-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 330px;
+	flex-shrink: 0;
+}
+
+.iv-split-detail {
+	flex-grow: 1;
+	min-width: 0;
+	padding: 22px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+@media (max-width: 900px) {
+	.iv-split {
+		flex-direction: column;
+	}
+
+	.iv-split-list {
+		width: 100%;
+	}
+
+	.iv-split-detail {
+		width: 100%;
+	}
+}
