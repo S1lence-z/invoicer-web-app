@@ -132,4 +132,7 @@
   <data name="LoadInvoiceFailedError" xml:space="preserve">
     <value>Failed to load the requested invoice</value>
   </data>
+  <data name="InvoicesCrumb" xml:space="preserve">
+    <value>Invoices</value>
+  </data>
 </root>

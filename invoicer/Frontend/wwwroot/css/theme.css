@@ -460,3 +460,226 @@ textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
 .iv-right {
 	text-align: right;
 }
+
+/* Forms: cards of fields, an item table, and a sticky totals bar. */
+.iv-form {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.iv-card {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 20px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+.iv-grid-2, .iv-grid-3 {
+	display: grid;
+	gap: 16px;
+}
+
+.iv-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.iv-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.iv-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.iv-field-label {
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--iv-sub);
+}
+
+.iv-field-row {
+	display: flex;
+	gap: 8px;
+}
+
+.iv-field-row > .form-control,
+.iv-field-row > .form-select {
+	flex-grow: 1;
+	min-width: 0;
+}
+
+.iv-btn-square {
+	width: var(--iv-control);
+	padding: 0;
+	flex-shrink: 0;
+}
+
+.iv-btn-dashed {
+	align-self: flex-start;
+	background: transparent;
+	border: 1px dashed #c8c4bc;
+	color: var(--iv-accent);
+}
+
+.iv-btn-dashed:hover {
+	background: var(--iv-accent-tint);
+	border-color: var(--iv-accent-line);
+	color: var(--iv-accent-strong);
+}
+
+.iv-empty {
+	margin: 0;
+	color: var(--iv-muted);
+}
+
+/* One rate picker per item: the three Czech rates plus a way out. */
+.iv-segmented {
+	display: flex;
+	height: 40px;
+	border: 1px solid var(--iv-field);
+	border-radius: var(--iv-radius);
+	overflow: hidden;
+}
+
+.iv-segment {
+	flex: 1 1 0;
+	min-width: 0;
+	padding: 0 4px;
+	background: var(--iv-surface);
+	border: 0;
+	border-left: 1px solid var(--iv-field);
+	color: var(--iv-sub);
+	font-size: 12.5px;
+	cursor: pointer;
+}
+
+.iv-segment:first-child { border-left: 0; }
+.iv-segment:hover { background: var(--iv-soft); }
+
+.iv-segment.active {
+	background: var(--iv-accent);
+	color: #ffffff;
+	font-weight: 600;
+}
+
+.iv-item-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 90px 100px 140px 156px 130px 36px;
+	gap: 12px;
+	align-items: start;
+}
+
+.iv-item-head {
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--iv-line);
+	align-items: center;
+}
+
+.iv-item-row > .iv-icon-btn { margin-top: 2px; }
+
+.iv-item-total {
+	align-self: center;
+	font-size: 13.5px;
+	font-weight: 500;
+	text-align: right;
+}
+
+.iv-formbar {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	flex-wrap: wrap;
+	margin-top: 20px;
+	padding: 14px 20px;
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+	box-shadow: 0 -6px 18px rgba(28, 27, 25, 0.06);
+}
+
+.iv-formbar-totals {
+	display: flex;
+	align-items: center;
+	gap: 28px;
+	flex-wrap: wrap;
+}
+
+.iv-formbar-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-left: auto;
+}
+
+.iv-total-block {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.iv-total-label {
+	font-size: 11.5px;
+	color: var(--iv-muted);
+}
+
+.iv-total-value {
+	font-size: 14px;
+}
+
+.iv-total-strong {
+	font-size: 18px;
+	font-weight: 600;
+}
+
+/* Breadcrumb above a form page. */
+.iv-crumb {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	color: var(--iv-muted);
+}
+
+.iv-crumb a {
+	color: var(--iv-muted);
+	text-decoration: none;
+}
+
+.iv-crumb a:hover {
+	color: var(--iv-ink);
+}
+
+.iv-crumb-current {
+	color: var(--iv-ink);
+}
+
+@media (max-width: 1100px) {
+	.iv-item-grid {
+		grid-template-columns: minmax(0, 1fr) 80px 80px 120px 140px 110px 36px;
+		gap: 10px;
+	}
+}
+
+@media (max-width: 900px) {
+	.iv-grid-2, .iv-grid-3 { grid-template-columns: minmax(0, 1fr); }
+
+	.iv-item-grid {
+		grid-template-columns: minmax(0, 1fr) 36px;
+		row-gap: 8px;
+	}
+
+	.iv-item-head { display: none; }
+
+	.iv-item-row {
+		padding: 14px;
+		border: 1px solid var(--iv-line);
+		border-radius: var(--iv-radius);
+	}
+
+	.iv-item-total { text-align: left; }
+}

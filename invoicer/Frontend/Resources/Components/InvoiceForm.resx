@@ -202,4 +202,34 @@
   <data name="SignedByPlaceholder" xml:space="preserve">
     <value>Name of the person signing the invoice</value>
   </data>
+  <data name="SectionInvoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="SectionParties" xml:space="preserve">
+    <value>Parties</value>
+  </data>
+  <data name="SectionPayment" xml:space="preserve">
+    <value>Payment and signature</value>
+  </data>
+  <data name="ItemTotalLabel" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="VatCustomOption" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="AddEntityButtonTitle" xml:space="preserve">
+    <value>Add a new entity</value>
+  </data>
+  <data name="TotalNetLabel" xml:space="preserve">
+    <value>Net amount</value>
+  </data>
+  <data name="TotalVatLabel" xml:space="preserve">
+    <value>VAT</value>
+  </data>
+  <data name="TotalGrossLabel" xml:space="preserve">
+    <value>Total incl. VAT</value>
+  </data>
+  <data name="CancelButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
 </root>
