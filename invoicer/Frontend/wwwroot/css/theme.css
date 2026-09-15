@@ -1,0 +1,280 @@
+/* Invoicer design system: fonts, tokens, and the primitives every screen uses. */
+
+@font-face {
+	font-family: 'IBM Plex Sans';
+	font-style: normal;
+	font-weight: 100 700;
+	font-display: swap;
+	src: url('../fonts/IBMPlexSans-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: 'IBM Plex Sans';
+	font-style: normal;
+	font-weight: 100 700;
+	font-display: swap;
+	src: url('../fonts/IBMPlexSans-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../fonts/IBMPlexMono-400-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../fonts/IBMPlexMono-400-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('../fonts/IBMPlexMono-500-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('../fonts/IBMPlexMono-500-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+	--iv-font: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+	--iv-font-mono: 'IBM Plex Mono', 'Cascadia Mono', Consolas, monospace;
+
+	--iv-ink: #1c1b19;
+	--iv-sub: #55524d;
+	--iv-muted: #76736c;
+	--iv-faint: #a3a099;
+
+	--iv-page: #f7f7f5;
+	--iv-surface: #ffffff;
+	--iv-soft: #f1efeb;
+	--iv-head: #fbfaf8;
+
+	--iv-line: #e4e2dd;
+	--iv-hairline: #f1efeb;
+	--iv-field: #e0ddd7;
+
+	--iv-accent: #16554b;
+	--iv-accent-strong: #0f3f38;
+	--iv-accent-tint: #e8f0ed;
+	--iv-accent-line: #d5e0db;
+
+	--iv-ok: #1f6b4a;
+	--iv-ok-tint: #e4efe7;
+	--iv-warn: #7d5c14;
+	--iv-warn-tint: #f6efdc;
+	--iv-danger: #a8302a;
+	--iv-danger-tint: #f8e4e2;
+	--iv-danger-line: #edd6d3;
+
+	--iv-radius: 6px;
+	--iv-radius-lg: 8px;
+	--iv-control: 42px;
+	--iv-control-sm: 36px;
+	--iv-shadow: 0 18px 48px rgba(28, 27, 25, 0.22);
+}
+
+html, body {
+	font-family: var(--iv-font);
+	background: var(--iv-page);
+	color: var(--iv-ink);
+	font-size: 14px;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: var(--iv-ink);
+}
+
+h1 { font-size: 27px; }
+h2 { font-size: 23px; }
+h3 { font-size: 20px; }
+h4 { font-size: 17px; }
+h5 { font-size: 15px; }
+
+a, .btn-link { color: var(--iv-accent); }
+a:hover, .btn-link:hover { color: var(--iv-accent-strong); }
+
+hr { border-color: var(--iv-line); opacity: 1; }
+.text-muted { color: var(--iv-muted) !important; }
+
+/* Numbers line up in columns: invoice numbers, dates, amounts. */
+.iv-num {
+	font-family: var(--iv-font-mono);
+	font-variant-numeric: tabular-nums;
+}
+
+/* A small uppercase label above a group of fields or a table. */
+.iv-label {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--iv-muted);
+}
+
+/* Controls */
+.btn {
+	--bs-btn-border-radius: var(--iv-radius);
+	height: var(--iv-control);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 0 18px;
+	border-radius: var(--iv-radius);
+	font-size: 14px;
+	font-weight: 500;
+	white-space: nowrap;
+	transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.btn-sm {
+	height: var(--iv-control-sm);
+	padding: 0 14px;
+	font-size: 13px;
+	font-weight: 400;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+	box-shadow: 0 0 0 3px var(--iv-accent-tint);
+	border-color: var(--iv-accent);
+	outline: none;
+}
+
+.btn-primary, .btn-success {
+	background-color: var(--iv-accent);
+	border-color: var(--iv-accent);
+	color: #ffffff;
+}
+
+.btn-primary:hover, .btn-success:hover,
+.btn-primary:active, .btn-success:active {
+	background-color: var(--iv-accent-strong);
+	border-color: var(--iv-accent-strong);
+	color: #ffffff;
+}
+
+.btn-primary:disabled, .btn-success:disabled {
+	background-color: var(--iv-accent);
+	border-color: var(--iv-accent);
+	opacity: 0.55;
+}
+
+.btn-secondary, .btn-outline-secondary, .btn-outline-dark, .btn-outline-primary {
+	background-color: var(--iv-surface);
+	border: 1px solid var(--iv-field);
+	color: var(--iv-sub);
+}
+
+.btn-secondary:hover, .btn-outline-secondary:hover,
+.btn-outline-dark:hover, .btn-outline-primary:hover {
+	background-color: var(--iv-soft);
+	border-color: var(--iv-field);
+	color: var(--iv-ink);
+}
+
+.btn-outline-primary:active, .btn-outline-secondary:active,
+.btn-outline-secondary.active, .btn-check:checked + .btn-outline-secondary {
+	background-color: var(--iv-accent);
+	border-color: var(--iv-accent);
+	color: #ffffff;
+}
+
+.btn-danger, .btn-outline-danger {
+	background-color: var(--iv-surface);
+	border: 1px solid var(--iv-danger-line);
+	color: var(--iv-danger);
+}
+
+.btn-danger:hover, .btn-outline-danger:hover {
+	background-color: var(--iv-danger-tint);
+	border-color: var(--iv-danger-line);
+	color: var(--iv-danger);
+}
+
+.form-control, .form-select {
+	height: var(--iv-control);
+	padding: 0 12px;
+	background-color: var(--iv-surface);
+	border: 1px solid var(--iv-field);
+	border-radius: var(--iv-radius);
+	color: var(--iv-ink);
+	font-size: 14px;
+}
+
+textarea.form-control { height: auto; padding: 11px 12px; line-height: 1.5; }
+
+.form-control-sm, .form-select-sm {
+	height: 40px;
+	padding: 0 11px;
+	font-size: 13.5px;
+	border-radius: var(--iv-radius);
+}
+
+.form-control::placeholder { color: var(--iv-faint); }
+.form-control:disabled, .form-control[readonly] { background-color: var(--iv-page); color: var(--iv-sub); }
+
+.form-label, label.font-weight-bold {
+	margin-bottom: 6px;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--iv-sub);
+}
+
+.form-check-input { border-color: var(--iv-field); }
+.form-check-input:checked { background-color: var(--iv-accent); border-color: var(--iv-accent); }
+
+.input-group > .form-control:not(:last-child),
+.input-group > .form-select:not(:last-child) { border-right: 0; }
+
+/* Surfaces */
+.card {
+	background: var(--iv-surface);
+	border: 1px solid var(--iv-line);
+	border-radius: var(--iv-radius-lg);
+}
+
+.card + .card { margin-top: 0; }
+.shadow-sm { box-shadow: none !important; }
+
+.list-group-item { border-color: var(--iv-line); border-radius: var(--iv-radius-lg) !important; }
+
+.modal-content {
+	border: 0;
+	border-radius: var(--iv-radius-lg);
+	box-shadow: var(--iv-shadow);
+}
+
+.modal-header { padding: 18px 24px; border-bottom: 1px solid var(--iv-line); }
+.modal-title { font-size: 16px; font-weight: 600; }
+.modal-body { padding: 22px 24px; }
+
+.alert-danger {
+	background: var(--iv-danger-tint);
+	border-color: var(--iv-danger-line);
+	color: var(--iv-danger);
+	border-radius: var(--iv-radius);
+}
+
+.spinner-border { color: var(--iv-accent) !important; }
+
+.valid.modified:not([type=checkbox]) { outline: none; border-color: var(--iv-accent); }
+.invalid { outline: none; border-color: var(--iv-danger); }
+.validation-message { color: var(--iv-danger); font-size: 12px; }
