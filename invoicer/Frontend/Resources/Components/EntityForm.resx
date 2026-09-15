@@ -207,7 +207,7 @@
     <value>Is this your client?</value>
   </data>
   <data name="RegistrationTextPlaceholder" xml:space="preserve">
-    <value>e.g. Natural person registered in the Trade Register</value>
+    <value>e.g. An entitiy registered in the Trade Register</value>
   </data>
   <data name="SectionBasics" xml:space="preserve">
     <value>Basic details</value>
